@@ -3,7 +3,7 @@ import { ProgressBar } from "./ProgressBar";
 import { DadosPessoaisStep } from "./steps/DadosPessoaisStep";
 import { SegurancaStep } from "./steps/SegurancaStep";
 import { ClinicasStep } from "./steps/ClinicasStep";
-import { EspecificasStep } from "./steps/EspecificasStep";
+import { ConsentimentoStep } from "./steps/ConsentimentoStep";
 import { Summary } from "./Summary";
 import { QuestionnaireData, initialData } from "@/types/questionnaire";
 import { Stethoscope } from "lucide-react";
@@ -13,13 +13,7 @@ export function Questionnaire() {
   const [data, setData] = useState<QuestionnaireData>(initialData);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Skip specific questions step for 'outro' sex
-  const getTotalSteps = () => {
-    if (data.sexo === 'outro') return 3;
-    return 4;
-  };
-
-  const totalSteps = getTotalSteps();
+  const totalSteps = 4; // Dados Pessoais, Segurança, Clínicas, Consentimento
 
   const updateData = useCallback((updates: Partial<QuestionnaireData>) => {
     setData((prev) => ({ ...prev, ...updates }));
@@ -77,7 +71,7 @@ export function Questionnaire() {
         );
       case 4:
         return (
-          <EspecificasStep
+          <ConsentimentoStep
             data={data}
             updateData={updateData}
             onNext={handleNext}

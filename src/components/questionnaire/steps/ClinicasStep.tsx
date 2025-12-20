@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuestionnaireData } from "@/types/questionnaire";
 
 interface ClinicasStepProps {
@@ -21,7 +22,15 @@ const SINTOMAS_OPTIONS = [
 ];
 
 export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepProps) {
-  const canProceed = data.motivoExame.trim() !== '';
+  const isFeminino = data.sexo === 'feminino';
+  const isMasculino = data.sexo === 'masculino';
+
+  // Validate required fields including sex-specific ones
+  const baseValid = data.motivoExame.trim() !== '';
+  const femininoValid = !isFeminino || (data.cancerMama !== null && data.amamentando !== null);
+  const masculinoValid = !isMasculino || (data.problemaProstata !== null && data.dificuldadeUrinaria !== null);
+  
+  const canProceed = baseValid && femininoValid && masculinoValid;
 
   const handleSintomaChange = (sintomaId: string, checked: boolean) => {
     const newSintomas = checked
@@ -82,6 +91,96 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
             />
           )}
         </div>
+
+        {/* Perguntas específicas para mulheres */}
+        {isFeminino && (
+          <div className="space-y-6 pt-4 border-t border-border animate-fade-in">
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
+                Você já foi diagnosticada com câncer de mama?
+              </Label>
+              <RadioGroup
+                value={data.cancerMama === null ? '' : data.cancerMama ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ cancerMama: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="cancer-sim" />
+                  <Label htmlFor="cancer-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="cancer-nao" />
+                  <Label htmlFor="cancer-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
+                Você está em período de amamentação?
+              </Label>
+              <RadioGroup
+                value={data.amamentando === null ? '' : data.amamentando ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ amamentando: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="amamentando-sim" />
+                  <Label htmlFor="amamentando-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="amamentando-nao" />
+                  <Label htmlFor="amamentando-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        )}
+
+        {/* Perguntas específicas para homens */}
+        {isMasculino && (
+          <div className="space-y-6 pt-4 border-t border-border animate-fade-in">
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
+                Você tem histórico de problemas na próstata?
+              </Label>
+              <RadioGroup
+                value={data.problemaProstata === null ? '' : data.problemaProstata ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ problemaProstata: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="prostata-sim" />
+                  <Label htmlFor="prostata-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="prostata-nao" />
+                  <Label htmlFor="prostata-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
+                Você tem dificuldades urinárias ou histórico de infecção urinária?
+              </Label>
+              <RadioGroup
+                value={data.dificuldadeUrinaria === null ? '' : data.dificuldadeUrinaria ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ dificuldadeUrinaria: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="urinaria-sim" />
+                  <Label htmlFor="urinaria-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="urinaria-nao" />
+                  <Label htmlFor="urinaria-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        )}
       </div>
 
       <NavigationButtons
