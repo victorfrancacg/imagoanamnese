@@ -2,6 +2,57 @@ import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
 
+const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/ddd7a19f-0f74-464c-9dd8-b30d7ed6ddac";
+
+async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<void> {
+  try {
+    const webhookPayload = {
+      id: savedId,
+      timestamp: new Date().toISOString(),
+      paciente: {
+        nome: data.nome,
+        idade: data.idade,
+        sexo: data.sexo,
+        sexoOutro: data.sexoOutro || null,
+      },
+      respostas: {
+        temContraindicacao: data.temContraindicacao,
+        contraindicacaoDetalhes: data.contraindicacaoDetalhes || null,
+        tomografiaAnterior: data.tomografiaAnterior,
+        alergia: data.alergia,
+        alergiaDetalhes: data.alergiaDetalhes || null,
+        gravida: data.gravida,
+        motivoExame: data.motivoExame || null,
+        sintomas: data.sintomas,
+        sintomasOutros: data.sintomasOutros || null,
+        cancerMama: data.cancerMama,
+        amamentando: data.amamentando,
+        problemaProstata: data.problemaProstata,
+        dificuldadeUrinaria: data.dificuldadeUrinaria,
+      },
+      consentimento: {
+        aceitaRiscos: data.aceitaRiscos,
+        aceitaCompartilhamento: data.aceitaCompartilhamento,
+        assinatura: data.assinaturaData || null,
+      },
+    };
+
+    await fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(webhookPayload),
+      mode: "no-cors",
+    });
+
+    console.log("Dados enviados para n8n webhook com sucesso");
+  } catch (error) {
+    console.error("Erro ao enviar para webhook n8n:", error);
+    // Não bloqueia o fluxo principal se o webhook falhar
+  }
+}
+
 export async function saveQuestionario(data: QuestionnaireData): Promise<{ success: boolean; id?: string }> {
   try {
     const { data: result, error } = await supabase
@@ -40,6 +91,9 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       });
       return { success: false };
     }
+
+    // Enviar dados para o webhook n8n após salvar com sucesso
+    await sendToWebhook(data, result.id);
 
     toast({
       title: "Questionário salvo!",
