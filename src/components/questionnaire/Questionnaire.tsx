@@ -6,12 +6,15 @@ import { ClinicasStep } from "./steps/ClinicasStep";
 import { ConsentimentoStep } from "./steps/ConsentimentoStep";
 import { Summary } from "./Summary";
 import { QuestionnaireData, initialData } from "@/types/questionnaire";
+import { saveQuestionario } from "@/hooks/useQuestionarioSave";
 import { Stethoscope } from "lucide-react";
 
 export function Questionnaire() {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<QuestionnaireData>(initialData);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   const totalSteps = 4; // Dados Pessoais, Segurança, Clínicas, Consentimento
 
@@ -19,13 +22,21 @@ export function Questionnaire() {
     setData((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentStep === totalSteps) {
-      setIsCompleted(true);
+      // Save to database when completing the questionnaire
+      setIsSaving(true);
+      const result = await saveQuestionario(data);
+      setIsSaving(false);
+      
+      if (result.success) {
+        setSavedId(result.id || null);
+        setIsCompleted(true);
+      }
     } else {
       setCurrentStep((prev) => prev + 1);
     }
-  }, [currentStep, totalSteps]);
+  }, [currentStep, totalSteps, data]);
 
   const handleBack = useCallback(() => {
     setCurrentStep((prev) => Math.max(1, prev - 1));
@@ -35,11 +46,12 @@ export function Questionnaire() {
     setData(initialData);
     setCurrentStep(1);
     setIsCompleted(false);
+    setSavedId(null);
   }, []);
 
   const renderStep = () => {
     if (isCompleted) {
-      return <Summary data={data} onReset={handleReset} />;
+      return <Summary data={data} onReset={handleReset} savedId={savedId} />;
     }
 
     switch (currentStep) {
@@ -76,6 +88,7 @@ export function Questionnaire() {
             updateData={updateData}
             onNext={handleNext}
             onBack={handleBack}
+            isSaving={isSaving}
           />
         );
       default:
