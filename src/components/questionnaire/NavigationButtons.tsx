@@ -7,6 +7,7 @@ interface NavigationButtonsProps {
   showBack?: boolean;
   isLastStep?: boolean;
   disabled?: boolean;
+  nextLabel?: string;
 }
 
 export function NavigationButtons({
@@ -15,7 +16,13 @@ export function NavigationButtons({
   showBack = true,
   isLastStep = false,
   disabled = false,
+  nextLabel,
 }: NavigationButtonsProps) {
+  const getButtonLabel = () => {
+    if (nextLabel) return nextLabel;
+    return isLastStep ? "Finalizar" : "Próximo";
+  };
+
   return (
     <div className="flex justify-between gap-4 mt-8">
       {showBack && onBack ? (
@@ -35,16 +42,11 @@ export function NavigationButtons({
         disabled={disabled}
         className="flex items-center gap-2 px-8 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity shadow-md"
       >
+        {getButtonLabel()}
         {isLastStep ? (
-          <>
-            Finalizar
-            <Check className="w-4 h-4" />
-          </>
+          <Check className="w-4 h-4" />
         ) : (
-          <>
-            Próximo
-            <ChevronRight className="w-4 h-4" />
-          </>
+          <ChevronRight className="w-4 h-4" />
         )}
       </Button>
     </div>

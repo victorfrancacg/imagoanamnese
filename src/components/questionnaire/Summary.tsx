@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 interface SummaryProps {
   data: QuestionnaireData;
   onReset: () => void;
+  savedId?: string | null;
 }
 
 const SINTOMAS_LABELS: Record<string, string> = {
@@ -43,7 +44,7 @@ function SummaryItem({ label, value, highlight }: { label: string; value: string
   );
 }
 
-export function Summary({ data, onReset }: SummaryProps) {
+export function Summary({ data, onReset, savedId }: SummaryProps) {
   const sexoLabel = data.sexo === 'masculino' 
     ? 'Masculino' 
     : data.sexo === 'feminino' 

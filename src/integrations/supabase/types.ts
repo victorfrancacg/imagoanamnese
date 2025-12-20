@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      questionarios: {
+        Row: {
+          aceita_compartilhamento: boolean
+          aceita_riscos: boolean
+          alergia: boolean | null
+          alergia_detalhes: string | null
+          amamentando: boolean | null
+          assinatura_data: string | null
+          cancer_mama: boolean | null
+          contraindicacao_detalhes: string | null
+          created_at: string
+          dificuldade_urinaria: boolean | null
+          gravida: boolean | null
+          id: string
+          idade: number | null
+          motivo_exame: string | null
+          nome: string
+          problema_prostata: boolean | null
+          sexo: string | null
+          sexo_outro: string | null
+          sintomas: string[] | null
+          sintomas_outros: string | null
+          tem_contraindicacao: boolean | null
+          tomografia_anterior: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          aceita_compartilhamento: boolean
+          aceita_riscos: boolean
+          alergia?: boolean | null
+          alergia_detalhes?: string | null
+          amamentando?: boolean | null
+          assinatura_data?: string | null
+          cancer_mama?: boolean | null
+          contraindicacao_detalhes?: string | null
+          created_at?: string
+          dificuldade_urinaria?: boolean | null
+          gravida?: boolean | null
+          id?: string
+          idade?: number | null
+          motivo_exame?: string | null
+          nome: string
+          problema_prostata?: boolean | null
+          sexo?: string | null
+          sexo_outro?: string | null
+          sintomas?: string[] | null
+          sintomas_outros?: string | null
+          tem_contraindicacao?: boolean | null
+          tomografia_anterior?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          aceita_compartilhamento?: boolean
+          aceita_riscos?: boolean
+          alergia?: boolean | null
+          alergia_detalhes?: string | null
+          amamentando?: boolean | null
+          assinatura_data?: string | null
+          cancer_mama?: boolean | null
+          contraindicacao_detalhes?: string | null
+          created_at?: string
+          dificuldade_urinaria?: boolean | null
+          gravida?: boolean | null
+          id?: string
+          idade?: number | null
+          motivo_exame?: string | null
+          nome?: string
+          problema_prostata?: boolean | null
+          sexo?: string | null
+          sexo_outro?: string | null
+          sintomas?: string[] | null
+          sintomas_outros?: string | null
+          tem_contraindicacao?: boolean | null
+          tomografia_anterior?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -12,9 +12,10 @@ interface ConsentimentoStepProps {
   updateData: (updates: Partial<QuestionnaireData>) => void;
   onNext: () => void;
   onBack: () => void;
+  isSaving?: boolean;
 }
 
-export function ConsentimentoStep({ data, updateData, onNext, onBack }: ConsentimentoStepProps) {
+export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving = false }: ConsentimentoStepProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
@@ -244,7 +245,8 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack }: Consenti
         onBack={onBack}
         onNext={onNext}
         isLastStep
-        disabled={!canProceed}
+        disabled={!canProceed || isSaving}
+        nextLabel={isSaving ? "Salvando..." : undefined}
       />
     </QuestionCard>
   );
