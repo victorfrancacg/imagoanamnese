@@ -27,6 +27,11 @@ export interface QuestionnaireData {
   // Perguntas Específicas - Masculino
   problemaProstata: boolean | null;
   dificuldadeUrinaria: boolean | null;
+
+  // Termo de Consentimento
+  aceitaRiscos: boolean | null;
+  aceitaCompartilhamento: boolean | null;
+  assinaturaData: string;
 }
 
 export const initialData: QuestionnaireData = {
@@ -47,4 +52,7 @@ export const initialData: QuestionnaireData = {
   amamentando: null,
   problemaProstata: null,
   dificuldadeUrinaria: null,
+  aceitaRiscos: null,
+  aceitaCompartilhamento: null,
+  assinaturaData: '',
 };
