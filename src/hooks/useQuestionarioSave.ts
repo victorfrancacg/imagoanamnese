@@ -1,11 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
+import { generateQuestionnaireHTML } from "@/components/questionnaire/Summary";
 
 const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/ddd7a19f-0f74-464c-9dd8-b30d7ed6ddac";
 
 async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<void> {
   try {
+    // Gera o HTML do questionário
+    const htmlContent = generateQuestionnaireHTML(data);
+
     const webhookPayload = {
       id: savedId,
       timestamp: new Date().toISOString(),
@@ -15,6 +19,7 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<
         sexo: data.sexo,
         sexoOutro: data.sexoOutro || null,
       },
+      html: htmlContent,
       respostas: {
         temContraindicacao: data.temContraindicacao,
         contraindicacaoDetalhes: data.contraindicacaoDetalhes || null,
@@ -46,7 +51,7 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<
       mode: "no-cors",
     });
 
-    console.log("Dados enviados para n8n webhook com sucesso");
+    console.log("Dados e HTML enviados para n8n webhook com sucesso");
   } catch (error) {
     console.error("Erro ao enviar para webhook n8n:", error);
     // Não bloqueia o fluxo principal se o webhook falhar

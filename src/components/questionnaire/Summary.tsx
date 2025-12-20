@@ -1,7 +1,6 @@
 import { QuestionnaireData } from "@/types/questionnaire";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, User, Shield, Stethoscope, FileCheck, RotateCcw, Download } from "lucide-react";
-import jsPDF from "jspdf";
 
 interface SummaryProps {
   data: QuestionnaireData;
@@ -44,7 +43,7 @@ function SummaryItem({ label, value, highlight }: { label: string; value: string
   );
 }
 
-export function Summary({ data, onReset, savedId }: SummaryProps) {
+export function generateQuestionnaireHTML(data: QuestionnaireData): string {
   const sexoLabel = data.sexo === 'masculino' 
     ? 'Masculino' 
     : data.sexo === 'feminino' 
@@ -59,135 +58,250 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
         : SINTOMAS_LABELS[s] || s).join(', ')
     : 'Nenhum sintoma selecionado';
 
-  const generatePDF = () => {
-    const pdf = new jsPDF();
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    let yPosition = 20;
-    const lineHeight = 7;
-    const marginLeft = 20;
-    const maxWidth = pageWidth - 40;
+  const currentDate = new Date().toLocaleDateString('pt-BR');
 
-    // Header
-    pdf.setFontSize(18);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Questionário Clínico', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 8;
-    
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('Exame de Tomografia Computadorizada', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 15;
-
-    // Date
-    pdf.setFontSize(10);
-    pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, marginLeft, yPosition);
-    yPosition += 15;
-
-    // Helper function to add section
-    const addSection = (title: string) => {
-      if (yPosition > 260) {
-        pdf.addPage();
-        yPosition = 20;
-      }
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(title, marginLeft, yPosition);
-      yPosition += 10;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-    };
-
-    // Helper function to add item
-    const addItem = (label: string, value: string) => {
-      if (yPosition > 270) {
-        pdf.addPage();
-        yPosition = 20;
-      }
-      pdf.text(`${label}: ${value}`, marginLeft, yPosition);
-      yPosition += lineHeight;
-    };
-
-    // Dados Pessoais
-    addSection('Dados Pessoais');
-    addItem('Nome', data.nome || '-');
-    addItem('Idade', data.idade ? `${data.idade} anos` : '-');
-    addItem('Sexo', sexoLabel);
-    yPosition += 5;
-
-    // Questões de Segurança
-    addSection('Questões de Segurança');
-    addItem('Contraindicação', formatBoolean(data.temContraindicacao));
-    if (data.temContraindicacao && data.contraindicacaoDetalhes) {
-      addItem('Detalhes da contraindicação', data.contraindicacaoDetalhes);
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questionário Clínico - ${data.nome}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    addItem('Tomografia anterior (12 meses)', formatBoolean(data.tomografiaAnterior));
-    addItem('Alergia a contraste', formatBoolean(data.alergia));
-    if (data.alergia && data.alergiaDetalhes) {
-      addItem('Detalhes da alergia', data.alergiaDetalhes);
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #333;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
     }
-    if (data.sexo === 'feminino') {
-      addItem('Gravidez', formatBoolean(data.gravida));
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #0066cc;
     }
-    yPosition += 5;
-
-    // Questões Clínicas
-    addSection('Questões Clínicas');
-    addItem('Motivo do Exame', data.motivoExame || '-');
-    
-    // Handle long symptoms text
-    const sintomasText = sintomasLabel;
-    const splitSintomas = pdf.splitTextToSize(`Sintomas: ${sintomasText}`, maxWidth);
-    pdf.text(splitSintomas, marginLeft, yPosition);
-    yPosition += splitSintomas.length * lineHeight;
-    
-    // Sex-specific questions
-    if (data.sexo === 'feminino') {
-      yPosition += 3;
-      addItem('Diagnóstico de câncer de mama', formatBoolean(data.cancerMama));
-      addItem('Amamentação', formatBoolean(data.amamentando));
+    .header h1 {
+      font-size: 24px;
+      color: #0066cc;
+      margin-bottom: 8px;
     }
-    if (data.sexo === 'masculino') {
-      yPosition += 3;
-      addItem('Problemas na próstata', formatBoolean(data.problemaProstata));
-      addItem('Dificuldades urinárias', formatBoolean(data.dificuldadeUrinaria));
+    .header p {
+      font-size: 14px;
+      color: #666;
     }
-    yPosition += 5;
-
-    // Termo de Consentimento
-    addSection('Termo de Consentimento');
-    addItem('Aceita riscos do exame', formatBoolean(data.aceitaRiscos));
-    addItem('Autoriza compartilhamento de dados', formatBoolean(data.aceitaCompartilhamento));
-    yPosition += 10;
-
-    // Assinatura
-    if (data.assinaturaData) {
-      if (yPosition > 220) {
-        pdf.addPage();
-        yPosition = 20;
-      }
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Assinatura do Paciente:', marginLeft, yPosition);
-      yPosition += 5;
-      
-      try {
-        pdf.addImage(data.assinaturaData, 'PNG', marginLeft, yPosition, 60, 30);
-        yPosition += 35;
-      } catch (e) {
-        console.error('Error adding signature to PDF:', e);
-      }
+    .date {
+      text-align: right;
+      color: #666;
+      margin-bottom: 20px;
     }
+    .section {
+      margin-bottom: 25px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #0066cc;
+      margin-bottom: 12px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ddd;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .item-label {
+      color: #666;
+    }
+    .item-value {
+      font-weight: 500;
+      color: #333;
+    }
+    .item-value.highlight {
+      color: #dc3545;
+      font-weight: bold;
+    }
+    .signature-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #0066cc;
+    }
+    .signature-label {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .signature-image {
+      max-width: 200px;
+      max-height: 80px;
+      border: 1px solid #ddd;
+      padding: 5px;
+      background: #fafafa;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      font-size: 10px;
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Questionário Clínico</h1>
+    <p>Exame de Tomografia Computadorizada</p>
+  </div>
 
-    // Footer
-    yPosition += 10;
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'italic');
-    pdf.text('Documento gerado automaticamente pelo sistema de questionário clínico.', marginLeft, yPosition);
+  <p class="date">Data: ${currentDate}</p>
 
-    // Save PDF
-    const fileName = `questionario_${data.nome.replace(/\s+/g, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`;
-    pdf.save(fileName);
-  };
+  <div class="section">
+    <h2 class="section-title">Dados Pessoais</h2>
+    <div class="item">
+      <span class="item-label">Nome</span>
+      <span class="item-value">${data.nome || '-'}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Idade</span>
+      <span class="item-value">${data.idade ? `${data.idade} anos` : '-'}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Sexo</span>
+      <span class="item-value">${sexoLabel}</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Questões de Segurança</h2>
+    <div class="item">
+      <span class="item-label">Contraindicação</span>
+      <span class="item-value${data.temContraindicacao ? ' highlight' : ''}">${formatBoolean(data.temContraindicacao)}</span>
+    </div>
+    ${data.temContraindicacao && data.contraindicacaoDetalhes ? `
+    <div class="item">
+      <span class="item-label">Detalhes da contraindicação</span>
+      <span class="item-value">${data.contraindicacaoDetalhes}</span>
+    </div>
+    ` : ''}
+    <div class="item">
+      <span class="item-label">Tomografia anterior (12 meses)</span>
+      <span class="item-value">${formatBoolean(data.tomografiaAnterior)}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Alergia a contraste</span>
+      <span class="item-value${data.alergia ? ' highlight' : ''}">${formatBoolean(data.alergia)}</span>
+    </div>
+    ${data.alergia && data.alergiaDetalhes ? `
+    <div class="item">
+      <span class="item-label">Detalhes da alergia</span>
+      <span class="item-value">${data.alergiaDetalhes}</span>
+    </div>
+    ` : ''}
+    ${data.sexo === 'feminino' ? `
+    <div class="item">
+      <span class="item-label">Gravidez</span>
+      <span class="item-value${data.gravida ? ' highlight' : ''}">${formatBoolean(data.gravida)}</span>
+    </div>
+    ` : ''}
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Questões Clínicas</h2>
+    <div class="item">
+      <span class="item-label">Motivo do Exame</span>
+      <span class="item-value">${data.motivoExame || '-'}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Sintomas</span>
+      <span class="item-value">${sintomasLabel}</span>
+    </div>
+    ${data.sexo === 'feminino' ? `
+    <div class="item">
+      <span class="item-label">Diagnóstico de câncer de mama</span>
+      <span class="item-value${data.cancerMama ? ' highlight' : ''}">${formatBoolean(data.cancerMama)}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Amamentação</span>
+      <span class="item-value">${formatBoolean(data.amamentando)}</span>
+    </div>
+    ` : ''}
+    ${data.sexo === 'masculino' ? `
+    <div class="item">
+      <span class="item-label">Problemas na próstata</span>
+      <span class="item-value${data.problemaProstata ? ' highlight' : ''}">${formatBoolean(data.problemaProstata)}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Dificuldades urinárias</span>
+      <span class="item-value${data.dificuldadeUrinaria ? ' highlight' : ''}">${formatBoolean(data.dificuldadeUrinaria)}</span>
+    </div>
+    ` : ''}
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Termo de Consentimento</h2>
+    <div class="item">
+      <span class="item-label">Aceita riscos do exame</span>
+      <span class="item-value">${formatBoolean(data.aceitaRiscos)}</span>
+    </div>
+    <div class="item">
+      <span class="item-label">Autoriza compartilhamento de dados</span>
+      <span class="item-value">${formatBoolean(data.aceitaCompartilhamento)}</span>
+    </div>
+  </div>
+
+  ${data.assinaturaData ? `
+  <div class="signature-section">
+    <p class="signature-label">Assinatura do Paciente:</p>
+    <img src="${data.assinaturaData}" alt="Assinatura do paciente" class="signature-image" />
+  </div>
+  ` : ''}
+
+  <div class="footer">
+    Documento gerado automaticamente pelo sistema de questionário clínico.
+  </div>
+</body>
+</html>`;
+}
+
+function downloadHTML(data: QuestionnaireData) {
+  const html = generateQuestionnaireHTML(data);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `questionario_${data.nome.replace(/\s+/g, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.html`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export function Summary({ data, onReset, savedId }: SummaryProps) {
+  const sexoLabel = data.sexo === 'masculino' 
+    ? 'Masculino' 
+    : data.sexo === 'feminino' 
+    ? 'Feminino' 
+    : data.sexo === 'outro' 
+    ? `Outro: ${data.sexoOutro}` 
+    : '-';
+
+  const sintomasLabel = data.sintomas.length > 0
+    ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
+        ? `Outros: ${data.sintomasOutros}` 
+        : SINTOMAS_LABELS[s] || s).join(', ')
+    : 'Nenhum sintoma selecionado';
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-up">
@@ -297,11 +411,11 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
           Novo Questionário
         </Button>
         <Button
-          onClick={generatePDF}
+          onClick={() => downloadHTML(data)}
           className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow"
         >
           <Download className="w-4 h-4" />
-          Salvar Questionário
+          Baixar HTML
         </Button>
       </div>
     </div>
