@@ -1,17 +1,6 @@
 import jsPDF from "jspdf";
 import { QuestionnaireData } from "@/types/questionnaire";
 
-// Sintomas apenas para mamografia
-const SINTOMAS_LABELS: Record<string, string> = {
-  // Mamografia
-  'nodulo': 'Nódulo palpável',
-  'dor-mama': 'Dor na mama',
-  'secrecao': 'Secreção mamilar',
-  'alteracao-pele': 'Alteração na pele da mama',
-  'historico-familiar': 'Histórico familiar de câncer de mama',
-  // Comum
-  'outros': 'Outros',
-};
 
 function formatBoolean(value: boolean | null): string {
   if (value === null) return '-';
@@ -64,6 +53,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   };
 
   const isDensitometria = data.tipoExame === 'densitometria';
+  const isMamografia = data.tipoExame === 'mamografia';
   const isFeminino = data.sexo === 'feminino';
 
   // Header
@@ -188,14 +178,42 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
 
   addRow(isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame", data.motivoExame || '-');
   
-  // Sintomas apenas para mamografia
-  if (data.tipoExame === 'mamografia') {
-    const sintomasLabel = data.sintomas.length > 0
-      ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
-          ? `Outros: ${data.sintomasOutros}` 
-          : SINTOMAS_LABELS[s] || s).join(', ')
-      : 'Nenhum sintoma selecionado';
-    addRow("Sintomas", sintomasLabel);
+  // Campos específicos de Mamografia
+  if (isMamografia) {
+    addRow("Exame anterior", formatBoolean(data.mamoExameAnterior));
+    if (data.mamoExameAnterior && data.mamoExameAnteriorDetalhes) {
+      addRow("Quando realizou", data.mamoExameAnteriorDetalhes);
+    }
+    addRow("Última menstruação", data.mamoUltimaMenstruacao || '-');
+    addRow("Na menopausa", formatBoolean(data.mamoMenopausa));
+    if (data.mamoMenopausa && data.mamoMenopausaDetalhes) {
+      addRow("Idade menopausa", data.mamoMenopausaDetalhes);
+    }
+    addRow("Usa hormônios", formatBoolean(data.mamoUsaHormonios));
+    addRow("Tem filhos", formatBoolean(data.mamoTemFilhos));
+    if (data.mamoTemFilhos && data.mamoTemFilhosDetalhes) {
+      addRow("Amamentação", data.mamoTemFilhosDetalhes);
+    }
+    addRow("Problema nas mamas", formatBoolean(data.mamoProblemaMamas), data.mamoProblemaMamas === true);
+    if (data.mamoProblemaMamas && data.mamoProblemaMamasDetalhes) {
+      addRow("Detalhes problema", data.mamoProblemaMamasDetalhes);
+    }
+    addRow("Cirurgia nas mamas", formatBoolean(data.mamoCirurgiaMamas));
+    if (data.mamoCirurgiaMamas && data.mamoCirurgiaMamasDetalhes) {
+      addRow("Detalhes cirurgia", data.mamoCirurgiaMamasDetalhes);
+    }
+    addRow("Ultrassonografia mama", formatBoolean(data.mamoUltrassonografia));
+    if (data.mamoUltrassonografia && data.mamoUltrassonografiaDetalhes) {
+      addRow("Quando realizou", data.mamoUltrassonografiaDetalhes);
+    }
+    addRow("Histórico familiar câncer mama/ovário", formatBoolean(data.mamoHistoricoFamiliar), data.mamoHistoricoFamiliar === true);
+    if (data.mamoHistoricoFamiliar && data.mamoHistoricoFamiliarDetalhes) {
+      addRow("Quais parentes", data.mamoHistoricoFamiliarDetalhes);
+    }
+    addRow("Radioterapia mama", formatBoolean(data.mamoRadioterapia), data.mamoRadioterapia === true);
+    if (data.mamoRadioterapia && data.mamoRadioterapiaDetalhes) {
+      addRow("Ano radioterapia", data.mamoRadioterapiaDetalhes);
+    }
   }
   
   // Campos específicos de Tomografia e Ressonância (Clínicas)
@@ -258,14 +276,9 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     }
   }
   
-  // Amamentando apenas para tomografia e mamografia (removido de ressonância)
-  if (data.sexo === 'feminino' && (data.tipoExame === 'tomografia' || data.tipoExame === 'mamografia')) {
+  // Amamentando apenas para tomografia
+  if (data.sexo === 'feminino' && data.tipoExame === 'tomografia') {
     addRow("Amamentação", formatBoolean(data.amamentando));
-  }
-  
-  // Câncer de mama apenas para mamografia
-  if (data.sexo === 'feminino' && data.tipoExame === 'mamografia') {
-    addRow("Diagnóstico de câncer de mama", formatBoolean(data.cancerMama), data.cancerMama === true);
   }
   
   if (data.sexo === 'masculino' && (data.tipoExame === 'tomografia' || data.tipoExame === 'ressonancia')) {

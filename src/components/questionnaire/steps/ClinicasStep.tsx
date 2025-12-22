@@ -14,20 +14,13 @@ interface ClinicasStepProps {
   onBack: () => void;
 }
 
-const SINTOMAS_MAMOGRAFIA = [
-  { id: 'nodulo', label: 'Nódulo palpável' },
-  { id: 'dor-mama', label: 'Dor na mama' },
-  { id: 'secrecao', label: 'Secreção mamilar' },
-  { id: 'alteracao-pele', label: 'Alteração na pele da mama' },
-  { id: 'historico-familiar', label: 'Histórico familiar de câncer de mama' },
-  { id: 'outros', label: 'Outros' },
-];
 
 export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepProps) {
   const tipoExame = data.tipoExame;
   const isFeminino = data.sexo === 'feminino';
   const isMasculino = data.sexo === 'masculino';
   const isDensitometria = tipoExame === 'densitometria';
+  const isMamografia = tipoExame === 'mamografia';
 
   // Novas perguntas específicas para Tomografia e Ressonância
   const showTraumaRegiao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
@@ -35,19 +28,13 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const showHistoricoCancer = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const showExamesRelacionados = tipoExame === 'ressonancia';
 
-  // Sintomas apenas para mamografia
-  const sintomasOptions = tipoExame === 'mamografia' ? SINTOMAS_MAMOGRAFIA : [];
-  const showSintomas = tipoExame === 'mamografia' && sintomasOptions.length > 0;
-
   // Perguntas específicas por sexo e tipo de exame
-  const showCancerMama = isFeminino && tipoExame === 'mamografia';
-  const showAmamentando = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
+  const showAmamentando = isFeminino && tipoExame === 'tomografia';
   const showProstata = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
 
   // Validate required fields
   const baseValid = data.motivoExame.trim() !== '';
-  const femininoValid = !showCancerMama || data.cancerMama !== null;
   const amamentandoValid = !showAmamentando || data.amamentando !== null;
   const masculinoValid = !showProstata || data.problemaProstata !== null;
   const urinariaValid = !showDificuldadeUrinaria || data.dificuldadeUrinaria !== null;
@@ -89,17 +76,32 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
     (!data.fezHisterectomia || (data.fezHisterectomiaDetalhes?.trim() ?? '') !== '') &&
     data.retirouOvarios !== null
   );
-  
-  const canProceed = baseValid && femininoValid && amamentandoValid && masculinoValid && urinariaValid && 
-                     traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid &&
-                     examesRelacionadosValid && examesRelacionadosDetalhesValid && densitometriaValid && densitometriaFemininoValid;
 
-  const handleSintomaChange = (sintomaId: string, checked: boolean) => {
-    const newSintomas = checked
-      ? [...data.sintomas, sintomaId]
-      : data.sintomas.filter((s) => s !== sintomaId);
-    updateData({ sintomas: newSintomas });
-  };
+  // Validações Mamografia
+  const mamografiaValid = !isMamografia || (
+    data.mamoExameAnterior !== null &&
+    (!data.mamoExameAnterior || (data.mamoExameAnteriorDetalhes?.trim() ?? '') !== '') &&
+    data.mamoUltimaMenstruacao.trim() !== '' &&
+    data.mamoMenopausa !== null &&
+    (!data.mamoMenopausa || (data.mamoMenopausaDetalhes?.trim() ?? '') !== '') &&
+    data.mamoUsaHormonios !== null &&
+    data.mamoTemFilhos !== null &&
+    (!data.mamoTemFilhos || (data.mamoTemFilhosDetalhes?.trim() ?? '') !== '') &&
+    data.mamoProblemaMamas !== null &&
+    (!data.mamoProblemaMamas || (data.mamoProblemaMamasDetalhes?.trim() ?? '') !== '') &&
+    data.mamoCirurgiaMamas !== null &&
+    (!data.mamoCirurgiaMamas || (data.mamoCirurgiaMamasDetalhes?.trim() ?? '') !== '') &&
+    data.mamoUltrassonografia !== null &&
+    (!data.mamoUltrassonografia || (data.mamoUltrassonografiaDetalhes?.trim() ?? '') !== '') &&
+    data.mamoHistoricoFamiliar !== null &&
+    (!data.mamoHistoricoFamiliar || (data.mamoHistoricoFamiliarDetalhes?.trim() ?? '') !== '') &&
+    data.mamoRadioterapia !== null &&
+    (!data.mamoRadioterapia || (data.mamoRadioterapiaDetalhes?.trim() ?? '') !== '')
+  );
+  
+  const canProceed = baseValid && amamentandoValid && masculinoValid && urinariaValid && 
+                     traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid &&
+                     examesRelacionadosValid && examesRelacionadosDetalhesValid && densitometriaValid && densitometriaFemininoValid && mamografiaValid;
 
   const getMotivoLabel = () => {
     if (tipoExame === 'densitometria') {
@@ -142,41 +144,269 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
           />
         </div>
 
-        {/* Sintomas - apenas para mamografia */}
-        {showSintomas && (
-          <div className="space-y-4">
-            <Label className="text-base font-medium">
-              Sintomas Relacionados (selecione todos que se aplicam)
-            </Label>
-            <div className="space-y-3">
-              {sintomasOptions.map((sintoma) => (
-                <div
-                  key={sintoma.id}
-                  className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => handleSintomaChange(sintoma.id, !data.sintomas.includes(sintoma.id))}
-                >
-                  <Checkbox
-                    id={sintoma.id}
-                    checked={data.sintomas.includes(sintoma.id)}
-                    onCheckedChange={(checked) => handleSintomaChange(sintoma.id, checked as boolean)}
-                  />
-                  <Label htmlFor={sintoma.id} className="cursor-pointer flex-1">
-                    {sintoma.label}
-                  </Label>
+        {/* Perguntas específicas para Mamografia */}
+        {isMamografia && (
+          <>
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Já realizou este exame anteriormente? Se sim, quando?
+              </Label>
+              <RadioGroup
+                value={data.mamoExameAnterior === null ? '' : data.mamoExameAnterior ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoExameAnterior: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-anterior-sim" />
+                  <Label htmlFor="mamo-anterior-sim" className="cursor-pointer">Sim</Label>
                 </div>
-              ))}
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-anterior-nao" />
+                  <Label htmlFor="mamo-anterior-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoExameAnterior && (
+                <Input
+                  type="text"
+                  placeholder="Por favor, informe quando realizou"
+                  value={data.mamoExameAnteriorDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoExameAnteriorDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in h-12 text-base"
+                />
+              )}
             </div>
 
-            {data.sintomas.includes('outros') && (
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Em qual data foi sua última menstruação?
+              </Label>
               <Input
                 type="text"
-                placeholder="Por favor, especifique outros sintomas"
-                value={data.sintomasOutros ?? ''}
-                onChange={(e) => updateData({ sintomasOutros: e.target.value })}
-                className="h-12 text-base animate-fade-in"
+                placeholder="Ex: 15/12/2024 ou há 2 semanas"
+                value={data.mamoUltimaMenstruacao}
+                onChange={(e) => updateData({ mamoUltimaMenstruacao: e.target.value })}
+                className="h-12 text-base"
               />
-            )}
-          </div>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Está na menopausa? Se sim, entrou com que idade?
+              </Label>
+              <RadioGroup
+                value={data.mamoMenopausa === null ? '' : data.mamoMenopausa ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoMenopausa: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-menopausa-sim" />
+                  <Label htmlFor="mamo-menopausa-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-menopausa-nao" />
+                  <Label htmlFor="mamo-menopausa-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoMenopausa && (
+                <Input
+                  type="text"
+                  placeholder="Por favor, informe a idade"
+                  value={data.mamoMenopausaDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoMenopausaDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in h-12 text-base"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">Faz uso de hormônios?</Label>
+              <RadioGroup
+                value={data.mamoUsaHormonios === null ? '' : data.mamoUsaHormonios ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoUsaHormonios: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-hormonios-sim" />
+                  <Label htmlFor="mamo-hormonios-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-hormonios-nao" />
+                  <Label htmlFor="mamo-hormonios-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você tem filhos? Se sim, amamentou?
+              </Label>
+              <RadioGroup
+                value={data.mamoTemFilhos === null ? '' : data.mamoTemFilhos ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoTemFilhos: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-filhos-sim" />
+                  <Label htmlFor="mamo-filhos-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-filhos-nao" />
+                  <Label htmlFor="mamo-filhos-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoTemFilhos && (
+                <Input
+                  type="text"
+                  placeholder="Amamentou? Por quanto tempo?"
+                  value={data.mamoTemFilhosDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoTemFilhosDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in h-12 text-base"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você já teve ou tem algum problema nas mamas? Se sim, em qual?
+              </Label>
+              <RadioGroup
+                value={data.mamoProblemaMamas === null ? '' : data.mamoProblemaMamas ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoProblemaMamas: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-problema-sim" />
+                  <Label htmlFor="mamo-problema-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-problema-nao" />
+                  <Label htmlFor="mamo-problema-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoProblemaMamas && (
+                <Textarea
+                  placeholder="Por favor, descreva o problema e em qual mama"
+                  value={data.mamoProblemaMamasDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoProblemaMamasDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Já realizou alguma cirurgia nas mamas? Se sim, qual?
+              </Label>
+              <RadioGroup
+                value={data.mamoCirurgiaMamas === null ? '' : data.mamoCirurgiaMamas ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoCirurgiaMamas: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-cirurgia-sim" />
+                  <Label htmlFor="mamo-cirurgia-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-cirurgia-nao" />
+                  <Label htmlFor="mamo-cirurgia-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoCirurgiaMamas && (
+                <Textarea
+                  placeholder="Por favor, descreva qual cirurgia"
+                  value={data.mamoCirurgiaMamasDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoCirurgiaMamasDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Já realizou ultrassonografia de mama? Se sim, quando?
+              </Label>
+              <RadioGroup
+                value={data.mamoUltrassonografia === null ? '' : data.mamoUltrassonografia ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoUltrassonografia: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-ultra-sim" />
+                  <Label htmlFor="mamo-ultra-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-ultra-nao" />
+                  <Label htmlFor="mamo-ultra-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoUltrassonografia && (
+                <Input
+                  type="text"
+                  placeholder="Por favor, informe quando realizou"
+                  value={data.mamoUltrassonografiaDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoUltrassonografiaDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in h-12 text-base"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Há histórico familiar de câncer de mama ou de câncer de ovário? Se sim, qual ou quais parentes?
+              </Label>
+              <RadioGroup
+                value={data.mamoHistoricoFamiliar === null ? '' : data.mamoHistoricoFamiliar ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoHistoricoFamiliar: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-historico-sim" />
+                  <Label htmlFor="mamo-historico-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-historico-nao" />
+                  <Label htmlFor="mamo-historico-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoHistoricoFamiliar && (
+                <Textarea
+                  placeholder="Por favor, informe quais parentes"
+                  value={data.mamoHistoricoFamiliarDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoHistoricoFamiliarDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Já fez radioterapia na mama? Se sim, em que ano?
+              </Label>
+              <RadioGroup
+                value={data.mamoRadioterapia === null ? '' : data.mamoRadioterapia ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ mamoRadioterapia: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="mamo-radio-sim" />
+                  <Label htmlFor="mamo-radio-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="mamo-radio-nao" />
+                  <Label htmlFor="mamo-radio-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.mamoRadioterapia && (
+                <Input
+                  type="text"
+                  placeholder="Por favor, informe o ano"
+                  value={data.mamoRadioterapiaDetalhes ?? ''}
+                  onChange={(e) => updateData({ mamoRadioterapiaDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in h-12 text-base"
+                />
+              )}
+            </div>
+          </>
         )}
 
         {/* Perguntas específicas para Tomografia e Ressonância */}
@@ -636,52 +866,28 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
           </>
         )}
 
-        {/* Perguntas específicas para mulheres (mamografia) */}
-        {(showCancerMama || showAmamentando) && !isDensitometria && (
+        {/* Perguntas específicas para mulheres (tomografia) */}
+        {showAmamentando && !isDensitometria && !isMamografia && (
           <div className="space-y-6 pt-4 border-t border-border animate-fade-in">
-            {showCancerMama && (
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  Você já foi diagnosticada com câncer de mama?
-                </Label>
-                <RadioGroup
-                  value={data.cancerMama === null ? '' : data.cancerMama ? 'sim' : 'nao'}
-                  onValueChange={(value) => updateData({ cancerMama: value === 'sim' })}
-                  className="flex gap-4"
-                >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                    <RadioGroupItem value="sim" id="cancer-sim" />
-                    <Label htmlFor="cancer-sim" className="cursor-pointer">Sim</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                    <RadioGroupItem value="nao" id="cancer-nao" />
-                    <Label htmlFor="cancer-nao" className="cursor-pointer">Não</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            )}
-
-            {showAmamentando && (
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  Você está em período de amamentação?
-                </Label>
-                <RadioGroup
-                  value={data.amamentando === null ? '' : data.amamentando ? 'sim' : 'nao'}
-                  onValueChange={(value) => updateData({ amamentando: value === 'sim' })}
-                  className="flex gap-4"
-                >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                    <RadioGroupItem value="sim" id="amamentando-sim" />
-                    <Label htmlFor="amamentando-sim" className="cursor-pointer">Sim</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                    <RadioGroupItem value="nao" id="amamentando-nao" />
-                    <Label htmlFor="amamentando-nao" className="cursor-pointer">Não</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            )}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">
+                Você está em período de amamentação?
+              </Label>
+              <RadioGroup
+                value={data.amamentando === null ? '' : data.amamentando ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ amamentando: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="amamentando-sim" />
+                  <Label htmlFor="amamentando-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="amamentando-nao" />
+                  <Label htmlFor="amamentando-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
         )}
 
