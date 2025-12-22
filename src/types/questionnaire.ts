@@ -1,4 +1,5 @@
 export type Sex = 'masculino' | 'feminino';
+export type TipoExame = 'tomografia' | 'ressonancia' | 'densitometria' | 'mamografia';
 
 export interface QuestionnaireData {
   // Dados Pessoais
@@ -8,7 +9,7 @@ export interface QuestionnaireData {
   sexo: Sex | null;
   peso: number | null;
   altura: number | null;
-  tipoExame: string;
+  tipoExame: TipoExame | '';
   dataExame: string;
 
   // Questões de Segurança

@@ -9,6 +9,7 @@ interface DadosPessoaisStepProps {
   data: QuestionnaireData;
   updateData: (updates: Partial<QuestionnaireData>) => void;
   onNext: () => void;
+  onBack: () => void;
 }
 
 function formatCPF(value: string): string {
@@ -19,7 +20,7 @@ function formatCPF(value: string): string {
   return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
 }
 
-export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisStepProps) {
+export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPessoaisStepProps) {
   const canProceed = 
     data.nome.trim() !== '' && 
     data.cpf.replace(/\D/g, '').length === 11 &&
@@ -27,7 +28,6 @@ export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisSte
     data.sexo !== null &&
     data.peso !== null &&
     data.altura !== null &&
-    data.tipoExame.trim() !== '' &&
     data.dataExame !== '';
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,21 +134,7 @@ export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisSte
             />
           </div>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="tipoExame" className="text-base font-medium">
-            Tipo do Exame
-          </Label>
-          <Input
-            id="tipoExame"
-            type="text"
-            placeholder="Ex: Tomografia de Tórax"
-            value={data.tipoExame}
-            onChange={(e) => updateData({ tipoExame: e.target.value })}
-            className="h-12 text-base"
-          />
-        </div>
-
+        
         <div className="space-y-2">
           <Label htmlFor="dataExame" className="text-base font-medium">
             Data do Exame
@@ -164,8 +150,8 @@ export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisSte
       </div>
 
       <NavigationButtons
+        onBack={onBack}
         onNext={onNext}
-        showBack={false}
         disabled={!canProceed}
       />
     </QuestionCard>
