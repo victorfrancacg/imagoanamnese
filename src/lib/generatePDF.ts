@@ -1,10 +1,21 @@
 import jsPDF from "jspdf";
 import { QuestionnaireData } from "@/types/questionnaire";
 
+// Sintomas apenas para densitometria e mamografia
 const SINTOMAS_LABELS: Record<string, string> = {
-  'dor-peito': 'Dor no peito',
-  'dificuldade-respiratoria': 'Dificuldade respiratória',
-  'dor-abdominal': 'Dor abdominal',
+  // Densitometria
+  'fratura-recente': 'Fratura recente',
+  'dor-ossea': 'Dor óssea',
+  'perda-altura': 'Perda de altura',
+  'menopausa': 'Menopausa',
+  'uso-corticoides': 'Uso prolongado de corticoides',
+  // Mamografia
+  'nodulo': 'Nódulo palpável',
+  'dor-mama': 'Dor na mama',
+  'secrecao': 'Secreção mamilar',
+  'alteracao-pele': 'Alteração na pele da mama',
+  'historico-familiar': 'Histórico familiar de câncer de mama',
+  // Comum
   'outros': 'Outros',
 };
 
@@ -123,13 +134,30 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   if (data.temContraindicacao && data.contraindicacaoDetalhes) {
     addRow("Detalhes da contraindicação", data.contraindicacaoDetalhes);
   }
-  addRow("Tomografia anterior (12 meses)", formatBoolean(data.tomografiaAnterior));
+  
+  const exameAnteriorLabel = data.tipoExame === 'ressonancia' 
+    ? 'Ressonância anterior (12 meses)' 
+    : 'Tomografia anterior (12 meses)';
+  addRow(exameAnteriorLabel, formatBoolean(data.tomografiaAnterior));
   addRow("Alergia a contraste", formatBoolean(data.alergia), data.alergia === true);
   if (data.alergia && data.alergiaDetalhes) {
     addRow("Detalhes da alergia", data.alergiaDetalhes);
   }
   if (data.sexo === 'feminino') {
     addRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
+  }
+  
+  // Campos específicos de Tomografia (Segurança)
+  if (data.tipoExame === 'tomografia') {
+    addRow("Uso de metformina", formatBoolean(data.usaMetformina));
+    addRow("Cirurgia renal", formatBoolean(data.cirurgiaRenal), data.cirurgiaRenal === true);
+    if (data.cirurgiaRenal && data.cirurgiaRenalDetalhes) {
+      addRow("Detalhes cirurgia renal", data.cirurgiaRenalDetalhes);
+    }
+    addRow("Doença renal", formatBoolean(data.doencaRenal), data.doencaRenal === true);
+    if (data.doencaRenal && data.doencaRenalDetalhes) {
+      addRow("Detalhes doença renal", data.doencaRenalDetalhes);
+    }
   }
   yPos += 8;
 
@@ -140,20 +168,50 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   addLine(margin, pageWidth - margin, [221, 221, 221]);
   yPos += 8;
 
-  const sintomasLabel = data.sintomas.length > 0
-    ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
-        ? `Outros: ${data.sintomasOutros}` 
-        : SINTOMAS_LABELS[s] || s).join(', ')
-    : 'Nenhum sintoma selecionado';
-
   addRow("Motivo do Exame", data.motivoExame || '-');
-  addRow("Sintomas", sintomasLabel);
   
-  if (data.sexo === 'feminino') {
-    addRow("Diagnóstico de câncer de mama", formatBoolean(data.cancerMama), data.cancerMama === true);
+  // Sintomas apenas para densitometria e mamografia
+  if (data.tipoExame === 'densitometria' || data.tipoExame === 'mamografia') {
+    const sintomasLabel = data.sintomas.length > 0
+      ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
+          ? `Outros: ${data.sintomasOutros}` 
+          : SINTOMAS_LABELS[s] || s).join(', ')
+      : 'Nenhum sintoma selecionado';
+    addRow("Sintomas", sintomasLabel);
+  }
+  
+  // Campos específicos de Tomografia e Ressonância (Clínicas)
+  if (data.tipoExame === 'tomografia' || data.tipoExame === 'ressonancia') {
+    addRow("Trauma na região", formatBoolean(data.traumaRegiao), data.traumaRegiao === true);
+    addRow("Cirurgia no corpo", formatBoolean(data.cirurgiaCorpo));
+    if (data.cirurgiaCorpo && data.cirurgiaCorpoDetalhes) {
+      addRow("Detalhes cirurgia", data.cirurgiaCorpoDetalhes);
+    }
+    addRow("Histórico de câncer", formatBoolean(data.historicoCancer), data.historicoCancer === true);
+    if (data.historicoCancer && data.historicoCancerDetalhes) {
+      addRow("Detalhes câncer", data.historicoCancerDetalhes);
+    }
+  }
+  
+  // Campo específico de Ressonância
+  if (data.tipoExame === 'ressonancia') {
+    addRow("Exames relacionados", formatBoolean(data.examesRelacionados));
+    if (data.examesRelacionados && data.examesRelacionadosDetalhes) {
+      addRow("Detalhes exames", data.examesRelacionadosDetalhes);
+    }
+  }
+  
+  // Amamentando apenas para tomografia e mamografia (removido de ressonância)
+  if (data.sexo === 'feminino' && (data.tipoExame === 'tomografia' || data.tipoExame === 'mamografia')) {
     addRow("Amamentação", formatBoolean(data.amamentando));
   }
-  if (data.sexo === 'masculino') {
+  
+  // Câncer de mama apenas para mamografia
+  if (data.sexo === 'feminino' && data.tipoExame === 'mamografia') {
+    addRow("Diagnóstico de câncer de mama", formatBoolean(data.cancerMama), data.cancerMama === true);
+  }
+  
+  if (data.sexo === 'masculino' && (data.tipoExame === 'tomografia' || data.tipoExame === 'ressonancia')) {
     addRow("Problemas na próstata", formatBoolean(data.problemaProstata), data.problemaProstata === true);
     addRow("Dificuldades urinárias", formatBoolean(data.dificuldadeUrinaria), data.dificuldadeUrinaria === true);
   }
