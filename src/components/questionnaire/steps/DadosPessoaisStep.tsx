@@ -3,13 +3,6 @@ import { NavigationButtons } from "../NavigationButtons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format, parse } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import { QuestionnaireData, Sex } from "@/types/questionnaire";
 
 interface DadosPessoaisStepProps {
@@ -27,6 +20,52 @@ function formatCPF(value: string): string {
   return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
 }
 
+// Formata a data para exibição (dd/mm/yyyy)
+function formatDateInput(value: string): string {
+  const numbers = value.replace(/\D/g, '').slice(0, 8);
+  if (numbers.length <= 2) return numbers;
+  if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+  return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4)}`;
+}
+
+// Converte dd/mm/yyyy para yyyy-MM-dd (formato de armazenamento)
+function displayToStorage(displayDate: string): string {
+  const numbers = displayDate.replace(/\D/g, '');
+  if (numbers.length !== 8) return '';
+  const day = numbers.slice(0, 2);
+  const month = numbers.slice(2, 4);
+  const year = numbers.slice(4, 8);
+  return `${year}-${month}-${day}`;
+}
+
+// Converte yyyy-MM-dd para dd/mm/yyyy (formato de exibição)
+function storageToDisplay(storageDate: string): string {
+  if (!storageDate) return '';
+  const [year, month, day] = storageDate.split('-');
+  if (!year || !month || !day) return '';
+  return `${day}/${month}/${year}`;
+}
+
+// Valida se a data é válida
+function isValidDate(displayDate: string): boolean {
+  const numbers = displayDate.replace(/\D/g, '');
+  if (numbers.length !== 8) return false;
+  
+  const day = parseInt(numbers.slice(0, 2), 10);
+  const month = parseInt(numbers.slice(2, 4), 10);
+  const year = parseInt(numbers.slice(4, 8), 10);
+  
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  if (year < 1900 || year > 2100) return false;
+  
+  // Verificação mais precisa de dias por mês
+  const daysInMonth = new Date(year, month, 0).getDate();
+  if (day > daysInMonth) return false;
+  
+  return true;
+}
+
 export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPessoaisStepProps) {
   // Para mamografia, sexo é sempre feminino
   const isMamografia = data.tipoExame === 'mamografia';
@@ -36,38 +75,30 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
     updateData({ sexo: 'feminino' });
   }
 
+  const dataNascimentoDisplay = storageToDisplay(data.dataNascimento);
+  const dataExameDisplay = storageToDisplay(data.dataExame);
+
   const canProceed = 
     data.nome.trim() !== '' && 
     data.cpf.replace(/\D/g, '').length === 11 &&
     data.dataNascimento !== '' && 
+    isValidDate(dataNascimentoDisplay) &&
     (isMamografia || data.sexo !== null) &&
     data.peso !== null &&
     data.altura !== null &&
-    data.dataExame !== '';
+    data.dataExame !== '' &&
+    isValidDate(dataExameDisplay);
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
     updateData({ cpf: formatted });
   };
 
-  // Convert string date (yyyy-MM-dd) to Date object
-  const parseDate = (dateString: string): Date | undefined => {
-    if (!dateString) return undefined;
-    try {
-      return parse(dateString, 'yyyy-MM-dd', new Date());
-    } catch {
-      return undefined;
-    }
+  const handleDateChange = (field: 'dataNascimento' | 'dataExame') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatDateInput(e.target.value);
+    const storageFormat = displayToStorage(formatted);
+    updateData({ [field]: storageFormat || formatted.replace(/\D/g, '') });
   };
-
-  // Convert Date object to string (yyyy-MM-dd) for storage
-  const formatDateForStorage = (date: Date | undefined): string => {
-    if (!date) return '';
-    return format(date, 'yyyy-MM-dd');
-  };
-
-  const dataNascimentoDate = parseDate(data.dataNascimento);
-  const dataExameDate = parseDate(data.dataExame);
 
   return (
     <QuestionCard
@@ -104,40 +135,18 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
         </div>
 
         <div className="space-y-2">
-          <Label className="text-base font-medium">
+          <Label htmlFor="dataNascimento" className="text-base font-medium">
             Data de Nascimento
           </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full h-12 justify-start text-left font-normal text-base",
-                  !dataNascimentoDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dataNascimentoDate ? (
-                  format(dataNascimentoDate, "dd/MM/yyyy", { locale: ptBR })
-                ) : (
-                  <span>Selecione a data</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dataNascimentoDate}
-                onSelect={(date) => updateData({ dataNascimento: formatDateForStorage(date) })}
-                disabled={(date) =>
-                  date > new Date() || date < new Date("1900-01-01")
-                }
-                initialFocus
-                locale={ptBR}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
+          <Input
+            id="dataNascimento"
+            type="text"
+            placeholder="dd/mm/aaaa"
+            value={dataNascimentoDisplay}
+            onChange={handleDateChange('dataNascimento')}
+            className="h-12 text-base"
+            maxLength={10}
+          />
         </div>
 
         {/* Só mostra pergunta de sexo se NÃO for mamografia */}
@@ -197,37 +206,18 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
         </div>
         
         <div className="space-y-2">
-          <Label className="text-base font-medium">
+          <Label htmlFor="dataExame" className="text-base font-medium">
             Data do Exame
           </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full h-12 justify-start text-left font-normal text-base",
-                  !dataExameDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dataExameDate ? (
-                  format(dataExameDate, "dd/MM/yyyy", { locale: ptBR })
-                ) : (
-                  <span>Selecione a data</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dataExameDate}
-                onSelect={(date) => updateData({ dataExame: formatDateForStorage(date) })}
-                initialFocus
-                locale={ptBR}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
+          <Input
+            id="dataExame"
+            type="text"
+            placeholder="dd/mm/aaaa"
+            value={dataExameDisplay}
+            onChange={handleDateChange('dataExame')}
+            className="h-12 text-base"
+            maxLength={10}
+          />
         </div>
       </div>
 
