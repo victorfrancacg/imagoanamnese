@@ -3,6 +3,7 @@ import { ProgressBar } from "./ProgressBar";
 import { DadosPessoaisStep } from "./steps/DadosPessoaisStep";
 import { SegurancaStep } from "./steps/SegurancaStep";
 import { ClinicasStep } from "./steps/ClinicasStep";
+import { RevisaoStep } from "./steps/RevisaoStep";
 import { ConsentimentoStep } from "./steps/ConsentimentoStep";
 import { Summary } from "./Summary";
 import { QuestionnaireData, initialData } from "@/types/questionnaire";
@@ -15,8 +16,9 @@ export function Questionnaire() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const totalSteps = 4; // Dados Pessoais, Segurança, Clínicas, Consentimento
+  const totalSteps = 5; // Dados Pessoais, Segurança, Clínicas, Revisão, Consentimento
 
   const updateData = useCallback((updates: Partial<QuestionnaireData>) => {
     setData((prev) => ({ ...prev, ...updates }));
@@ -31,6 +33,7 @@ export function Questionnaire() {
       
       if (result.success) {
         setSavedId(result.id || null);
+        setPdfUrl(result.pdfUrl || null);
         setIsCompleted(true);
       }
     } else {
@@ -42,16 +45,21 @@ export function Questionnaire() {
     setCurrentStep((prev) => Math.max(1, prev - 1));
   }, []);
 
+  const handleEditStep = useCallback((step: number) => {
+    setCurrentStep(step);
+  }, []);
+
   const handleReset = useCallback(() => {
     setData(initialData);
     setCurrentStep(1);
     setIsCompleted(false);
     setSavedId(null);
+    setPdfUrl(null);
   }, []);
 
   const renderStep = () => {
     if (isCompleted) {
-      return <Summary data={data} onReset={handleReset} savedId={savedId} />;
+      return <Summary data={data} onReset={handleReset} savedId={savedId} pdfUrl={pdfUrl} />;
     }
 
     switch (currentStep) {
@@ -82,6 +90,15 @@ export function Questionnaire() {
           />
         );
       case 4:
+        return (
+          <RevisaoStep
+            data={data}
+            onNext={handleNext}
+            onBack={handleBack}
+            onEditStep={handleEditStep}
+          />
+        );
+      case 5:
         return (
           <ConsentimentoStep
             data={data}

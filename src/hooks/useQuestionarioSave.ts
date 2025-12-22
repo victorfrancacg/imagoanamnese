@@ -1,25 +1,65 @@
 import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
-import { generateQuestionnaireHTML } from "@/components/questionnaire/Summary";
+import { generateQuestionnairePDF } from "@/lib/generatePDF";
 
 const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/ddd7a19f-0f74-464c-9dd8-b30d7ed6ddac";
 
-async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<void> {
+async function uploadPDF(pdfBlob: Blob, questionarioId: string): Promise<string | null> {
   try {
-    // Gera o HTML do questionário
-    const htmlContent = generateQuestionnaireHTML(data);
+    const fileName = `questionario_${questionarioId}_${Date.now()}.pdf`;
+    
+    const { data, error } = await supabase.storage
+      .from('questionarios-pdfs')
+      .upload(fileName, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false
+      });
 
+    if (error) {
+      console.error('Erro ao fazer upload do PDF:', error);
+      return null;
+    }
+
+    // Obter URL pública do PDF
+    const { data: publicUrlData } = supabase.storage
+      .from('questionarios-pdfs')
+      .getPublicUrl(data.path);
+
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('Erro ao fazer upload do PDF:', error);
+    return null;
+  }
+}
+
+async function updateQuestionarioWithPdfUrl(questionarioId: string, pdfUrl: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('questionarios')
+      .update({ pdf_url: pdfUrl })
+      .eq('id', questionarioId);
+
+    if (error) {
+      console.error('Erro ao atualizar URL do PDF:', error);
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar URL do PDF:', error);
+  }
+}
+
+async function sendToWebhook(data: QuestionnaireData, savedId: string, pdfUrl: string | null): Promise<void> {
+  try {
     const webhookPayload = {
       id: savedId,
       timestamp: new Date().toISOString(),
+      pdfUrl: pdfUrl,
       paciente: {
         nome: data.nome,
         idade: data.idade,
         sexo: data.sexo,
         sexoOutro: data.sexoOutro || null,
       },
-      html: htmlContent,
       respostas: {
         temContraindicacao: data.temContraindicacao,
         contraindicacaoDetalhes: data.contraindicacaoDetalhes || null,
@@ -38,7 +78,7 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<
       consentimento: {
         aceitaRiscos: data.aceitaRiscos,
         aceitaCompartilhamento: data.aceitaCompartilhamento,
-        assinatura: data.assinaturaData || null,
+        assinatura: data.assinaturaData ? true : false,
       },
     };
 
@@ -51,15 +91,15 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string): Promise<
       mode: "no-cors",
     });
 
-    console.log("Dados e HTML enviados para n8n webhook com sucesso");
+    console.log("Dados enviados para n8n webhook com sucesso");
   } catch (error) {
     console.error("Erro ao enviar para webhook n8n:", error);
-    // Não bloqueia o fluxo principal se o webhook falhar
   }
 }
 
-export async function saveQuestionario(data: QuestionnaireData): Promise<{ success: boolean; id?: string }> {
+export async function saveQuestionario(data: QuestionnaireData): Promise<{ success: boolean; id?: string; pdfUrl?: string }> {
   try {
+    // 1. Salvar dados no banco
     const { data: result, error } = await supabase
       .from('questionarios')
       .insert({
@@ -97,15 +137,26 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       return { success: false };
     }
 
-    // Enviar dados para o webhook n8n após salvar com sucesso
-    await sendToWebhook(data, result.id);
+    // 2. Gerar PDF
+    const pdfBlob = generateQuestionnairePDF(data);
+
+    // 3. Fazer upload do PDF para o storage
+    const pdfUrl = await uploadPDF(pdfBlob, result.id);
+
+    // 4. Atualizar o questionário com a URL do PDF
+    if (pdfUrl) {
+      await updateQuestionarioWithPdfUrl(result.id, pdfUrl);
+    }
+
+    // 5. Enviar dados para o webhook n8n
+    await sendToWebhook(data, result.id, pdfUrl);
 
     toast({
       title: "Questionário salvo!",
       description: "Os dados foram salvos com sucesso no sistema.",
     });
 
-    return { success: true, id: result.id };
+    return { success: true, id: result.id, pdfUrl: pdfUrl || undefined };
   } catch (error) {
     console.error('Error saving questionario:', error);
     toast({
