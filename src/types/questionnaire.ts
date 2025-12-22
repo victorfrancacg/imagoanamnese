@@ -19,11 +19,23 @@ export interface QuestionnaireData {
   alergia: boolean | null;
   alergiaDetalhes?: string;
   gravida: boolean | null;
+  // Específicas Tomografia
+  usaMetformina: boolean | null;
+  cirurgiaRenal: boolean | null;
+  cirurgiaRenalDetalhes?: string;
+  doencaRenal: boolean | null;
+  doencaRenalDetalhes?: string;
 
   // Questões Clínicas
   motivoExame: string;
   sintomas: string[];
   sintomasOutros?: string;
+  // Específicas Tomografia
+  traumaRegiao: boolean | null;
+  cirurgiaCorpo: boolean | null;
+  cirurgiaCorpoDetalhes?: string;
+  historicoCancer: boolean | null;
+  historicoCancerDetalhes?: string;
 
   // Perguntas Específicas - Feminino
   cancerMama: boolean | null;
@@ -54,9 +66,19 @@ export const initialData: QuestionnaireData = {
   alergia: null,
   alergiaDetalhes: '',
   gravida: null,
+  usaMetformina: null,
+  cirurgiaRenal: null,
+  cirurgiaRenalDetalhes: '',
+  doencaRenal: null,
+  doencaRenalDetalhes: '',
   motivoExame: '',
   sintomas: [],
   sintomasOutros: '',
+  traumaRegiao: null,
+  cirurgiaCorpo: null,
+  cirurgiaCorpoDetalhes: '',
+  historicoCancer: null,
+  historicoCancerDetalhes: '',
   cancerMama: null,
   amamentando: null,
   problemaProstata: null,

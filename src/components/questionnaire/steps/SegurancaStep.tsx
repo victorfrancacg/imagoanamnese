@@ -24,6 +24,11 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
   const needsMetalImplant = tipoExame === 'ressonancia';
   const needsClaustrofobia = tipoExame === 'ressonancia';
   const needsProteseMamaria = tipoExame === 'mamografia' && data.sexo === 'feminino';
+  
+  // Novas perguntas específicas para Tomografia
+  const needsMetformina = tipoExame === 'tomografia';
+  const needsCirurgiaRenal = tipoExame === 'tomografia';
+  const needsDoencaRenal = tipoExame === 'tomografia';
 
   const canProceed = () => {
     // Validar campos obrigatórios baseado no tipo de exame
@@ -36,6 +41,13 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
     if (data.alergia && (data.alergiaDetalhes?.trim() ?? '') === '') return false;
     
     if (needsGravidez && data.gravida === null) return false;
+    
+    // Validações específicas para Tomografia
+    if (needsMetformina && data.usaMetformina === null) return false;
+    if (needsCirurgiaRenal && data.cirurgiaRenal === null) return false;
+    if (data.cirurgiaRenal && (data.cirurgiaRenalDetalhes?.trim() ?? '') === '') return false;
+    if (needsDoencaRenal && data.doencaRenal === null) return false;
+    if (data.doencaRenal && (data.doencaRenalDetalhes?.trim() ?? '') === '') return false;
     
     // Para densitometria, apenas gravidez é relevante para mulheres
     if (tipoExame === 'densitometria' && data.sexo === 'feminino' && data.gravida === null) return false;
@@ -179,6 +191,89 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
                 <Label htmlFor="gravida-nao" className="cursor-pointer">Não</Label>
               </div>
             </RadioGroup>
+          </div>
+        )}
+
+        {/* Perguntas específicas para Tomografia */}
+        {needsMetformina && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Você faz uso de metformina?
+            </Label>
+            <RadioGroup
+              value={data.usaMetformina === null ? '' : data.usaMetformina ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ usaMetformina: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="metformina-sim" />
+                <Label htmlFor="metformina-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="metformina-nao" />
+                <Label htmlFor="metformina-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {needsCirurgiaRenal && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Tem alguma cirurgia renal? (p.ex. retirada de rim e transplante renal)
+            </Label>
+            <RadioGroup
+              value={data.cirurgiaRenal === null ? '' : data.cirurgiaRenal ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ cirurgiaRenal: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="cirurgia-renal-sim" />
+                <Label htmlFor="cirurgia-renal-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="cirurgia-renal-nao" />
+                <Label htmlFor="cirurgia-renal-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+            {data.cirurgiaRenal && (
+              <Textarea
+                placeholder="Por favor, descreva qual cirurgia renal"
+                value={data.cirurgiaRenalDetalhes ?? ''}
+                onChange={(e) => updateData({ cirurgiaRenalDetalhes: e.target.value })}
+                className="mt-3 animate-fade-in"
+              />
+            )}
+          </div>
+        )}
+
+        {needsDoencaRenal && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Tem alguma doença renal? (p. ex. insuficiência renal ou doença renal crônica)
+            </Label>
+            <RadioGroup
+              value={data.doencaRenal === null ? '' : data.doencaRenal ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ doencaRenal: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="doenca-renal-sim" />
+                <Label htmlFor="doenca-renal-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="doenca-renal-nao" />
+                <Label htmlFor="doenca-renal-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+            {data.doencaRenal && (
+              <Textarea
+                placeholder="Por favor, descreva qual doença renal"
+                value={data.doencaRenalDetalhes ?? ''}
+                onChange={(e) => updateData({ doencaRenalDetalhes: e.target.value })}
+                className="mt-3 animate-fade-in"
+              />
+            )}
           </div>
         )}
 
