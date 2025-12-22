@@ -30,12 +30,15 @@ export interface QuestionnaireData {
   motivoExame: string;
   sintomas: string[];
   sintomasOutros?: string;
-  // Específicas Tomografia
+  // Específicas Tomografia e Ressonância
   traumaRegiao: boolean | null;
   cirurgiaCorpo: boolean | null;
   cirurgiaCorpoDetalhes?: string;
   historicoCancer: boolean | null;
   historicoCancerDetalhes?: string;
+  // Específicas Ressonância
+  examesRelacionados: boolean | null;
+  examesRelacionadosDetalhes?: string;
 
   // Perguntas Específicas - Feminino
   cancerMama: boolean | null;
@@ -79,6 +82,8 @@ export const initialData: QuestionnaireData = {
   cirurgiaCorpoDetalhes: '',
   historicoCancer: null,
   historicoCancerDetalhes: '',
+  examesRelacionados: null,
+  examesRelacionadosDetalhes: '',
   cancerMama: null,
   amamentando: null,
   problemaProstata: null,

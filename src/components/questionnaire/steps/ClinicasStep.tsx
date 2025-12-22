@@ -14,16 +14,7 @@ interface ClinicasStepProps {
   onBack: () => void;
 }
 
-// Sintomas por tipo de exame (exceto tomografia que tem perguntas específicas)
-const SINTOMAS_RESSONANCIA = [
-  { id: 'dor-articular', label: 'Dor articular' },
-  { id: 'dor-coluna', label: 'Dor na coluna' },
-  { id: 'dor-cabeca', label: 'Dor de cabeça frequente' },
-  { id: 'tontura', label: 'Tontura ou vertigem' },
-  { id: 'formigamento', label: 'Formigamento ou dormência' },
-  { id: 'outros', label: 'Outros' },
-];
-
+// Sintomas por tipo de exame (exceto tomografia e ressonância que têm perguntas específicas)
 const SINTOMAS_DENSITOMETRIA = [
   { id: 'fratura-recente', label: 'Fratura recente' },
   { id: 'dor-ossea', label: 'Dor óssea' },
@@ -47,16 +38,15 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const isFeminino = data.sexo === 'feminino';
   const isMasculino = data.sexo === 'masculino';
 
-  // Novas perguntas específicas para Tomografia
-  const showTraumaRegiao = tipoExame === 'tomografia';
-  const showCirurgiaCorpo = tipoExame === 'tomografia';
-  const showHistoricoCancer = tipoExame === 'tomografia';
+  // Novas perguntas específicas para Tomografia e Ressonância
+  const showTraumaRegiao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showCirurgiaCorpo = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showHistoricoCancer = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showExamesRelacionados = tipoExame === 'ressonancia';
 
-  // Selecionar sintomas baseado no tipo de exame (exceto tomografia que não terá mais)
+  // Selecionar sintomas baseado no tipo de exame (exceto tomografia e ressonância que não terão mais)
   const getSintomasOptions = () => {
     switch (tipoExame) {
-      case 'ressonancia':
-        return SINTOMAS_RESSONANCIA;
       case 'densitometria':
         return SINTOMAS_DENSITOMETRIA;
       case 'mamografia':
@@ -67,30 +57,34 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   };
 
   const sintomasOptions = getSintomasOptions();
-  const showSintomas = tipoExame !== 'tomografia' && sintomasOptions.length > 0;
+  const showSintomas = tipoExame !== 'tomografia' && tipoExame !== 'ressonancia' && sintomasOptions.length > 0;
 
   // Perguntas específicas por sexo e tipo de exame
-  const showCancerMama = isFeminino && tipoExame === 'mamografia'; // Removido tomografia pois já tem histórico de câncer geral
-  const showAmamentando = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia');
+  const showCancerMama = isFeminino && tipoExame === 'mamografia';
+  // Amamentando removido de ressonância
+  const showAmamentando = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
   const showProstata = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
 
-  // Validate required fields including sex-specific ones and new tomografia fields
+  // Validate required fields including sex-specific ones and new tomografia/ressonancia fields
   const baseValid = data.motivoExame.trim() !== '';
   const femininoValid = !showCancerMama || data.cancerMama !== null;
   const amamentandoValid = !showAmamentando || data.amamentando !== null;
   const masculinoValid = !showProstata || data.problemaProstata !== null;
   const urinariaValid = !showDificuldadeUrinaria || data.dificuldadeUrinaria !== null;
   
-  // Validações específicas para Tomografia
+  // Validações específicas para Tomografia e Ressonância
   const traumaValid = !showTraumaRegiao || data.traumaRegiao !== null;
   const cirurgiaCorpoValid = !showCirurgiaCorpo || data.cirurgiaCorpo !== null;
   const cirurgiaCorpoDetalhesValid = !data.cirurgiaCorpo || (data.cirurgiaCorpoDetalhes?.trim() ?? '') !== '';
   const historicoCancerValid = !showHistoricoCancer || data.historicoCancer !== null;
   const historicoCancerDetalhesValid = !data.historicoCancer || (data.historicoCancerDetalhes?.trim() ?? '') !== '';
+  const examesRelacionadosValid = !showExamesRelacionados || data.examesRelacionados !== null;
+  const examesRelacionadosDetalhesValid = !data.examesRelacionados || (data.examesRelacionadosDetalhes?.trim() ?? '') !== '';
   
   const canProceed = baseValid && femininoValid && amamentandoValid && masculinoValid && urinariaValid && 
-                     traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid;
+                     traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid &&
+                     examesRelacionadosValid && examesRelacionadosDetalhesValid;
 
   const handleSintomaChange = (sintomaId: string, checked: boolean) => {
     const newSintomas = checked
@@ -247,6 +241,36 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 placeholder="Por favor, descreva em qual local"
                 value={data.historicoCancerDetalhes ?? ''}
                 onChange={(e) => updateData({ historicoCancerDetalhes: e.target.value })}
+                className="mt-3 animate-fade-in"
+              />
+            )}
+          </div>
+        )}
+
+        {showExamesRelacionados && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Tem exames relacionados à doença atual? Se sim, quais?
+            </Label>
+            <RadioGroup
+              value={data.examesRelacionados === null ? '' : data.examesRelacionados ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ examesRelacionados: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="exames-relacionados-sim" />
+                <Label htmlFor="exames-relacionados-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="exames-relacionados-nao" />
+                <Label htmlFor="exames-relacionados-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+            {data.examesRelacionados && (
+              <Textarea
+                placeholder="Por favor, descreva quais exames"
+                value={data.examesRelacionadosDetalhes ?? ''}
+                onChange={(e) => updateData({ examesRelacionadosDetalhes: e.target.value })}
                 className="mt-3 animate-fade-in"
               />
             )}

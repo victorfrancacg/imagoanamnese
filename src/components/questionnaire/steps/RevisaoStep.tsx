@@ -129,10 +129,11 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
   const showCirurgiaRenal = tipoExame === 'tomografia';
   const showDoencaRenal = tipoExame === 'tomografia';
 
-  // Novos campos específicos de Tomografia (Clínicas)
-  const showTraumaRegiao = tipoExame === 'tomografia';
-  const showCirurgiaCorpo = tipoExame === 'tomografia';
-  const showHistoricoCancer = tipoExame === 'tomografia';
+  // Novos campos específicos de Tomografia e Ressonância (Clínicas)
+  const showTraumaRegiao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showCirurgiaCorpo = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showHistoricoCancer = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+  const showExamesRelacionados = tipoExame === 'ressonancia';
 
   // Labels dinâmicos para exame anterior
   const exameAnteriorLabel = tipoExame === 'ressonancia' 
@@ -140,13 +141,14 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
     : 'Tomografia anterior (12 meses)';
 
   // Perguntas clínicas específicas por sexo e tipo
-  const showCancerMama = data.sexo === 'feminino' && tipoExame === 'mamografia'; // Removido tomografia
-  const showAmamentando = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia');
+  const showCancerMama = data.sexo === 'feminino' && tipoExame === 'mamografia';
+  // Amamentando removido de ressonância
+  const showAmamentando = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
   const showProstata = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   
-  // Mostrar sintomas apenas para exames que não são tomografia
-  const showSintomas = tipoExame !== 'tomografia';
+  // Mostrar sintomas apenas para exames que não são tomografia ou ressonância
+  const showSintomas = tipoExame !== 'tomografia' && tipoExame !== 'ressonancia';
 
   return (
     <QuestionCard
@@ -274,6 +276,17 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               />
               {data.historicoCancer && data.historicoCancerDetalhes && (
                 <InfoRow label="Detalhes" value={data.historicoCancerDetalhes} />
+              )}
+            </>
+          )}
+          {showExamesRelacionados && (
+            <>
+              <InfoRow 
+                label="Exames relacionados" 
+                value={formatBoolean(data.examesRelacionados)} 
+              />
+              {data.examesRelacionados && data.examesRelacionadosDetalhes && (
+                <InfoRow label="Detalhes" value={data.examesRelacionadosDetalhes} />
               )}
             </>
           )}
