@@ -144,9 +144,11 @@ export function Questionnaire() {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
             Questionário Clínico
           </h1>
-          <p className="text-muted-foreground">
-            {data.tipoExame ? `Exame de ${getExamTypeLabel()}` : 'Preencha o questionário de anamnese'}
-          </p>
+          {currentStep > 1 && data.tipoExame && (
+            <p className="text-muted-foreground">
+              Exame de {getExamTypeLabel()}
+            </p>
+          )}
         </div>
 
         {/* Progress Bar - only show during questionnaire */}
