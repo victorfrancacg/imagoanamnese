@@ -70,7 +70,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const showSintomas = tipoExame !== 'tomografia' && sintomasOptions.length > 0;
 
   // Perguntas específicas por sexo e tipo de exame
-  const showCancerMama = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
+  const showCancerMama = isFeminino && tipoExame === 'mamografia'; // Removido tomografia pois já tem histórico de câncer geral
   const showAmamentando = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia');
   const showProstata = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');

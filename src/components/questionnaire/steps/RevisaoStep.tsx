@@ -124,16 +124,29 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
   const showExameAnterior = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const showAlergia = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
 
+  // Novos campos específicos de Tomografia (Segurança)
+  const showMetformina = tipoExame === 'tomografia';
+  const showCirurgiaRenal = tipoExame === 'tomografia';
+  const showDoencaRenal = tipoExame === 'tomografia';
+
+  // Novos campos específicos de Tomografia (Clínicas)
+  const showTraumaRegiao = tipoExame === 'tomografia';
+  const showCirurgiaCorpo = tipoExame === 'tomografia';
+  const showHistoricoCancer = tipoExame === 'tomografia';
+
   // Labels dinâmicos para exame anterior
   const exameAnteriorLabel = tipoExame === 'ressonancia' 
     ? 'Ressonância anterior (12 meses)' 
     : 'Tomografia anterior (12 meses)';
 
   // Perguntas clínicas específicas por sexo e tipo
-  const showCancerMama = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
+  const showCancerMama = data.sexo === 'feminino' && tipoExame === 'mamografia'; // Removido tomografia
   const showAmamentando = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia');
   const showProstata = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
+  
+  // Mostrar sintomas apenas para exames que não são tomografia
+  const showSintomas = tipoExame !== 'tomografia';
 
   return (
     <QuestionCard
@@ -193,6 +206,36 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               highlight={data.gravida === true}
             />
           )}
+          {showMetformina && (
+            <InfoRow 
+              label="Uso de metformina" 
+              value={formatBoolean(data.usaMetformina)} 
+            />
+          )}
+          {showCirurgiaRenal && (
+            <>
+              <InfoRow 
+                label="Cirurgia renal" 
+                value={formatBoolean(data.cirurgiaRenal)} 
+                highlight={data.cirurgiaRenal === true}
+              />
+              {data.cirurgiaRenal && data.cirurgiaRenalDetalhes && (
+                <InfoRow label="Detalhes" value={data.cirurgiaRenalDetalhes} />
+              )}
+            </>
+          )}
+          {showDoencaRenal && (
+            <>
+              <InfoRow 
+                label="Doença renal" 
+                value={formatBoolean(data.doencaRenal)} 
+                highlight={data.doencaRenal === true}
+              />
+              {data.doencaRenal && data.doencaRenalDetalhes && (
+                <InfoRow label="Detalhes" value={data.doencaRenalDetalhes} />
+              )}
+            </>
+          )}
           {tipoExame === 'densitometria' && data.sexo !== 'feminino' && (
             <InfoRow label="Status" value="Sem contraindicações específicas" />
           )}
@@ -201,7 +244,39 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         {/* Questões Clínicas */}
         <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(4)}>
           <InfoRow label="Motivo do Exame" value={data.motivoExame || '-'} />
-          <InfoRow label="Sintomas" value={sintomasLabel} />
+          {showSintomas && (
+            <InfoRow label="Sintomas" value={sintomasLabel} />
+          )}
+          {showTraumaRegiao && (
+            <InfoRow 
+              label="Trauma na região" 
+              value={formatBoolean(data.traumaRegiao)} 
+              highlight={data.traumaRegiao === true}
+            />
+          )}
+          {showCirurgiaCorpo && (
+            <>
+              <InfoRow 
+                label="Cirurgia no corpo" 
+                value={formatBoolean(data.cirurgiaCorpo)} 
+              />
+              {data.cirurgiaCorpo && data.cirurgiaCorpoDetalhes && (
+                <InfoRow label="Detalhes" value={data.cirurgiaCorpoDetalhes} />
+              )}
+            </>
+          )}
+          {showHistoricoCancer && (
+            <>
+              <InfoRow 
+                label="Histórico de câncer" 
+                value={formatBoolean(data.historicoCancer)} 
+                highlight={data.historicoCancer === true}
+              />
+              {data.historicoCancer && data.historicoCancerDetalhes && (
+                <InfoRow label="Detalhes" value={data.historicoCancerDetalhes} />
+              )}
+            </>
+          )}
           {showCancerMama && (
             <InfoRow 
               label="Câncer de mama" 
