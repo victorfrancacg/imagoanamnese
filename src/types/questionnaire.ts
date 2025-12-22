@@ -1,11 +1,15 @@
-export type Sex = 'masculino' | 'feminino' | 'outro';
+export type Sex = 'masculino' | 'feminino';
 
 export interface QuestionnaireData {
   // Dados Pessoais
   nome: string;
-  idade: number | null;
+  cpf: string;
+  dataNascimento: string;
   sexo: Sex | null;
-  sexoOutro?: string;
+  peso: number | null;
+  altura: number | null;
+  tipoExame: string;
+  dataExame: string;
 
   // Questões de Segurança
   temContraindicacao: boolean | null;
@@ -36,9 +40,13 @@ export interface QuestionnaireData {
 
 export const initialData: QuestionnaireData = {
   nome: '',
-  idade: null,
+  cpf: '',
+  dataNascimento: '',
   sexo: null,
-  sexoOutro: '',
+  peso: null,
+  altura: null,
+  tipoExame: '',
+  dataExame: '',
   temContraindicacao: null,
   contraindicacaoDetalhes: '',
   tomografiaAnterior: null,

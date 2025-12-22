@@ -11,8 +11,29 @@ interface DadosPessoaisStepProps {
   onNext: () => void;
 }
 
+function formatCPF(value: string): string {
+  const numbers = value.replace(/\D/g, '').slice(0, 11);
+  if (numbers.length <= 3) return numbers;
+  if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+  if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
+}
+
 export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisStepProps) {
-  const canProceed = data.nome.trim() !== '' && data.idade !== null && data.sexo !== null;
+  const canProceed = 
+    data.nome.trim() !== '' && 
+    data.cpf.replace(/\D/g, '').length === 11 &&
+    data.dataNascimento !== '' && 
+    data.sexo !== null &&
+    data.peso !== null &&
+    data.altura !== null &&
+    data.tipoExame.trim() !== '' &&
+    data.dataExame !== '';
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCPF(e.target.value);
+    updateData({ cpf: formatted });
+  };
 
   return (
     <QuestionCard
@@ -35,17 +56,28 @@ export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisSte
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="idade" className="text-base font-medium">
-            Idade
+          <Label htmlFor="cpf" className="text-base font-medium">
+            CPF
           </Label>
           <Input
-            id="idade"
-            type="number"
-            placeholder="Digite sua idade"
-            min={0}
-            max={150}
-            value={data.idade ?? ''}
-            onChange={(e) => updateData({ idade: e.target.value ? parseInt(e.target.value) : null })}
+            id="cpf"
+            type="text"
+            placeholder="000.000.000-00"
+            value={data.cpf}
+            onChange={handleCPFChange}
+            className="h-12 text-base"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dataNascimento" className="text-base font-medium">
+            Data de Nascimento
+          </Label>
+          <Input
+            id="dataNascimento"
+            type="date"
+            value={data.dataNascimento}
+            onChange={(e) => updateData({ dataNascimento: e.target.value })}
             className="h-12 text-base"
           />
         </div>
@@ -65,21 +97,69 @@ export function DadosPessoaisStep({ data, updateData, onNext }: DadosPessoaisSte
               <RadioGroupItem value="feminino" id="feminino" />
               <Label htmlFor="feminino" className="cursor-pointer flex-1">Feminino</Label>
             </div>
-            <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-              <RadioGroupItem value="outro" id="outro" />
-              <Label htmlFor="outro" className="cursor-pointer flex-1">Outro</Label>
-            </div>
           </RadioGroup>
+        </div>
 
-          {data.sexo === 'outro' && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="peso" className="text-base font-medium">
+              Peso (kg)
+            </Label>
             <Input
-              type="text"
-              placeholder="Por favor, especifique"
-              value={data.sexoOutro ?? ''}
-              onChange={(e) => updateData({ sexoOutro: e.target.value })}
-              className="h-12 text-base mt-3 animate-fade-in"
+              id="peso"
+              type="number"
+              placeholder="Ex: 70"
+              min={1}
+              max={500}
+              step={0.1}
+              value={data.peso ?? ''}
+              onChange={(e) => updateData({ peso: e.target.value ? parseFloat(e.target.value) : null })}
+              className="h-12 text-base"
             />
-          )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="altura" className="text-base font-medium">
+              Altura (cm)
+            </Label>
+            <Input
+              id="altura"
+              type="number"
+              placeholder="Ex: 170"
+              min={1}
+              max={300}
+              value={data.altura ?? ''}
+              onChange={(e) => updateData({ altura: e.target.value ? parseFloat(e.target.value) : null })}
+              className="h-12 text-base"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tipoExame" className="text-base font-medium">
+            Tipo do Exame
+          </Label>
+          <Input
+            id="tipoExame"
+            type="text"
+            placeholder="Ex: Tomografia de Tórax"
+            value={data.tipoExame}
+            onChange={(e) => updateData({ tipoExame: e.target.value })}
+            className="h-12 text-base"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dataExame" className="text-base font-medium">
+            Data do Exame
+          </Label>
+          <Input
+            id="dataExame"
+            type="date"
+            value={data.dataExame}
+            onChange={(e) => updateData({ dataExame: e.target.value })}
+            className="h-12 text-base"
+          />
         </div>
       </div>
 

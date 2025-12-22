@@ -59,7 +59,7 @@ export function Questionnaire() {
 
   const renderStep = () => {
     if (isCompleted) {
-      return <Summary data={data} onReset={handleReset} savedId={savedId} pdfUrl={pdfUrl} />;
+      return <Summary data={data} onReset={handleReset} savedId={savedId} />;
     }
 
     switch (currentStep) {
