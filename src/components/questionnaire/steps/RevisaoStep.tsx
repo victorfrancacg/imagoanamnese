@@ -11,17 +11,6 @@ interface RevisaoStepProps {
   onEditStep: (step: number) => void;
 }
 
-// Mapa de labels para sintomas (apenas mamografia agora)
-const SINTOMAS_LABELS: Record<string, string> = {
-  // Mamografia
-  'nodulo': 'Nódulo palpável',
-  'dor-mama': 'Dor na mama',
-  'secrecao': 'Secreção mamilar',
-  'alteracao-pele': 'Alteração na pele da mama',
-  'historico-familiar': 'Histórico familiar de câncer de mama',
-  // Comum
-  'outros': 'Outros',
-};
 
 const TIPO_EXAME_LABELS: Record<TipoExame, string> = {
   'tomografia': 'Tomografia Computadorizada',
@@ -89,6 +78,7 @@ function InfoRow({ label, value, highlight }: { label: string; value: string; hi
 export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepProps) {
   const tipoExame = data.tipoExame;
   const isDensitometria = tipoExame === 'densitometria';
+  const isMamografia = tipoExame === 'mamografia';
   const isFeminino = data.sexo === 'feminino';
   
   const sexoLabel = data.sexo === 'masculino' 
@@ -98,12 +88,6 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
     : '-';
 
   const tipoExameLabel = tipoExame ? TIPO_EXAME_LABELS[tipoExame] : '-';
-
-  const sintomasLabel = data.sintomas.length > 0
-    ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
-        ? `Outros: ${data.sintomasOutros}` 
-        : SINTOMAS_LABELS[s] || s).join(', ')
-    : 'Nenhum';
 
   // Determinar quais campos de segurança mostrar baseado no tipo de exame
   const showContraindicacao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
@@ -127,13 +111,9 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
     : 'Tomografia anterior (12 meses)';
 
   // Perguntas clínicas específicas por sexo e tipo
-  const showCancerMama = data.sexo === 'feminino' && tipoExame === 'mamografia';
-  const showAmamentando = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
+  const showAmamentando = data.sexo === 'feminino' && tipoExame === 'tomografia';
   const showProstata = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
-  
-  // Mostrar sintomas apenas para mamografia
-  const showSintomas = tipoExame === 'mamografia';
 
   return (
     <QuestionCard
@@ -274,8 +254,44 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         {/* Questões Clínicas */}
         <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(4)}>
           <InfoRow label={isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame"} value={data.motivoExame || '-'} />
-          {showSintomas && (
-            <InfoRow label="Sintomas" value={sintomasLabel} />
+          {/* Campos Mamografia */}
+          {isMamografia && (
+            <>
+              <InfoRow label="Exame anterior" value={formatBoolean(data.mamoExameAnterior)} />
+              {data.mamoExameAnterior && data.mamoExameAnteriorDetalhes && (
+                <InfoRow label="Quando realizou" value={data.mamoExameAnteriorDetalhes} />
+              )}
+              <InfoRow label="Última menstruação" value={data.mamoUltimaMenstruacao || '-'} />
+              <InfoRow label="Na menopausa" value={formatBoolean(data.mamoMenopausa)} />
+              {data.mamoMenopausa && data.mamoMenopausaDetalhes && (
+                <InfoRow label="Idade menopausa" value={data.mamoMenopausaDetalhes} />
+              )}
+              <InfoRow label="Usa hormônios" value={formatBoolean(data.mamoUsaHormonios)} />
+              <InfoRow label="Tem filhos" value={formatBoolean(data.mamoTemFilhos)} />
+              {data.mamoTemFilhos && data.mamoTemFilhosDetalhes && (
+                <InfoRow label="Amamentação" value={data.mamoTemFilhosDetalhes} />
+              )}
+              <InfoRow label="Problema nas mamas" value={formatBoolean(data.mamoProblemaMamas)} highlight={data.mamoProblemaMamas === true} />
+              {data.mamoProblemaMamas && data.mamoProblemaMamasDetalhes && (
+                <InfoRow label="Detalhes problema" value={data.mamoProblemaMamasDetalhes} />
+              )}
+              <InfoRow label="Cirurgia nas mamas" value={formatBoolean(data.mamoCirurgiaMamas)} />
+              {data.mamoCirurgiaMamas && data.mamoCirurgiaMamasDetalhes && (
+                <InfoRow label="Detalhes cirurgia" value={data.mamoCirurgiaMamasDetalhes} />
+              )}
+              <InfoRow label="Ultrassonografia mama" value={formatBoolean(data.mamoUltrassonografia)} />
+              {data.mamoUltrassonografia && data.mamoUltrassonografiaDetalhes && (
+                <InfoRow label="Quando realizou" value={data.mamoUltrassonografiaDetalhes} />
+              )}
+              <InfoRow label="Histórico familiar câncer mama/ovário" value={formatBoolean(data.mamoHistoricoFamiliar)} highlight={data.mamoHistoricoFamiliar === true} />
+              {data.mamoHistoricoFamiliar && data.mamoHistoricoFamiliarDetalhes && (
+                <InfoRow label="Quais parentes" value={data.mamoHistoricoFamiliarDetalhes} />
+              )}
+              <InfoRow label="Radioterapia mama" value={formatBoolean(data.mamoRadioterapia)} highlight={data.mamoRadioterapia === true} />
+              {data.mamoRadioterapia && data.mamoRadioterapiaDetalhes && (
+                <InfoRow label="Ano radioterapia" value={data.mamoRadioterapiaDetalhes} />
+              )}
+            </>
           )}
           {showTraumaRegiao && (
             <InfoRow 
@@ -358,13 +374,6 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
                 </>
               )}
             </>
-          )}
-          {showCancerMama && (
-            <InfoRow 
-              label="Câncer de mama" 
-              value={formatBoolean(data.cancerMama)} 
-              highlight={data.cancerMama === true}
-            />
           )}
           {showAmamentando && (
             <InfoRow label="Amamentação" value={formatBoolean(data.amamentando)} />

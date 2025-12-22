@@ -77,6 +77,26 @@ export interface QuestionnaireData {
   cancerMama: boolean | null;
   amamentando: boolean | null;
 
+  // Perguntas Específicas - Mamografia
+  mamoExameAnterior: boolean | null;
+  mamoExameAnteriorDetalhes?: string;
+  mamoUltimaMenstruacao: string;
+  mamoMenopausa: boolean | null;
+  mamoMenopausaDetalhes?: string;
+  mamoUsaHormonios: boolean | null;
+  mamoTemFilhos: boolean | null;
+  mamoTemFilhosDetalhes?: string;
+  mamoProblemaMamas: boolean | null;
+  mamoProblemaMamasDetalhes?: string;
+  mamoCirurgiaMamas: boolean | null;
+  mamoCirurgiaMamasDetalhes?: string;
+  mamoUltrassonografia: boolean | null;
+  mamoUltrassonografiaDetalhes?: string;
+  mamoHistoricoFamiliar: boolean | null;
+  mamoHistoricoFamiliarDetalhes?: string;
+  mamoRadioterapia: boolean | null;
+  mamoRadioterapiaDetalhes?: string;
+
   // Perguntas Específicas - Masculino
   problemaProstata: boolean | null;
   dificuldadeUrinaria: boolean | null;
@@ -154,6 +174,25 @@ export const initialData: QuestionnaireData = {
   // Outros
   cancerMama: null,
   amamentando: null,
+  // Mamografia
+  mamoExameAnterior: null,
+  mamoExameAnteriorDetalhes: '',
+  mamoUltimaMenstruacao: '',
+  mamoMenopausa: null,
+  mamoMenopausaDetalhes: '',
+  mamoUsaHormonios: null,
+  mamoTemFilhos: null,
+  mamoTemFilhosDetalhes: '',
+  mamoProblemaMamas: null,
+  mamoProblemaMamasDetalhes: '',
+  mamoCirurgiaMamas: null,
+  mamoCirurgiaMamasDetalhes: '',
+  mamoUltrassonografia: null,
+  mamoUltrassonografiaDetalhes: '',
+  mamoHistoricoFamiliar: null,
+  mamoHistoricoFamiliarDetalhes: '',
+  mamoRadioterapia: null,
+  mamoRadioterapiaDetalhes: '',
   problemaProstata: null,
   dificuldadeUrinaria: null,
   aceitaRiscos: null,
