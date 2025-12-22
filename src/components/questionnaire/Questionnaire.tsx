@@ -123,6 +123,16 @@ export function Questionnaire() {
     }
   };
 
+  const getExamTypeLabel = () => {
+    const labels: Record<string, string> = {
+      'tomografia': 'Tomografia Computadorizada',
+      'ressonancia': 'Ressonância Magnética',
+      'densitometria': 'Densitometria Óssea',
+      'mamografia': 'Mamografia',
+    };
+    return data.tipoExame ? labels[data.tipoExame] : 'Selecione o tipo de exame';
+  };
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -135,7 +145,7 @@ export function Questionnaire() {
             Questionário Clínico
           </h1>
           <p className="text-muted-foreground">
-            Exame de Tomografia Computadorizada
+            {data.tipoExame ? `Exame de ${getExamTypeLabel()}` : 'Preencha o questionário de anamnese'}
           </p>
         </div>
 
