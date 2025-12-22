@@ -3,6 +3,13 @@ import { NavigationButtons } from "../NavigationButtons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format, parse } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { QuestionnaireData, Sex } from "@/types/questionnaire";
 
 interface DadosPessoaisStepProps {
@@ -43,11 +50,24 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
     updateData({ cpf: formatted });
   };
 
-  const formatDateForDisplay = (dateString: string): string => {
-    if (!dateString) return '';
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+  // Convert string date (yyyy-MM-dd) to Date object
+  const parseDate = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+    try {
+      return parse(dateString, 'yyyy-MM-dd', new Date());
+    } catch {
+      return undefined;
+    }
   };
+
+  // Convert Date object to string (yyyy-MM-dd) for storage
+  const formatDateForStorage = (date: Date | undefined): string => {
+    if (!date) return '';
+    return format(date, 'yyyy-MM-dd');
+  };
+
+  const dataNascimentoDate = parseDate(data.dataNascimento);
+  const dataExameDate = parseDate(data.dataExame);
 
   return (
     <QuestionCard
@@ -84,21 +104,40 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dataNascimento" className="text-base font-medium">
+          <Label className="text-base font-medium">
             Data de Nascimento
           </Label>
-          <Input
-            id="dataNascimento"
-            type="date"
-            value={data.dataNascimento}
-            onChange={(e) => updateData({ dataNascimento: e.target.value })}
-            className="h-12 text-base"
-          />
-          {data.dataNascimento && (
-            <p className="text-sm text-muted-foreground">
-              {formatDateForDisplay(data.dataNascimento)}
-            </p>
-          )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full h-12 justify-start text-left font-normal text-base",
+                  !dataNascimentoDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataNascimentoDate ? (
+                  format(dataNascimentoDate, "dd/MM/yyyy", { locale: ptBR })
+                ) : (
+                  <span>Selecione a data</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataNascimentoDate}
+                onSelect={(date) => updateData({ dataNascimento: formatDateForStorage(date) })}
+                disabled={(date) =>
+                  date > new Date() || date < new Date("1900-01-01")
+                }
+                initialFocus
+                locale={ptBR}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Só mostra pergunta de sexo se NÃO for mamografia */}
@@ -158,24 +197,37 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="dataExame" className="text-base font-medium">
+          <Label className="text-base font-medium">
             Data do Exame
           </Label>
-          <Input
-            id="dataExame"
-            type="date"
-            value={data.dataExame}
-            onChange={(e) => updateData({ dataExame: e.target.value })}
-            className="h-12 text-base"
-          />
-          {data.dataExame && (
-            <p className="text-sm text-muted-foreground">
-              {(() => {
-                const [year, month, day] = data.dataExame.split('-');
-                return `${day}/${month}/${year}`;
-              })()}
-            </p>
-          )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full h-12 justify-start text-left font-normal text-base",
+                  !dataExameDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataExameDate ? (
+                  format(dataExameDate, "dd/MM/yyyy", { locale: ptBR })
+                ) : (
+                  <span>Selecione a data</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataExameDate}
+                onSelect={(date) => updateData({ dataExame: formatDateForStorage(date) })}
+                initialFocus
+                locale={ptBR}
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
