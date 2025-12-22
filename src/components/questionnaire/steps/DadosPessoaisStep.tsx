@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QuestionCard } from "../QuestionCard";
 import { NavigationButtons } from "../NavigationButtons";
 import { Input } from "@/components/ui/input";
@@ -28,25 +29,7 @@ function formatDateInput(value: string): string {
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4)}`;
 }
 
-// Converte dd/mm/yyyy para yyyy-MM-dd (formato de armazenamento)
-function displayToStorage(displayDate: string): string {
-  const numbers = displayDate.replace(/\D/g, '');
-  if (numbers.length !== 8) return '';
-  const day = numbers.slice(0, 2);
-  const month = numbers.slice(2, 4);
-  const year = numbers.slice(4, 8);
-  return `${year}-${month}-${day}`;
-}
-
-// Converte yyyy-MM-dd para dd/mm/yyyy (formato de exibição)
-function storageToDisplay(storageDate: string): string {
-  if (!storageDate) return '';
-  const [year, month, day] = storageDate.split('-');
-  if (!year || !month || !day) return '';
-  return `${day}/${month}/${year}`;
-}
-
-// Valida se a data é válida
+// Valida se a data é válida (formato completo dd/mm/yyyy)
 function isValidDate(displayDate: string): boolean {
   const numbers = displayDate.replace(/\D/g, '');
   if (numbers.length !== 8) return false;
@@ -67,6 +50,24 @@ function isValidDate(displayDate: string): boolean {
 }
 
 export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPessoaisStepProps) {
+  // Estados locais para os inputs de data (formato de exibição dd/mm/yyyy)
+  const [dataNascimentoInput, setDataNascimentoInput] = useState(() => {
+    // Se já tiver data salva no formato yyyy-MM-dd, converte para dd/mm/yyyy
+    if (data.dataNascimento && data.dataNascimento.includes('-')) {
+      const [year, month, day] = data.dataNascimento.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    return data.dataNascimento || '';
+  });
+  
+  const [dataExameInput, setDataExameInput] = useState(() => {
+    if (data.dataExame && data.dataExame.includes('-')) {
+      const [year, month, day] = data.dataExame.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    return data.dataExame || '';
+  });
+
   // Para mamografia, sexo é sempre feminino
   const isMamografia = data.tipoExame === 'mamografia';
   
@@ -75,29 +76,50 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
     updateData({ sexo: 'feminino' });
   }
 
-  const dataNascimentoDisplay = storageToDisplay(data.dataNascimento);
-  const dataExameDisplay = storageToDisplay(data.dataExame);
-
   const canProceed = 
     data.nome.trim() !== '' && 
     data.cpf.replace(/\D/g, '').length === 11 &&
-    data.dataNascimento !== '' && 
-    isValidDate(dataNascimentoDisplay) &&
+    isValidDate(dataNascimentoInput) &&
     (isMamografia || data.sexo !== null) &&
     data.peso !== null &&
     data.altura !== null &&
-    data.dataExame !== '' &&
-    isValidDate(dataExameDisplay);
+    isValidDate(dataExameInput);
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
     updateData({ cpf: formatted });
   };
 
-  const handleDateChange = (field: 'dataNascimento' | 'dataExame') => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDataNascimentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatDateInput(e.target.value);
-    const storageFormat = displayToStorage(formatted);
-    updateData({ [field]: storageFormat || formatted.replace(/\D/g, '') });
+    setDataNascimentoInput(formatted);
+    
+    // Se a data estiver completa e válida, converte para formato de armazenamento
+    const numbers = formatted.replace(/\D/g, '');
+    if (numbers.length === 8) {
+      const day = numbers.slice(0, 2);
+      const month = numbers.slice(2, 4);
+      const year = numbers.slice(4, 8);
+      updateData({ dataNascimento: `${year}-${month}-${day}` });
+    } else {
+      updateData({ dataNascimento: formatted });
+    }
+  };
+
+  const handleDataExameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatDateInput(e.target.value);
+    setDataExameInput(formatted);
+    
+    // Se a data estiver completa e válida, converte para formato de armazenamento
+    const numbers = formatted.replace(/\D/g, '');
+    if (numbers.length === 8) {
+      const day = numbers.slice(0, 2);
+      const month = numbers.slice(2, 4);
+      const year = numbers.slice(4, 8);
+      updateData({ dataExame: `${year}-${month}-${day}` });
+    } else {
+      updateData({ dataExame: formatted });
+    }
   };
 
   return (
@@ -142,8 +164,8 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             id="dataNascimento"
             type="text"
             placeholder="dd/mm/aaaa"
-            value={dataNascimentoDisplay}
-            onChange={handleDateChange('dataNascimento')}
+            value={dataNascimentoInput}
+            onChange={handleDataNascimentoChange}
             className="h-12 text-base"
             maxLength={10}
           />
@@ -213,8 +235,8 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             id="dataExame"
             type="text"
             placeholder="dd/mm/aaaa"
-            value={dataExameDisplay}
-            onChange={handleDateChange('dataExame')}
+            value={dataExameInput}
+            onChange={handleDataExameChange}
             className="h-12 text-base"
             maxLength={10}
           />
