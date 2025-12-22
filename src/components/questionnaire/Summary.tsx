@@ -1,12 +1,11 @@
 import { QuestionnaireData } from "@/types/questionnaire";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, User, Shield, Stethoscope, FileCheck, RotateCcw, Download } from "lucide-react";
+import { CheckCircle2, User, Shield, Stethoscope, FileCheck, RotateCcw } from "lucide-react";
 
 interface SummaryProps {
   data: QuestionnaireData;
   onReset: () => void;
   savedId?: string | null;
-  pdfUrl?: string | null;
 }
 
 const SINTOMAS_LABELS: Record<string, string> = {
@@ -19,6 +18,12 @@ const SINTOMAS_LABELS: Record<string, string> = {
 function formatBoolean(value: boolean | null): string {
   if (value === null) return '-';
   return value ? 'Sim' : 'Não';
+}
+
+function formatDate(dateString: string): string {
+  if (!dateString) return '-';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
 }
 
 function SummarySection({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
@@ -44,13 +49,11 @@ function SummaryItem({ label, value, highlight }: { label: string; value: string
   );
 }
 
-export function Summary({ data, onReset, savedId, pdfUrl }: SummaryProps) {
+export function Summary({ data, onReset, savedId }: SummaryProps) {
   const sexoLabel = data.sexo === 'masculino' 
     ? 'Masculino' 
     : data.sexo === 'feminino' 
     ? 'Feminino' 
-    : data.sexo === 'outro' 
-    ? `Outro: ${data.sexoOutro}` 
     : '-';
 
   const sintomasLabel = data.sintomas.length > 0
@@ -58,12 +61,6 @@ export function Summary({ data, onReset, savedId, pdfUrl }: SummaryProps) {
         ? `Outros: ${data.sintomasOutros}` 
         : SINTOMAS_LABELS[s] || s).join(', ')
     : 'Nenhum sintoma selecionado';
-
-  const handleDownloadPDF = () => {
-    if (pdfUrl) {
-      window.open(pdfUrl, '_blank');
-    }
-  };
 
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-up">
@@ -88,8 +85,13 @@ export function Summary({ data, onReset, savedId, pdfUrl }: SummaryProps) {
 
         <SummarySection title="Dados Pessoais" icon={User}>
           <SummaryItem label="Nome" value={data.nome || '-'} />
-          <SummaryItem label="Idade" value={data.idade ? `${data.idade} anos` : '-'} />
+          <SummaryItem label="CPF" value={data.cpf || '-'} />
+          <SummaryItem label="Data de Nascimento" value={formatDate(data.dataNascimento)} />
           <SummaryItem label="Sexo" value={sexoLabel} />
+          <SummaryItem label="Peso" value={data.peso ? `${data.peso} kg` : '-'} />
+          <SummaryItem label="Altura" value={data.altura ? `${data.altura} cm` : '-'} />
+          <SummaryItem label="Tipo do Exame" value={data.tipoExame || '-'} />
+          <SummaryItem label="Data do Exame" value={formatDate(data.dataExame)} />
         </SummarySection>
 
         <SummarySection title="Questões de Segurança" icon={Shield}>
@@ -172,15 +174,6 @@ export function Summary({ data, onReset, savedId, pdfUrl }: SummaryProps) {
           <RotateCcw className="w-4 h-4" />
           Novo Questionário
         </Button>
-        {pdfUrl && (
-          <Button
-            onClick={handleDownloadPDF}
-            className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-glow"
-          >
-            <Download className="w-4 h-4" />
-            Baixar PDF
-          </Button>
-        )}
       </div>
     </div>
   );

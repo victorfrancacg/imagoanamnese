@@ -23,6 +23,12 @@ function formatBoolean(value: boolean | null): string {
   return value ? 'Sim' : 'Não';
 }
 
+function formatDate(dateString: string): string {
+  if (!dateString) return '-';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 function SectionCard({ 
   title, 
   icon: Icon, 
@@ -73,8 +79,6 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
     ? 'Masculino' 
     : data.sexo === 'feminino' 
     ? 'Feminino' 
-    : data.sexo === 'outro' 
-    ? `Outro: ${data.sexoOutro}` 
     : '-';
 
   const sintomasLabel = data.sintomas.length > 0
@@ -92,8 +96,13 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         {/* Dados Pessoais */}
         <SectionCard title="Dados Pessoais" icon={User} onEdit={() => onEditStep(1)}>
           <InfoRow label="Nome" value={data.nome || '-'} />
-          <InfoRow label="Idade" value={data.idade ? `${data.idade} anos` : '-'} />
+          <InfoRow label="CPF" value={data.cpf || '-'} />
+          <InfoRow label="Data de Nascimento" value={formatDate(data.dataNascimento)} />
           <InfoRow label="Sexo" value={sexoLabel} />
+          <InfoRow label="Peso" value={data.peso ? `${data.peso} kg` : '-'} />
+          <InfoRow label="Altura" value={data.altura ? `${data.altura} cm` : '-'} />
+          <InfoRow label="Tipo do Exame" value={data.tipoExame || '-'} />
+          <InfoRow label="Data do Exame" value={formatDate(data.dataExame)} />
         </SectionCard>
 
         {/* Questões de Segurança */}

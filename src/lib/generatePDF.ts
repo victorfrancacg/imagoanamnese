@@ -13,6 +13,12 @@ function formatBoolean(value: boolean | null): string {
   return value ? 'Sim' : 'Não';
 }
 
+function formatDate(dateString: string): string {
+  if (!dateString) return '-';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -82,13 +88,16 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     ? 'Masculino' 
     : data.sexo === 'feminino' 
     ? 'Feminino' 
-    : data.sexo === 'outro' 
-    ? `Outro: ${data.sexoOutro}` 
     : '-';
 
   addRow("Nome", data.nome || '-');
-  addRow("Idade", data.idade ? `${data.idade} anos` : '-');
+  addRow("CPF", data.cpf || '-');
+  addRow("Data de Nascimento", formatDate(data.dataNascimento));
   addRow("Sexo", sexoLabel);
+  addRow("Peso", data.peso ? `${data.peso} kg` : '-');
+  addRow("Altura", data.altura ? `${data.altura} cm` : '-');
+  addRow("Tipo do Exame", data.tipoExame || '-');
+  addRow("Data do Exame", formatDate(data.dataExame));
   yPos += 8;
 
   // Questões de Segurança

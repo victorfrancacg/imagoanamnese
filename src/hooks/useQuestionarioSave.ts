@@ -56,9 +56,13 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string, pdfUrl: s
       pdfUrl: pdfUrl,
       paciente: {
         nome: data.nome,
-        idade: data.idade,
+        cpf: data.cpf,
+        dataNascimento: data.dataNascimento,
         sexo: data.sexo,
-        sexoOutro: data.sexoOutro || null,
+        peso: data.peso,
+        altura: data.altura,
+        tipoExame: data.tipoExame,
+        dataExame: data.dataExame,
       },
       respostas: {
         temContraindicacao: data.temContraindicacao,
@@ -104,9 +108,13 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       .from('questionarios')
       .insert({
         nome: data.nome,
-        idade: data.idade,
+        cpf: data.cpf,
+        data_nascimento: data.dataNascimento || null,
         sexo: data.sexo,
-        sexo_outro: data.sexoOutro || null,
+        peso: data.peso,
+        altura: data.altura,
+        tipo_exame: data.tipoExame || null,
+        data_exame: data.dataExame || null,
         tem_contraindicacao: data.temContraindicacao,
         contraindicacao_detalhes: data.contraindicacaoDetalhes || null,
         tomografia_anterior: data.tomografiaAnterior,

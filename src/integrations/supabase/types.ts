@@ -20,24 +20,29 @@ export type Database = {
           aceita_riscos: boolean
           alergia: boolean | null
           alergia_detalhes: string | null
+          altura: number | null
           amamentando: boolean | null
           assinatura_data: string | null
           cancer_mama: boolean | null
           contraindicacao_detalhes: string | null
+          cpf: string | null
           created_at: string
+          data_exame: string | null
+          data_nascimento: string | null
           dificuldade_urinaria: boolean | null
           gravida: boolean | null
           id: string
-          idade: number | null
           motivo_exame: string | null
           nome: string
           pdf_url: string | null
+          peso: number | null
           problema_prostata: boolean | null
           sexo: string | null
           sexo_outro: string | null
           sintomas: string[] | null
           sintomas_outros: string | null
           tem_contraindicacao: boolean | null
+          tipo_exame: string | null
           tomografia_anterior: boolean | null
           updated_at: string
         }
@@ -46,24 +51,29 @@ export type Database = {
           aceita_riscos: boolean
           alergia?: boolean | null
           alergia_detalhes?: string | null
+          altura?: number | null
           amamentando?: boolean | null
           assinatura_data?: string | null
           cancer_mama?: boolean | null
           contraindicacao_detalhes?: string | null
+          cpf?: string | null
           created_at?: string
+          data_exame?: string | null
+          data_nascimento?: string | null
           dificuldade_urinaria?: boolean | null
           gravida?: boolean | null
           id?: string
-          idade?: number | null
           motivo_exame?: string | null
           nome: string
           pdf_url?: string | null
+          peso?: number | null
           problema_prostata?: boolean | null
           sexo?: string | null
           sexo_outro?: string | null
           sintomas?: string[] | null
           sintomas_outros?: string | null
           tem_contraindicacao?: boolean | null
+          tipo_exame?: string | null
           tomografia_anterior?: boolean | null
           updated_at?: string
         }
@@ -72,24 +82,29 @@ export type Database = {
           aceita_riscos?: boolean
           alergia?: boolean | null
           alergia_detalhes?: string | null
+          altura?: number | null
           amamentando?: boolean | null
           assinatura_data?: string | null
           cancer_mama?: boolean | null
           contraindicacao_detalhes?: string | null
+          cpf?: string | null
           created_at?: string
+          data_exame?: string | null
+          data_nascimento?: string | null
           dificuldade_urinaria?: boolean | null
           gravida?: boolean | null
           id?: string
-          idade?: number | null
           motivo_exame?: string | null
           nome?: string
           pdf_url?: string | null
+          peso?: number | null
           problema_prostata?: boolean | null
           sexo?: string | null
           sexo_outro?: string | null
           sintomas?: string[] | null
           sintomas_outros?: string | null
           tem_contraindicacao?: boolean | null
+          tipo_exame?: string | null
           tomografia_anterior?: boolean | null
           updated_at?: string
         }
