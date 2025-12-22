@@ -31,6 +31,7 @@ export type Database = {
           idade: number | null
           motivo_exame: string | null
           nome: string
+          pdf_url: string | null
           problema_prostata: boolean | null
           sexo: string | null
           sexo_outro: string | null
@@ -56,6 +57,7 @@ export type Database = {
           idade?: number | null
           motivo_exame?: string | null
           nome: string
+          pdf_url?: string | null
           problema_prostata?: boolean | null
           sexo?: string | null
           sexo_outro?: string | null
@@ -81,6 +83,7 @@ export type Database = {
           idade?: number | null
           motivo_exame?: string | null
           nome?: string
+          pdf_url?: string | null
           problema_prostata?: boolean | null
           sexo?: string | null
           sexo_outro?: string | null
