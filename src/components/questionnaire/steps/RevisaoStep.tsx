@@ -11,24 +11,8 @@ interface RevisaoStepProps {
   onEditStep: (step: number) => void;
 }
 
-// Mapa de labels para todos os sintomas possíveis
+// Mapa de labels para sintomas (apenas mamografia agora)
 const SINTOMAS_LABELS: Record<string, string> = {
-  // Tomografia
-  'dor-peito': 'Dor no peito',
-  'dificuldade-respiratoria': 'Dificuldade respiratória',
-  'dor-abdominal': 'Dor abdominal',
-  // Ressonância
-  'dor-articular': 'Dor articular',
-  'dor-coluna': 'Dor na coluna',
-  'dor-cabeca': 'Dor de cabeça frequente',
-  'tontura': 'Tontura ou vertigem',
-  'formigamento': 'Formigamento ou dormência',
-  // Densitometria
-  'fratura-recente': 'Fratura recente',
-  'dor-ossea': 'Dor óssea',
-  'perda-altura': 'Perda de altura',
-  'menopausa': 'Menopausa',
-  'uso-corticoides': 'Uso prolongado de corticoides',
   // Mamografia
   'nodulo': 'Nódulo palpável',
   'dor-mama': 'Dor na mama',
@@ -104,6 +88,8 @@ function InfoRow({ label, value, highlight }: { label: string; value: string; hi
 
 export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepProps) {
   const tipoExame = data.tipoExame;
+  const isDensitometria = tipoExame === 'densitometria';
+  const isFeminino = data.sexo === 'feminino';
   
   const sexoLabel = data.sexo === 'masculino' 
     ? 'Masculino' 
@@ -142,13 +128,12 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
 
   // Perguntas clínicas específicas por sexo e tipo
   const showCancerMama = data.sexo === 'feminino' && tipoExame === 'mamografia';
-  // Amamentando removido de ressonância
   const showAmamentando = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
   const showProstata = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = data.sexo === 'masculino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   
-  // Mostrar sintomas apenas para exames que não são tomografia ou ressonância
-  const showSintomas = tipoExame !== 'tomografia' && tipoExame !== 'ressonancia';
+  // Mostrar sintomas apenas para mamografia
+  const showSintomas = tipoExame === 'mamografia';
 
   return (
     <QuestionCard
@@ -238,14 +223,57 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               )}
             </>
           )}
-          {tipoExame === 'densitometria' && data.sexo !== 'feminino' && (
-            <InfoRow label="Status" value="Sem contraindicações específicas" />
+          {/* Campos de Segurança Densitometria */}
+          {isDensitometria && (
+            <>
+              <InfoRow 
+                label="Exame contraste/bário recente" 
+                value={formatBoolean(data.exameContrasteRecente)} 
+                highlight={data.exameContrasteRecente === true}
+              />
+              <InfoRow 
+                label="Fraturou osso (5 anos)" 
+                value={formatBoolean(data.fraturouOsso)} 
+                highlight={data.fraturouOsso === true}
+              />
+              {data.fraturouOsso && data.fraturouOssoDetalhes && (
+                <InfoRow label="Detalhes" value={data.fraturouOssoDetalhes} />
+              )}
+              <InfoRow 
+                label="Perdeu mais de 3cm de altura" 
+                value={formatBoolean(data.perdeuAltura)} 
+                highlight={data.perdeuAltura === true}
+              />
+              <InfoRow 
+                label="Perda óssea em radiografia" 
+                value={formatBoolean(data.perdaOsseaRadiografia)} 
+                highlight={data.perdaOsseaRadiografia === true}
+              />
+              <InfoRow 
+                label="Cifose dorsal" 
+                value={formatBoolean(data.cifoseDorsal)} 
+                highlight={data.cifoseDorsal === true}
+              />
+              <InfoRow 
+                label="Mais de uma queda (12 meses)" 
+                value={formatBoolean(data.quedas12Meses)} 
+                highlight={data.quedas12Meses === true}
+              />
+              <InfoRow 
+                label="Parente com osteoporose" 
+                value={formatBoolean(data.parenteOsteoporose)} 
+                highlight={data.parenteOsteoporose === true}
+              />
+              {data.parenteOsteoporose && data.parenteOsteoporoseDetalhes && (
+                <InfoRow label="Qual parente" value={data.parenteOsteoporoseDetalhes} />
+              )}
+            </>
           )}
         </SectionCard>
 
         {/* Questões Clínicas */}
         <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(4)}>
-          <InfoRow label="Motivo do Exame" value={data.motivoExame || '-'} />
+          <InfoRow label={isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame"} value={data.motivoExame || '-'} />
           {showSintomas && (
             <InfoRow label="Sintomas" value={sintomasLabel} />
           )}
@@ -287,6 +315,47 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               />
               {data.examesRelacionados && data.examesRelacionadosDetalhes && (
                 <InfoRow label="Detalhes" value={data.examesRelacionadosDetalhes} />
+              )}
+            </>
+          )}
+          {/* Campos Clínicos Densitometria */}
+          {isDensitometria && (
+            <>
+              <InfoRow label="Osteoporose" value={formatBoolean(data.temOsteoporose)} highlight={data.temOsteoporose === true} />
+              <InfoRow label="Doença na tireoide" value={formatBoolean(data.doencaTireoide)} highlight={data.doencaTireoide === true} />
+              {data.doencaTireoide && data.doencaTireoideDetalhes && (
+                <InfoRow label="Detalhes tireoide" value={data.doencaTireoideDetalhes} />
+              )}
+              <InfoRow label="Doença intestinal crônica" value={formatBoolean(data.doencaIntestinal)} highlight={data.doencaIntestinal === true} />
+              {data.doencaIntestinal && data.doencaIntestinalDetalhes && (
+                <InfoRow label="Detalhes intestinal" value={data.doencaIntestinalDetalhes} />
+              )}
+              <InfoRow label="Hiperparatiroidismo" value={formatBoolean(data.temHiperparatiroidismo)} highlight={data.temHiperparatiroidismo === true} />
+              <InfoRow label="Doença de Paget" value={formatBoolean(data.temDoencaPaget)} highlight={data.temDoencaPaget === true} />
+              <InfoRow label="Má absorção de cálcio" value={formatBoolean(data.maAbsorcaoCalcio)} highlight={data.maAbsorcaoCalcio === true} />
+              <InfoRow label="Osteomalácia" value={formatBoolean(data.temOsteomalacia)} highlight={data.temOsteomalacia === true} />
+              <InfoRow label="Síndrome de Cushing" value={formatBoolean(data.temSindromeCushing)} highlight={data.temSindromeCushing === true} />
+              <InfoRow label="Deficiência vitamina D" value={formatBoolean(data.deficienciaVitaminaD)} highlight={data.deficienciaVitaminaD === true} />
+              <InfoRow label="Disfunção renal crônica" value={formatBoolean(data.disfuncaoRenalCronica)} highlight={data.disfuncaoRenalCronica === true} />
+              <InfoRow label="Usa medicação regular" value={formatBoolean(data.usaMedicacaoRegular)} />
+              {data.usaMedicacaoRegular && data.usaMedicacaoRegularDetalhes && (
+                <InfoRow label="Medicações" value={data.usaMedicacaoRegularDetalhes} />
+              )}
+              {/* Campos Densitometria Feminino */}
+              {isFeminino && (
+                <>
+                  <InfoRow label="Passou pela menopausa" value={formatBoolean(data.passouMenopausa)} />
+                  {data.passouMenopausa && data.passouMenopausaDetalhes && (
+                    <InfoRow label="Detalhes menopausa" value={data.passouMenopausaDetalhes} />
+                  )}
+                  <InfoRow label="Ciclos irregulares/perimenopausa" value={formatBoolean(data.ciclosIrregulares)} />
+                  <InfoRow label="Câncer de mama" value={formatBoolean(data.teveCancerMamaDensi)} highlight={data.teveCancerMamaDensi === true} />
+                  <InfoRow label="Histerectomia" value={formatBoolean(data.fezHisterectomia)} />
+                  {data.fezHisterectomia && data.fezHisterectomiaDetalhes && (
+                    <InfoRow label="Detalhes histerectomia" value={data.fezHisterectomiaDetalhes} />
+                  )}
+                  <InfoRow label="Retirou ovários" value={formatBoolean(data.retirouOvarios)} />
+                </>
               )}
             </>
           )}

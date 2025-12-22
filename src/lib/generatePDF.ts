@@ -1,14 +1,8 @@
 import jsPDF from "jspdf";
 import { QuestionnaireData } from "@/types/questionnaire";
 
-// Sintomas apenas para densitometria e mamografia
+// Sintomas apenas para mamografia
 const SINTOMAS_LABELS: Record<string, string> = {
-  // Densitometria
-  'fratura-recente': 'Fratura recente',
-  'dor-ossea': 'Dor óssea',
-  'perda-altura': 'Perda de altura',
-  'menopausa': 'Menopausa',
-  'uso-corticoides': 'Uso prolongado de corticoides',
   // Mamografia
   'nodulo': 'Nódulo palpável',
   'dor-mama': 'Dor na mama',
@@ -68,6 +62,9 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     doc.text(value, pageWidth - margin, yPos, { align: "right" });
     yPos += 7;
   };
+
+  const isDensitometria = data.tipoExame === 'densitometria';
+  const isFeminino = data.sexo === 'feminino';
 
   // Header
   doc.setFontSize(20);
@@ -130,19 +127,23 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   addLine(margin, pageWidth - margin, [221, 221, 221]);
   yPos += 8;
 
-  addRow("Contraindicação", formatBoolean(data.temContraindicacao), data.temContraindicacao === true);
-  if (data.temContraindicacao && data.contraindicacaoDetalhes) {
-    addRow("Detalhes da contraindicação", data.contraindicacaoDetalhes);
+  // Campos segurança para Tomografia e Ressonância
+  if (data.tipoExame === 'tomografia' || data.tipoExame === 'ressonancia') {
+    addRow("Contraindicação", formatBoolean(data.temContraindicacao), data.temContraindicacao === true);
+    if (data.temContraindicacao && data.contraindicacaoDetalhes) {
+      addRow("Detalhes da contraindicação", data.contraindicacaoDetalhes);
+    }
+    
+    const exameAnteriorLabel = data.tipoExame === 'ressonancia' 
+      ? 'Ressonância anterior (12 meses)' 
+      : 'Tomografia anterior (12 meses)';
+    addRow(exameAnteriorLabel, formatBoolean(data.tomografiaAnterior));
+    addRow("Alergia a contraste", formatBoolean(data.alergia), data.alergia === true);
+    if (data.alergia && data.alergiaDetalhes) {
+      addRow("Detalhes da alergia", data.alergiaDetalhes);
+    }
   }
-  
-  const exameAnteriorLabel = data.tipoExame === 'ressonancia' 
-    ? 'Ressonância anterior (12 meses)' 
-    : 'Tomografia anterior (12 meses)';
-  addRow(exameAnteriorLabel, formatBoolean(data.tomografiaAnterior));
-  addRow("Alergia a contraste", formatBoolean(data.alergia), data.alergia === true);
-  if (data.alergia && data.alergiaDetalhes) {
-    addRow("Detalhes da alergia", data.alergiaDetalhes);
-  }
+
   if (data.sexo === 'feminino') {
     addRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
   }
@@ -159,6 +160,23 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
       addRow("Detalhes doença renal", data.doencaRenalDetalhes);
     }
   }
+
+  // Campos específicos de Densitometria (Segurança)
+  if (isDensitometria) {
+    addRow("Exame contraste/bário recente", formatBoolean(data.exameContrasteRecente), data.exameContrasteRecente === true);
+    addRow("Fraturou osso (5 anos)", formatBoolean(data.fraturouOsso), data.fraturouOsso === true);
+    if (data.fraturouOsso && data.fraturouOssoDetalhes) {
+      addRow("Detalhes fratura", data.fraturouOssoDetalhes);
+    }
+    addRow("Perdeu mais de 3cm de altura", formatBoolean(data.perdeuAltura), data.perdeuAltura === true);
+    addRow("Perda óssea em radiografia", formatBoolean(data.perdaOsseaRadiografia), data.perdaOsseaRadiografia === true);
+    addRow("Cifose dorsal", formatBoolean(data.cifoseDorsal), data.cifoseDorsal === true);
+    addRow("Mais de uma queda (12 meses)", formatBoolean(data.quedas12Meses), data.quedas12Meses === true);
+    addRow("Parente com osteoporose", formatBoolean(data.parenteOsteoporose), data.parenteOsteoporose === true);
+    if (data.parenteOsteoporose && data.parenteOsteoporoseDetalhes) {
+      addRow("Qual parente", data.parenteOsteoporoseDetalhes);
+    }
+  }
   yPos += 8;
 
   // Questões Clínicas
@@ -168,10 +186,10 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   addLine(margin, pageWidth - margin, [221, 221, 221]);
   yPos += 8;
 
-  addRow("Motivo do Exame", data.motivoExame || '-');
+  addRow(isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame", data.motivoExame || '-');
   
-  // Sintomas apenas para densitometria e mamografia
-  if (data.tipoExame === 'densitometria' || data.tipoExame === 'mamografia') {
+  // Sintomas apenas para mamografia
+  if (data.tipoExame === 'mamografia') {
     const sintomasLabel = data.sintomas.length > 0
       ? data.sintomas.map(s => s === 'outros' && data.sintomasOutros 
           ? `Outros: ${data.sintomasOutros}` 
@@ -198,6 +216,45 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     addRow("Exames relacionados", formatBoolean(data.examesRelacionados));
     if (data.examesRelacionados && data.examesRelacionadosDetalhes) {
       addRow("Detalhes exames", data.examesRelacionadosDetalhes);
+    }
+  }
+
+  // Campos específicos de Densitometria (Clínicas)
+  if (isDensitometria) {
+    addRow("Osteoporose", formatBoolean(data.temOsteoporose), data.temOsteoporose === true);
+    addRow("Doença na tireoide", formatBoolean(data.doencaTireoide), data.doencaTireoide === true);
+    if (data.doencaTireoide && data.doencaTireoideDetalhes) {
+      addRow("Detalhes tireoide", data.doencaTireoideDetalhes);
+    }
+    addRow("Doença intestinal crônica", formatBoolean(data.doencaIntestinal), data.doencaIntestinal === true);
+    if (data.doencaIntestinal && data.doencaIntestinalDetalhes) {
+      addRow("Detalhes intestinal", data.doencaIntestinalDetalhes);
+    }
+    addRow("Hiperparatiroidismo", formatBoolean(data.temHiperparatiroidismo), data.temHiperparatiroidismo === true);
+    addRow("Doença de Paget", formatBoolean(data.temDoencaPaget), data.temDoencaPaget === true);
+    addRow("Má absorção de cálcio", formatBoolean(data.maAbsorcaoCalcio), data.maAbsorcaoCalcio === true);
+    addRow("Osteomalácia", formatBoolean(data.temOsteomalacia), data.temOsteomalacia === true);
+    addRow("Síndrome de Cushing", formatBoolean(data.temSindromeCushing), data.temSindromeCushing === true);
+    addRow("Deficiência vitamina D", formatBoolean(data.deficienciaVitaminaD), data.deficienciaVitaminaD === true);
+    addRow("Disfunção renal crônica", formatBoolean(data.disfuncaoRenalCronica), data.disfuncaoRenalCronica === true);
+    addRow("Usa medicação regular", formatBoolean(data.usaMedicacaoRegular));
+    if (data.usaMedicacaoRegular && data.usaMedicacaoRegularDetalhes) {
+      addRow("Medicações", data.usaMedicacaoRegularDetalhes);
+    }
+
+    // Campos Densitometria Feminino
+    if (isFeminino) {
+      addRow("Passou pela menopausa", formatBoolean(data.passouMenopausa));
+      if (data.passouMenopausa && data.passouMenopausaDetalhes) {
+        addRow("Detalhes menopausa", data.passouMenopausaDetalhes);
+      }
+      addRow("Ciclos irregulares/perimenopausa", formatBoolean(data.ciclosIrregulares));
+      addRow("Câncer de mama", formatBoolean(data.teveCancerMamaDensi), data.teveCancerMamaDensi === true);
+      addRow("Histerectomia", formatBoolean(data.fezHisterectomia));
+      if (data.fezHisterectomia && data.fezHisterectomiaDetalhes) {
+        addRow("Detalhes histerectomia", data.fezHisterectomiaDetalhes);
+      }
+      addRow("Retirou ovários", formatBoolean(data.retirouOvarios));
     }
   }
   

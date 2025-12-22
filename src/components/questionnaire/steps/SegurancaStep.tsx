@@ -15,12 +15,13 @@ interface SegurancaStepProps {
 
 export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaStepProps) {
   const tipoExame = data.tipoExame;
+  const isDensitometria = tipoExame === 'densitometria';
   
   // Perguntas variam por tipo de exame
   const needsContraindicacao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const needsExameAnterior = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const needsAlergia = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
-  const needsGravidez = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia');
+  const needsGravidez = data.sexo === 'feminino' && (tipoExame === 'tomografia' || tipoExame === 'ressonancia' || tipoExame === 'mamografia' || tipoExame === 'densitometria');
   const needsMetalImplant = tipoExame === 'ressonancia';
   const needsClaustrofobia = tipoExame === 'ressonancia';
   const needsProteseMamaria = tipoExame === 'mamografia' && data.sexo === 'feminino';
@@ -49,8 +50,18 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
     if (needsDoencaRenal && data.doencaRenal === null) return false;
     if (data.doencaRenal && (data.doencaRenalDetalhes?.trim() ?? '') === '') return false;
     
-    // Para densitometria, apenas gravidez é relevante para mulheres
-    if (tipoExame === 'densitometria' && data.sexo === 'feminino' && data.gravida === null) return false;
+    // Validações específicas para Densitometria
+    if (isDensitometria) {
+      if (data.exameContrasteRecente === null) return false;
+      if (data.fraturouOsso === null) return false;
+      if (data.fraturouOsso && (data.fraturouOssoDetalhes?.trim() ?? '') === '') return false;
+      if (data.perdeuAltura === null) return false;
+      if (data.perdaOsseaRadiografia === null) return false;
+      if (data.cifoseDorsal === null) return false;
+      if (data.quedas12Meses === null) return false;
+      if (data.parenteOsteoporose === null) return false;
+      if (data.parenteOsteoporose && (data.parenteOsteoporoseDetalhes?.trim() ?? '') === '') return false;
+    }
     
     return true;
   };
@@ -277,35 +288,165 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
           </div>
         )}
 
-        {/* Gravidez para densitometria - mulheres */}
-        {tipoExame === 'densitometria' && data.sexo === 'feminino' && !needsGravidez && (
-          <div className="space-y-3 animate-fade-in">
-            <Label className="text-base font-medium flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-warning" />
-              Você está grávida ou suspeita que possa estar?
-            </Label>
-            <RadioGroup
-              value={data.gravida === null ? '' : data.gravida ? 'sim' : 'nao'}
-              onValueChange={(value) => updateData({ gravida: value === 'sim' })}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                <RadioGroupItem value="sim" id="gravida-sim" />
-                <Label htmlFor="gravida-sim" className="cursor-pointer">Sim</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                <RadioGroupItem value="nao" id="gravida-nao" />
-                <Label htmlFor="gravida-nao" className="cursor-pointer">Não</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        )}
+        {/* Perguntas específicas para Densitometria */}
+        {isDensitometria && (
+          <>
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Realizou algum exame de raio-x com contraste/bário ou de medicina nuclear nas últimas duas semanas?
+              </Label>
+              <RadioGroup
+                value={data.exameContrasteRecente === null ? '' : data.exameContrasteRecente ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ exameContrasteRecente: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="contraste-recente-sim" />
+                  <Label htmlFor="contraste-recente-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="contraste-recente-nao" />
+                  <Label htmlFor="contraste-recente-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
 
-        {/* Mensagem para Densitometria se não houver perguntas específicas */}
-        {tipoExame === 'densitometria' && data.sexo !== 'feminino' && (
-          <div className="p-4 rounded-lg bg-muted/50 text-muted-foreground animate-fade-in">
-            <p>A densitometria óssea é um exame de baixa radiação e sem contraste. Não há contraindicações específicas para o seu perfil.</p>
-          </div>
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Fraturou algum osso nos últimos cinco anos? Se sim, qual osso e como ocorreu?
+              </Label>
+              <RadioGroup
+                value={data.fraturouOsso === null ? '' : data.fraturouOsso ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ fraturouOsso: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="fraturou-osso-sim" />
+                  <Label htmlFor="fraturou-osso-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="fraturou-osso-nao" />
+                  <Label htmlFor="fraturou-osso-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.fraturouOsso && (
+                <Textarea
+                  placeholder="Por favor, descreva qual osso e como ocorreu"
+                  value={data.fraturouOssoDetalhes ?? ''}
+                  onChange={(e) => updateData({ fraturouOssoDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in"
+                />
+              )}
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você já perdeu mais de três centímetros de altura?
+              </Label>
+              <RadioGroup
+                value={data.perdeuAltura === null ? '' : data.perdeuAltura ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ perdeuAltura: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="perdeu-altura-sim" />
+                  <Label htmlFor="perdeu-altura-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="perdeu-altura-nao" />
+                  <Label htmlFor="perdeu-altura-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você já teve perda óssea diagnosticada previamente em uma radiografia?
+              </Label>
+              <RadioGroup
+                value={data.perdaOsseaRadiografia === null ? '' : data.perdaOsseaRadiografia ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ perdaOsseaRadiografia: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="perda-ossea-sim" />
+                  <Label htmlFor="perda-ossea-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="perda-ossea-nao" />
+                  <Label htmlFor="perda-ossea-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você já desenvolveu curvatura nas costas (cifose dorsal)?
+              </Label>
+              <RadioGroup
+                value={data.cifoseDorsal === null ? '' : data.cifoseDorsal ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ cifoseDorsal: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="cifose-sim" />
+                  <Label htmlFor="cifose-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="cifose-nao" />
+                  <Label htmlFor="cifose-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Você sofreu mais de uma queda nos últimos doze meses?
+              </Label>
+              <RadioGroup
+                value={data.quedas12Meses === null ? '' : data.quedas12Meses ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ quedas12Meses: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="quedas-sim" />
+                  <Label htmlFor="quedas-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="quedas-nao" />
+                  <Label htmlFor="quedas-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 animate-fade-in">
+              <Label className="text-base font-medium">
+                Tem algum parente de primeiro grau com osteoporose? Se sim, qual parente?
+              </Label>
+              <RadioGroup
+                value={data.parenteOsteoporose === null ? '' : data.parenteOsteoporose ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ parenteOsteoporose: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="parente-osteo-sim" />
+                  <Label htmlFor="parente-osteo-sim" className="cursor-pointer">Sim</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="parente-osteo-nao" />
+                  <Label htmlFor="parente-osteo-nao" className="cursor-pointer">Não</Label>
+                </div>
+              </RadioGroup>
+              {data.parenteOsteoporose && (
+                <Textarea
+                  placeholder="Por favor, informe qual parente"
+                  value={data.parenteOsteoporoseDetalhes ?? ''}
+                  onChange={(e) => updateData({ parenteOsteoporoseDetalhes: e.target.value })}
+                  className="mt-3 animate-fade-in"
+                />
+              )}
+            </div>
+          </>
         )}
       </div>
 
