@@ -59,13 +59,25 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   };
 
   // Header
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
   doc.setTextColor(0, 102, 204);
-  addText("Questionário Clínico", pageWidth / 2, 20, true);
   doc.text("Questionário Clínico", pageWidth / 2, yPos, { align: "center" });
   yPos += 8;
+  
+  // Dynamic subtitle based on exam type
+  const examTypeLabels: Record<string, string> = {
+    'tomografia': 'Tomografia Computadorizada',
+    'ressonancia': 'Ressonância Magnética',
+    'densitometria': 'Densitometria Óssea',
+    'mamografia': 'Mamografia',
+  };
+  const examSubtitle = examTypeLabels[data.tipoExame] || data.tipoExame || 'Exame';
+  
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(12);
-  doc.text("Exame de Tomografia Computadorizada", pageWidth / 2, yPos, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.text(`Exame de ${examSubtitle}`, pageWidth / 2, yPos, { align: "center" });
   yPos += 5;
   addLine(margin, pageWidth - margin);
   yPos += 10;
