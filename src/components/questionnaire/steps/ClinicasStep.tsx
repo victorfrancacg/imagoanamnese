@@ -14,14 +14,7 @@ interface ClinicasStepProps {
   onBack: () => void;
 }
 
-// Sintomas por tipo de exame
-const SINTOMAS_TOMOGRAFIA = [
-  { id: 'dor-peito', label: 'Dor no peito' },
-  { id: 'dificuldade-respiratoria', label: 'Dificuldade respiratória' },
-  { id: 'dor-abdominal', label: 'Dor abdominal' },
-  { id: 'outros', label: 'Outros' },
-];
-
+// Sintomas por tipo de exame (exceto tomografia que tem perguntas específicas)
 const SINTOMAS_RESSONANCIA = [
   { id: 'dor-articular', label: 'Dor articular' },
   { id: 'dor-coluna', label: 'Dor na coluna' },
@@ -54,11 +47,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const isFeminino = data.sexo === 'feminino';
   const isMasculino = data.sexo === 'masculino';
 
-  // Selecionar sintomas baseado no tipo de exame
+  // Novas perguntas específicas para Tomografia
+  const showTraumaRegiao = tipoExame === 'tomografia';
+  const showCirurgiaCorpo = tipoExame === 'tomografia';
+  const showHistoricoCancer = tipoExame === 'tomografia';
+
+  // Selecionar sintomas baseado no tipo de exame (exceto tomografia que não terá mais)
   const getSintomasOptions = () => {
     switch (tipoExame) {
-      case 'tomografia':
-        return SINTOMAS_TOMOGRAFIA;
       case 'ressonancia':
         return SINTOMAS_RESSONANCIA;
       case 'densitometria':
@@ -66,11 +62,12 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
       case 'mamografia':
         return SINTOMAS_MAMOGRAFIA;
       default:
-        return SINTOMAS_TOMOGRAFIA;
+        return [];
     }
   };
 
   const sintomasOptions = getSintomasOptions();
+  const showSintomas = tipoExame !== 'tomografia' && sintomasOptions.length > 0;
 
   // Perguntas específicas por sexo e tipo de exame
   const showCancerMama = isFeminino && (tipoExame === 'tomografia' || tipoExame === 'mamografia');
@@ -78,14 +75,22 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const showProstata = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
 
-  // Validate required fields including sex-specific ones
+  // Validate required fields including sex-specific ones and new tomografia fields
   const baseValid = data.motivoExame.trim() !== '';
   const femininoValid = !showCancerMama || data.cancerMama !== null;
   const amamentandoValid = !showAmamentando || data.amamentando !== null;
   const masculinoValid = !showProstata || data.problemaProstata !== null;
   const urinariaValid = !showDificuldadeUrinaria || data.dificuldadeUrinaria !== null;
   
-  const canProceed = baseValid && femininoValid && amamentandoValid && masculinoValid && urinariaValid;
+  // Validações específicas para Tomografia
+  const traumaValid = !showTraumaRegiao || data.traumaRegiao !== null;
+  const cirurgiaCorpoValid = !showCirurgiaCorpo || data.cirurgiaCorpo !== null;
+  const cirurgiaCorpoDetalhesValid = !data.cirurgiaCorpo || (data.cirurgiaCorpoDetalhes?.trim() ?? '') !== '';
+  const historicoCancerValid = !showHistoricoCancer || data.historicoCancer !== null;
+  const historicoCancerDetalhesValid = !data.historicoCancer || (data.historicoCancerDetalhes?.trim() ?? '') !== '';
+  
+  const canProceed = baseValid && femininoValid && amamentandoValid && masculinoValid && urinariaValid && 
+                     traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid;
 
   const handleSintomaChange = (sintomaId: string, checked: boolean) => {
     const newSintomas = checked
@@ -128,39 +133,125 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
           />
         </div>
 
-        <div className="space-y-4">
-          <Label className="text-base font-medium">
-            Sintomas Relacionados (selecione todos que se aplicam)
-          </Label>
-          <div className="space-y-3">
-            {sintomasOptions.map((sintoma) => (
-              <div
-                key={sintoma.id}
-                className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => handleSintomaChange(sintoma.id, !data.sintomas.includes(sintoma.id))}
-              >
-                <Checkbox
-                  id={sintoma.id}
-                  checked={data.sintomas.includes(sintoma.id)}
-                  onCheckedChange={(checked) => handleSintomaChange(sintoma.id, checked as boolean)}
-                />
-                <Label htmlFor={sintoma.id} className="cursor-pointer flex-1">
-                  {sintoma.label}
-                </Label>
-              </div>
-            ))}
-          </div>
+        {/* Sintomas - apenas para exames que não são tomografia */}
+        {showSintomas && (
+          <div className="space-y-4">
+            <Label className="text-base font-medium">
+              Sintomas Relacionados (selecione todos que se aplicam)
+            </Label>
+            <div className="space-y-3">
+              {sintomasOptions.map((sintoma) => (
+                <div
+                  key={sintoma.id}
+                  className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
+                  onClick={() => handleSintomaChange(sintoma.id, !data.sintomas.includes(sintoma.id))}
+                >
+                  <Checkbox
+                    id={sintoma.id}
+                    checked={data.sintomas.includes(sintoma.id)}
+                    onCheckedChange={(checked) => handleSintomaChange(sintoma.id, checked as boolean)}
+                  />
+                  <Label htmlFor={sintoma.id} className="cursor-pointer flex-1">
+                    {sintoma.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
 
-          {data.sintomas.includes('outros') && (
-            <Input
-              type="text"
-              placeholder="Por favor, especifique outros sintomas"
-              value={data.sintomasOutros ?? ''}
-              onChange={(e) => updateData({ sintomasOutros: e.target.value })}
-              className="h-12 text-base animate-fade-in"
-            />
-          )}
-        </div>
+            {data.sintomas.includes('outros') && (
+              <Input
+                type="text"
+                placeholder="Por favor, especifique outros sintomas"
+                value={data.sintomasOutros ?? ''}
+                onChange={(e) => updateData({ sintomasOutros: e.target.value })}
+                className="h-12 text-base animate-fade-in"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Perguntas específicas para Tomografia */}
+        {showTraumaRegiao && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Sofreu algum trauma na região a ser examinada?
+            </Label>
+            <RadioGroup
+              value={data.traumaRegiao === null ? '' : data.traumaRegiao ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ traumaRegiao: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="trauma-sim" />
+                <Label htmlFor="trauma-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="trauma-nao" />
+                <Label htmlFor="trauma-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+
+        {showCirurgiaCorpo && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Já fez alguma cirurgia em qualquer lugar do corpo? Se sim, qual?
+            </Label>
+            <RadioGroup
+              value={data.cirurgiaCorpo === null ? '' : data.cirurgiaCorpo ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ cirurgiaCorpo: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="cirurgia-corpo-sim" />
+                <Label htmlFor="cirurgia-corpo-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="cirurgia-corpo-nao" />
+                <Label htmlFor="cirurgia-corpo-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+            {data.cirurgiaCorpo && (
+              <Textarea
+                placeholder="Por favor, descreva qual cirurgia"
+                value={data.cirurgiaCorpoDetalhes ?? ''}
+                onChange={(e) => updateData({ cirurgiaCorpoDetalhes: e.target.value })}
+                className="mt-3 animate-fade-in"
+              />
+            )}
+          </div>
+        )}
+
+        {showHistoricoCancer && (
+          <div className="space-y-3 animate-fade-in">
+            <Label className="text-base font-medium">
+              Tem histórico de câncer? Se sim, em qual local?
+            </Label>
+            <RadioGroup
+              value={data.historicoCancer === null ? '' : data.historicoCancer ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ historicoCancer: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="historico-cancer-sim" />
+                <Label htmlFor="historico-cancer-sim" className="cursor-pointer">Sim</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="historico-cancer-nao" />
+                <Label htmlFor="historico-cancer-nao" className="cursor-pointer">Não</Label>
+              </div>
+            </RadioGroup>
+            {data.historicoCancer && (
+              <Textarea
+                placeholder="Por favor, descreva em qual local"
+                value={data.historicoCancerDetalhes ?? ''}
+                onChange={(e) => updateData({ historicoCancerDetalhes: e.target.value })}
+                className="mt-3 animate-fade-in"
+              />
+            )}
+          </div>
+        )}
 
         {/* Perguntas específicas para mulheres */}
         {(showCancerMama || showAmamentando) && (
