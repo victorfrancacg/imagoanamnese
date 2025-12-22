@@ -21,11 +21,19 @@ function formatCPF(value: string): string {
 }
 
 export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPessoaisStepProps) {
+  // Para mamografia, sexo é sempre feminino
+  const isMamografia = data.tipoExame === 'mamografia';
+  
+  // Se for mamografia e sexo ainda não estiver definido, define automaticamente como feminino
+  if (isMamografia && data.sexo !== 'feminino') {
+    updateData({ sexo: 'feminino' });
+  }
+
   const canProceed = 
     data.nome.trim() !== '' && 
     data.cpf.replace(/\D/g, '').length === 11 &&
     data.dataNascimento !== '' && 
-    data.sexo !== null &&
+    (isMamografia || data.sexo !== null) &&
     data.peso !== null &&
     data.altura !== null &&
     data.dataExame !== '';
@@ -33,6 +41,12 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
     updateData({ cpf: formatted });
+  };
+
+  const formatDateForDisplay = (dateString: string): string => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
   };
 
   return (
@@ -80,25 +94,33 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             onChange={(e) => updateData({ dataNascimento: e.target.value })}
             className="h-12 text-base"
           />
+          {data.dataNascimento && (
+            <p className="text-sm text-muted-foreground">
+              {formatDateForDisplay(data.dataNascimento)}
+            </p>
+          )}
         </div>
 
-        <div className="space-y-3">
-          <Label className="text-base font-medium">Sexo</Label>
-          <RadioGroup
-            value={data.sexo ?? ''}
-            onValueChange={(value) => updateData({ sexo: value as Sex })}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-              <RadioGroupItem value="masculino" id="masculino" />
-              <Label htmlFor="masculino" className="cursor-pointer flex-1">Masculino</Label>
-            </div>
-            <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-              <RadioGroupItem value="feminino" id="feminino" />
-              <Label htmlFor="feminino" className="cursor-pointer flex-1">Feminino</Label>
-            </div>
-          </RadioGroup>
-        </div>
+        {/* Só mostra pergunta de sexo se NÃO for mamografia */}
+        {!isMamografia && (
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Sexo</Label>
+            <RadioGroup
+              value={data.sexo ?? ''}
+              onValueChange={(value) => updateData({ sexo: value as Sex })}
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                <RadioGroupItem value="masculino" id="masculino" />
+                <Label htmlFor="masculino" className="cursor-pointer flex-1">Masculino</Label>
+              </div>
+              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                <RadioGroupItem value="feminino" id="feminino" />
+                <Label htmlFor="feminino" className="cursor-pointer flex-1">Feminino</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -146,6 +168,14 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             onChange={(e) => updateData({ dataExame: e.target.value })}
             className="h-12 text-base"
           />
+          {data.dataExame && (
+            <p className="text-sm text-muted-foreground">
+              {(() => {
+                const [year, month, day] = data.dataExame.split('-');
+                return `${day}/${month}/${year}`;
+              })()}
+            </p>
+          )}
         </div>
       </div>
 
