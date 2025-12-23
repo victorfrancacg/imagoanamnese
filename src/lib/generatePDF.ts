@@ -101,11 +101,12 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   const isFeminino = data.sexo === 'feminino';
 
   // ========== CABEÇALHO ==========
-  // Adicionar logo IMAGO - usando proporção correta 4.5:1
-  const logoWidth = 50;
-  const logoHeight = 12;
+  // Adicionar logo IMAGO - proporção 4:1 da imagem original
+  const logoWidth = 48;
+  const logoHeight = 14;
   try {
-    doc.addImage(imagoLogo, 'PNG', margin, yPos, logoWidth, logoHeight);
+    // Usar JPEG format para melhor qualidade sem bordas pretas
+    doc.addImage(imagoLogo, 'JPEG', margin, yPos, logoWidth, logoHeight, undefined, 'FAST');
   } catch (e) {
     // Fallback: texto do logo
     doc.setFontSize(18);
