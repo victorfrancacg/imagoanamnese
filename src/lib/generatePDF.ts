@@ -195,33 +195,25 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     addDataRow("Alergia ao contraste de RM", formatBoolean(data.rmAlergiaContraste), data.rmAlergiaContraste === true);
   }
 
-  // Campos segurança para Tomografia
+  // Campos segurança para Tomografia Computadorizada
   if (isTomografia) {
-    addDataRow("Possui contraindicação", formatBoolean(data.temContraindicacao), data.temContraindicacao === true);
-    if (data.temContraindicacao && data.contraindicacaoDetalhes) {
-      addDataRow("Detalhes da contraindicação", data.contraindicacaoDetalhes);
-    }
-    addDataRow("Tomografia anterior (12 meses)", formatBoolean(data.tomografiaAnterior));
-    addDataRow("Alergia a contraste", formatBoolean(data.alergia), data.alergia === true);
-    if (data.alergia && data.alergiaDetalhes) {
-      addDataRow("Detalhes da alergia", data.alergiaDetalhes);
-    }
     if (isFeminino) {
-      addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
+      addDataRow("Possibilidade de gravidez", formatBoolean(data.tcGravida), data.tcGravida === true);
+      addDataRow("Amamentando", formatBoolean(data.tcAmamentando));
     }
-    addDataRow("Uso de metformina", formatBoolean(data.usaMetformina));
-    addDataRow("Cirurgia renal", formatBoolean(data.cirurgiaRenal), data.cirurgiaRenal === true);
-    if (data.cirurgiaRenal && data.cirurgiaRenalDetalhes) {
-      addDataRow("Detalhes cirurgia renal", data.cirurgiaRenalDetalhes);
-    }
-    addDataRow("Doença renal", formatBoolean(data.doencaRenal), data.doencaRenal === true);
-    if (data.doencaRenal && data.doencaRenalDetalhes) {
-      addDataRow("Detalhes doença renal", data.doencaRenalDetalhes);
-    }
+    addDataRow("Uso de metformina", formatBoolean(data.tcUsaMetformina));
+    addDataRow("Marcapasso/Desfibrilador", formatBoolean(data.tcMarcapasso), data.tcMarcapasso === true);
+    addDataRow("Alergia ao contraste de TC", formatBoolean(data.tcAlergiaContraste), data.tcAlergiaContraste === true);
+    addDataRow("Cirurgia renal", formatBoolean(data.tcCirurgiaRenal), data.tcCirurgiaRenal === true);
+    addDataRow("Doença renal", formatBoolean(data.tcDoencaRenal), data.tcDoencaRenal === true);
   }
-
   // Mamografia
   if (isMamografia && isFeminino) {
+    addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
+  }
+
+  // Densitometria - Gravidez
+  if (isDensitometria && isFeminino) {
     addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
   }
 

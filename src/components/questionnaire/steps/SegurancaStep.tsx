@@ -86,19 +86,17 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
       return true;
     }
     
-    // Validações para Tomografia
+    // Validações para Tomografia Computadorizada
     if (isTomografia) {
-      if (data.temContraindicacao === null) return false;
-      if (data.temContraindicacao && (data.contraindicacaoDetalhes?.trim() ?? '') === '') return false;
-      if (data.tomografiaAnterior === null) return false;
-      if (data.alergia === null) return false;
-      if (data.alergia && (data.alergiaDetalhes?.trim() ?? '') === '') return false;
-      if (isFeminino && data.gravida === null) return false;
-      if (data.usaMetformina === null) return false;
-      if (data.cirurgiaRenal === null) return false;
-      if (data.cirurgiaRenal && (data.cirurgiaRenalDetalhes?.trim() ?? '') === '') return false;
-      if (data.doencaRenal === null) return false;
-      if (data.doencaRenal && (data.doencaRenalDetalhes?.trim() ?? '') === '') return false;
+      if (isFeminino) {
+        if (data.tcGravida === null) return false;
+        if (data.tcAmamentando === null) return false;
+      }
+      if (data.tcUsaMetformina === null) return false;
+      if (data.tcMarcapasso === null) return false;
+      if (data.tcAlergiaContraste === null) return false;
+      if (data.tcCirurgiaRenal === null) return false;
+      if (data.tcDoencaRenal === null) return false;
       return true;
     }
     
@@ -257,98 +255,63 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
           </>
         )}
 
-        {/* ========== TOMOGRAFIA ========== */}
+        {/* ========== TOMOGRAFIA COMPUTADORIZADA ========== */}
         {isTomografia && (
           <>
-            <YesNoQuestion
-              id="contraind"
-              label="Você tem alguma condição que possa contraindicar a realização do exame (marcapasso, prótese metálica, etc.)?"
-              value={data.temContraindicacao}
-              onChange={(v) => updateData({ temContraindicacao: v })}
-              showWarning
-            >
-              {data.temContraindicacao && (
-                <Textarea
-                  placeholder="Por favor, descreva sua condição"
-                  value={data.contraindicacaoDetalhes ?? ''}
-                  onChange={(e) => updateData({ contraindicacaoDetalhes: e.target.value })}
-                  className="mt-3 animate-fade-in"
-                />
-              )}
-            </YesNoQuestion>
-
-            <YesNoQuestion
-              id="tomo-anterior"
-              label="Você já foi submetido a outro exame de tomografia computadorizada nos últimos 12 meses?"
-              value={data.tomografiaAnterior}
-              onChange={(v) => updateData({ tomografiaAnterior: v })}
-            />
-
-            <YesNoQuestion
-              id="alergia"
-              label="Você tem alguma alergia conhecida a contraste ou outros agentes utilizados em exames?"
-              value={data.alergia}
-              onChange={(v) => updateData({ alergia: v })}
-              showWarning
-            >
-              {data.alergia && (
-                <Textarea
-                  placeholder="Por favor, descreva sua alergia"
-                  value={data.alergiaDetalhes ?? ''}
-                  onChange={(e) => updateData({ alergiaDetalhes: e.target.value })}
-                  className="mt-3 animate-fade-in"
-                />
-              )}
-            </YesNoQuestion>
-
             {isFeminino && (
-              <YesNoQuestion
-                id="gravida"
-                label="Você está grávida ou suspeita que possa estar?"
-                value={data.gravida}
-                onChange={(v) => updateData({ gravida: v })}
-                showWarning
-              />
+              <>
+                <YesNoQuestion
+                  id="tc-gravida"
+                  label="Existe possibilidade de estar grávida?"
+                  value={data.tcGravida}
+                  onChange={(v) => updateData({ tcGravida: v })}
+                  showWarning
+                />
+                <YesNoQuestion
+                  id="tc-amamentando"
+                  label="Está amamentando?"
+                  value={data.tcAmamentando}
+                  onChange={(v) => updateData({ tcAmamentando: v })}
+                />
+              </>
             )}
-
+            
             <YesNoQuestion
-              id="metformina"
-              label="Você faz uso de metformina?"
-              value={data.usaMetformina}
-              onChange={(v) => updateData({ usaMetformina: v })}
+              id="tc-metformina"
+              label="Faz uso de metformina?"
+              value={data.tcUsaMetformina}
+              onChange={(v) => updateData({ tcUsaMetformina: v })}
             />
-
+            
             <YesNoQuestion
-              id="cirurgia-renal"
-              label="Tem alguma cirurgia renal? (p.ex. retirada de rim e transplante renal)"
-              value={data.cirurgiaRenal}
-              onChange={(v) => updateData({ cirurgiaRenal: v })}
-            >
-              {data.cirurgiaRenal && (
-                <Textarea
-                  placeholder="Por favor, descreva qual cirurgia renal"
-                  value={data.cirurgiaRenalDetalhes ?? ''}
-                  onChange={(e) => updateData({ cirurgiaRenalDetalhes: e.target.value })}
-                  className="mt-3 animate-fade-in"
-                />
-              )}
-            </YesNoQuestion>
-
+              id="tc-marcapasso"
+              label="Tem marcapasso ou desfibrilador cardíaco?"
+              value={data.tcMarcapasso}
+              onChange={(v) => updateData({ tcMarcapasso: v })}
+              showWarning
+            />
+            
             <YesNoQuestion
-              id="doenca-renal"
+              id="tc-alergia-contraste"
+              label="Já teve alguma reação alérgica ao contraste de tomografia computadorizada que precisou de atendimento médico?"
+              value={data.tcAlergiaContraste}
+              onChange={(v) => updateData({ tcAlergiaContraste: v })}
+              showWarning
+            />
+            
+            <YesNoQuestion
+              id="tc-cirurgia-renal"
+              label="Já fez alguma cirurgia renal? (p. ex. retirada de rim ou transplante renal)"
+              value={data.tcCirurgiaRenal}
+              onChange={(v) => updateData({ tcCirurgiaRenal: v })}
+            />
+            
+            <YesNoQuestion
+              id="tc-doenca-renal"
               label="Tem alguma doença renal? (p. ex. insuficiência renal ou doença renal crônica)"
-              value={data.doencaRenal}
-              onChange={(v) => updateData({ doencaRenal: v })}
-            >
-              {data.doencaRenal && (
-                <Textarea
-                  placeholder="Por favor, descreva qual doença renal"
-                  value={data.doencaRenalDetalhes ?? ''}
-                  onChange={(e) => updateData({ doencaRenalDetalhes: e.target.value })}
-                  className="mt-3 animate-fade-in"
-                />
-              )}
-            </YesNoQuestion>
+              value={data.tcDoencaRenal}
+              onChange={(v) => updateData({ tcDoencaRenal: v })}
+            />
           </>
         )}
 
