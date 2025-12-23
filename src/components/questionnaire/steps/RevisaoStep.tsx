@@ -139,7 +139,87 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
 
         {/* Questões de Segurança */}
         <SectionCard title="Questões de Segurança" icon={Shield} onEdit={() => onEditStep(3)}>
-          {showContraindicacao && (
+          {/* Questões de Segurança - Ressonância Magnética */}
+          {tipoExame === 'ressonancia' && (
+            <>
+              <InfoRow 
+                label="Está grávida ou suspeita" 
+                value={formatBoolean(data.rmGravida)} 
+                highlight={data.rmGravida === true}
+              />
+              <InfoRow 
+                label="Está amamentando" 
+                value={formatBoolean(data.rmAmamentando)} 
+              />
+              <InfoRow 
+                label="Implante medicamentoso" 
+                value={formatBoolean(data.rmImplanteMedicamentoso)} 
+                highlight={data.rmImplanteMedicamentoso === true}
+              />
+              <InfoRow 
+                label="Marcapasso ou desfibrilador" 
+                value={formatBoolean(data.rmMarcapasso)} 
+                highlight={data.rmMarcapasso === true}
+              />
+              <InfoRow 
+                label="Fragmento metálico/projétil" 
+                value={formatBoolean(data.rmFragmentoMetalico)} 
+                highlight={data.rmFragmentoMetalico === true}
+              />
+              <InfoRow 
+                label="Eletroestimulador implantado" 
+                value={formatBoolean(data.rmEletroestimulador)} 
+                highlight={data.rmEletroestimulador === true}
+              />
+              <InfoRow 
+                label="Clipe de aneurisma" 
+                value={formatBoolean(data.rmClipeAneurisma)} 
+                highlight={data.rmClipeAneurisma === true}
+              />
+              <InfoRow 
+                label="Expansor tecidual" 
+                value={formatBoolean(data.rmExpansorTecidual)} 
+                highlight={data.rmExpansorTecidual === true}
+              />
+              <InfoRow 
+                label="Clipe gástrico/esofágico/pílula câmera" 
+                value={formatBoolean(data.rmClipeGastrico)} 
+                highlight={data.rmClipeGastrico === true}
+              />
+              <InfoRow 
+                label="Implante coclear/eletrônico" 
+                value={formatBoolean(data.rmImplanteCoclear)} 
+                highlight={data.rmImplanteCoclear === true}
+              />
+              <InfoRow 
+                label="Lesão de olho por metal" 
+                value={formatBoolean(data.rmLesaoOlhoMetal)} 
+                highlight={data.rmLesaoOlhoMetal === true}
+              />
+              <InfoRow 
+                label="Tatuagem há menos de 15 dias" 
+                value={formatBoolean(data.rmTatuagemRecente)} 
+                highlight={data.rmTatuagemRecente === true}
+              />
+              <InfoRow 
+                label="Cirurgia renal" 
+                value={formatBoolean(data.rmCirurgiaRenal)} 
+                highlight={data.rmCirurgiaRenal === true}
+              />
+              <InfoRow 
+                label="Doença renal" 
+                value={formatBoolean(data.rmDoencaRenal)} 
+                highlight={data.rmDoencaRenal === true}
+              />
+              <InfoRow 
+                label="Alergia a contraste RM" 
+                value={formatBoolean(data.rmAlergiaContraste)} 
+                highlight={data.rmAlergiaContraste === true}
+              />
+            </>
+          )}
+          {/* Questões de Segurança - Tomografia */}
+          {tipoExame === 'tomografia' && (
             <>
               <InfoRow 
                 label="Contraindicação" 
@@ -149,13 +229,7 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               {data.temContraindicacao && data.contraindicacaoDetalhes && (
                 <InfoRow label="Detalhes" value={data.contraindicacaoDetalhes} />
               )}
-            </>
-          )}
-          {showExameAnterior && (
-            <InfoRow label={exameAnteriorLabel} value={formatBoolean(data.tomografiaAnterior)} />
-          )}
-          {showAlergia && (
-            <>
+              <InfoRow label="Tomografia anterior (12 meses)" value={formatBoolean(data.tomografiaAnterior)} />
               <InfoRow 
                 label="Alergia a contraste" 
                 value={formatBoolean(data.alergia)} 
@@ -164,23 +238,17 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               {data.alergia && data.alergiaDetalhes && (
                 <InfoRow label="Detalhes da alergia" value={data.alergiaDetalhes} />
               )}
-            </>
-          )}
-          {data.sexo === 'feminino' && (
-            <InfoRow 
-              label="Gravidez" 
-              value={formatBoolean(data.gravida)} 
-              highlight={data.gravida === true}
-            />
-          )}
-          {showMetformina && (
-            <InfoRow 
-              label="Uso de metformina" 
-              value={formatBoolean(data.usaMetformina)} 
-            />
-          )}
-          {showCirurgiaRenal && (
-            <>
+              {data.sexo === 'feminino' && (
+                <InfoRow 
+                  label="Gravidez" 
+                  value={formatBoolean(data.gravida)} 
+                  highlight={data.gravida === true}
+                />
+              )}
+              <InfoRow 
+                label="Uso de metformina" 
+                value={formatBoolean(data.usaMetformina)} 
+              />
               <InfoRow 
                 label="Cirurgia renal" 
                 value={formatBoolean(data.cirurgiaRenal)} 
@@ -189,10 +257,6 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               {data.cirurgiaRenal && data.cirurgiaRenalDetalhes && (
                 <InfoRow label="Detalhes" value={data.cirurgiaRenalDetalhes} />
               )}
-            </>
-          )}
-          {showDoencaRenal && (
-            <>
               <InfoRow 
                 label="Doença renal" 
                 value={formatBoolean(data.doencaRenal)} 
