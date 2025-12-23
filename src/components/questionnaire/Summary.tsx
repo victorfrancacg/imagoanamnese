@@ -49,6 +49,16 @@ function SummaryItem({ label, value, highlight }: { label: string; value: string
   );
 }
 
+function getExamTypeLabel(tipoExame: string): string {
+  const labels: Record<string, string> = {
+    'tomografia': 'Tomografia Computadorizada',
+    'ressonancia': 'Ressonância Magnética',
+    'densitometria': 'Densitometria',
+    'mamografia': 'Mamografia',
+  };
+  return labels[tipoExame] || tipoExame;
+}
+
 export function Summary({ data, onReset, savedId }: SummaryProps) {
   const sexoLabel = data.sexo === 'masculino' 
     ? 'Masculino' 
@@ -62,6 +72,11 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
         : SINTOMAS_LABELS[s] || s).join(', ')
     : 'Nenhum sintoma selecionado';
 
+  const isRessonancia = data.tipoExame === 'ressonancia';
+  const isTomografia = data.tipoExame === 'tomografia';
+  const isDensitometria = data.tipoExame === 'densitometria';
+  const isFeminino = data.sexo === 'feminino';
+
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-up">
       {/* Success Message */}
@@ -73,7 +88,7 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
           Questionário Preenchido com Sucesso!
         </h1>
         <p className="text-muted-foreground">
-          Você preencheu com sucesso o questionário de anamnese para o exame de Tomografia Computadorizada.
+          Você preencheu com sucesso o questionário de anamnese para o exame de {getExamTypeLabel(data.tipoExame)}.
         </p>
       </div>
 
@@ -90,29 +105,198 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
           <SummaryItem label="Sexo" value={sexoLabel} />
           <SummaryItem label="Peso" value={data.peso ? `${data.peso} kg` : '-'} />
           <SummaryItem label="Altura" value={data.altura ? `${data.altura} cm` : '-'} />
-          <SummaryItem label="Tipo do Exame" value={data.tipoExame || '-'} />
+          <SummaryItem label="Tipo do Exame" value={getExamTypeLabel(data.tipoExame)} />
           <SummaryItem label="Data do Exame" value={formatDate(data.dataExame)} />
         </SummarySection>
 
         <SummarySection title="Questões de Segurança" icon={Shield}>
-          <SummaryItem 
-            label="Contraindicação" 
-            value={formatBoolean(data.temContraindicacao)} 
-            highlight={data.temContraindicacao === true}
-          />
-          {data.temContraindicacao && data.contraindicacaoDetalhes && (
-            <SummaryItem label="Detalhes" value={data.contraindicacaoDetalhes} />
+          {/* Ressonância Magnética */}
+          {isRessonancia && (
+            <>
+              {isFeminino && (
+                <>
+                  <SummaryItem 
+                    label="Gravidez" 
+                    value={formatBoolean(data.rmGravida)} 
+                    highlight={data.rmGravida === true}
+                  />
+                  <SummaryItem 
+                    label="Amamentando" 
+                    value={formatBoolean(data.rmAmamentando)} 
+                  />
+                </>
+              )}
+              <SummaryItem 
+                label="Implante medicamentoso" 
+                value={formatBoolean(data.rmImplanteMedicamentoso)} 
+                highlight={data.rmImplanteMedicamentoso === true}
+              />
+              <SummaryItem 
+                label="Marcapasso/Desfibrilador" 
+                value={formatBoolean(data.rmMarcapasso)} 
+                highlight={data.rmMarcapasso === true}
+              />
+              <SummaryItem 
+                label="Fragmento metálico/Projétil" 
+                value={formatBoolean(data.rmFragmentoMetalico)} 
+                highlight={data.rmFragmentoMetalico === true}
+              />
+              <SummaryItem 
+                label="Eletroestimulador implantado" 
+                value={formatBoolean(data.rmEletroestimulador)} 
+                highlight={data.rmEletroestimulador === true}
+              />
+              <SummaryItem 
+                label="Clipe de aneurisma na cabeça" 
+                value={formatBoolean(data.rmClipeAneurisma)} 
+                highlight={data.rmClipeAneurisma === true}
+              />
+              <SummaryItem 
+                label="Expansor tecidual" 
+                value={formatBoolean(data.rmExpansorTecidual)} 
+                highlight={data.rmExpansorTecidual === true}
+              />
+              <SummaryItem 
+                label="Clipe gástrico/esofágico/microcâmera" 
+                value={formatBoolean(data.rmClipeGastrico)} 
+                highlight={data.rmClipeGastrico === true}
+              />
+              <SummaryItem 
+                label="Implante coclear/eletrônico" 
+                value={formatBoolean(data.rmImplanteCoclear)} 
+                highlight={data.rmImplanteCoclear === true}
+              />
+              <SummaryItem 
+                label="Lesão de olho por metal" 
+                value={formatBoolean(data.rmLesaoOlhoMetal)} 
+                highlight={data.rmLesaoOlhoMetal === true}
+              />
+              <SummaryItem 
+                label="Tatuagem recente (menos de 15 dias)" 
+                value={formatBoolean(data.rmTatuagemRecente)} 
+                highlight={data.rmTatuagemRecente === true}
+              />
+              <SummaryItem 
+                label="Cirurgia renal" 
+                value={formatBoolean(data.rmCirurgiaRenal)} 
+                highlight={data.rmCirurgiaRenal === true}
+              />
+              <SummaryItem 
+                label="Doença renal" 
+                value={formatBoolean(data.rmDoencaRenal)} 
+                highlight={data.rmDoencaRenal === true}
+              />
+              <SummaryItem 
+                label="Alergia ao contraste de RM" 
+                value={formatBoolean(data.rmAlergiaContraste)} 
+                highlight={data.rmAlergiaContraste === true}
+              />
+            </>
           )}
-          <SummaryItem label="Tomografia anterior (12 meses)" value={formatBoolean(data.tomografiaAnterior)} />
-          <SummaryItem 
-            label="Alergia a contraste" 
-            value={formatBoolean(data.alergia)} 
-            highlight={data.alergia === true}
-          />
-          {data.alergia && data.alergiaDetalhes && (
-            <SummaryItem label="Detalhes da alergia" value={data.alergiaDetalhes} />
+
+          {/* Tomografia */}
+          {isTomografia && (
+            <>
+              <SummaryItem 
+                label="Contraindicação" 
+                value={formatBoolean(data.temContraindicacao)} 
+                highlight={data.temContraindicacao === true}
+              />
+              {data.temContraindicacao && data.contraindicacaoDetalhes && (
+                <SummaryItem label="Detalhes" value={data.contraindicacaoDetalhes} />
+              )}
+              <SummaryItem label="Tomografia anterior (12 meses)" value={formatBoolean(data.tomografiaAnterior)} />
+              <SummaryItem 
+                label="Alergia a contraste" 
+                value={formatBoolean(data.alergia)} 
+                highlight={data.alergia === true}
+              />
+              {data.alergia && data.alergiaDetalhes && (
+                <SummaryItem label="Detalhes da alergia" value={data.alergiaDetalhes} />
+              )}
+              {isFeminino && (
+                <SummaryItem 
+                  label="Gravidez" 
+                  value={formatBoolean(data.gravida)} 
+                  highlight={data.gravida === true}
+                />
+              )}
+              <SummaryItem label="Uso de metformina" value={formatBoolean(data.usaMetformina)} />
+              <SummaryItem 
+                label="Cirurgia renal" 
+                value={formatBoolean(data.cirurgiaRenal)} 
+                highlight={data.cirurgiaRenal === true}
+              />
+              {data.cirurgiaRenal && data.cirurgiaRenalDetalhes && (
+                <SummaryItem label="Detalhes cirurgia renal" value={data.cirurgiaRenalDetalhes} />
+              )}
+              <SummaryItem 
+                label="Doença renal" 
+                value={formatBoolean(data.doencaRenal)} 
+                highlight={data.doencaRenal === true}
+              />
+              {data.doencaRenal && data.doencaRenalDetalhes && (
+                <SummaryItem label="Detalhes doença renal" value={data.doencaRenalDetalhes} />
+              )}
+            </>
           )}
-          {data.sexo === 'feminino' && (
+
+          {/* Densitometria */}
+          {isDensitometria && (
+            <>
+              {isFeminino && (
+                <SummaryItem 
+                  label="Gravidez" 
+                  value={formatBoolean(data.gravida)} 
+                  highlight={data.gravida === true}
+                />
+              )}
+              <SummaryItem 
+                label="Exame contraste/bário recente" 
+                value={formatBoolean(data.exameContrasteRecente)} 
+                highlight={data.exameContrasteRecente === true}
+              />
+              <SummaryItem 
+                label="Fraturou osso (5 anos)" 
+                value={formatBoolean(data.fraturouOsso)} 
+                highlight={data.fraturouOsso === true}
+              />
+              {data.fraturouOsso && data.fraturouOssoDetalhes && (
+                <SummaryItem label="Detalhes da fratura" value={data.fraturouOssoDetalhes} />
+              )}
+              <SummaryItem 
+                label="Perdeu mais de 3cm de altura" 
+                value={formatBoolean(data.perdeuAltura)} 
+                highlight={data.perdeuAltura === true}
+              />
+              <SummaryItem 
+                label="Perda óssea em radiografia" 
+                value={formatBoolean(data.perdaOsseaRadiografia)} 
+                highlight={data.perdaOsseaRadiografia === true}
+              />
+              <SummaryItem 
+                label="Cifose dorsal" 
+                value={formatBoolean(data.cifoseDorsal)} 
+                highlight={data.cifoseDorsal === true}
+              />
+              <SummaryItem 
+                label="Mais de uma queda (12 meses)" 
+                value={formatBoolean(data.quedas12Meses)} 
+                highlight={data.quedas12Meses === true}
+              />
+              <SummaryItem 
+                label="Parente com osteoporose" 
+                value={formatBoolean(data.parenteOsteoporose)} 
+                highlight={data.parenteOsteoporose === true}
+              />
+              {data.parenteOsteoporose && data.parenteOsteoporoseDetalhes && (
+                <SummaryItem label="Qual parente" value={data.parenteOsteoporoseDetalhes} />
+              )}
+            </>
+          )}
+
+          {/* Mamografia */}
+          {data.tipoExame === 'mamografia' && isFeminino && (
             <SummaryItem 
               label="Gravidez" 
               value={formatBoolean(data.gravida)} 

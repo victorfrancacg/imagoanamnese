@@ -12,19 +12,36 @@ export interface QuestionnaireData {
   tipoExame: TipoExame | '';
   dataExame: string;
 
-  // Questões de Segurança
+  // Questões de Segurança - Tomografia
   temContraindicacao: boolean | null;
   contraindicacaoDetalhes?: string;
   tomografiaAnterior: boolean | null;
   alergia: boolean | null;
   alergiaDetalhes?: string;
   gravida: boolean | null;
-  // Específicas Tomografia
   usaMetformina: boolean | null;
   cirurgiaRenal: boolean | null;
   cirurgiaRenalDetalhes?: string;
   doencaRenal: boolean | null;
   doencaRenalDetalhes?: string;
+  
+  // Questões de Segurança - Ressonância Magnética
+  rmGravida: boolean | null;
+  rmAmamentando: boolean | null;
+  rmImplanteMedicamentoso: boolean | null;
+  rmMarcapasso: boolean | null;
+  rmFragmentoMetalico: boolean | null;
+  rmEletroestimulador: boolean | null;
+  rmClipeAneurisma: boolean | null;
+  rmExpansorTecidual: boolean | null;
+  rmClipeGastrico: boolean | null;
+  rmImplanteCoclear: boolean | null;
+  rmLesaoOlhoMetal: boolean | null;
+  rmTatuagemRecente: boolean | null;
+  rmCirurgiaRenal: boolean | null;
+  rmDoencaRenal: boolean | null;
+  rmAlergiaContraste: boolean | null;
+  
   // Específicas Densitometria (Segurança)
   exameContrasteRecente: boolean | null;
   fraturouOsso: boolean | null;
@@ -127,6 +144,22 @@ export const initialData: QuestionnaireData = {
   cirurgiaRenalDetalhes: '',
   doencaRenal: null,
   doencaRenalDetalhes: '',
+  // Ressonância Magnética - Segurança
+  rmGravida: null,
+  rmAmamentando: null,
+  rmImplanteMedicamentoso: null,
+  rmMarcapasso: null,
+  rmFragmentoMetalico: null,
+  rmEletroestimulador: null,
+  rmClipeAneurisma: null,
+  rmExpansorTecidual: null,
+  rmClipeGastrico: null,
+  rmImplanteCoclear: null,
+  rmLesaoOlhoMetal: null,
+  rmTatuagemRecente: null,
+  rmCirurgiaRenal: null,
+  rmDoencaRenal: null,
+  rmAlergiaContraste: null,
   // Densitometria Segurança
   exameContrasteRecente: null,
   fraturouOsso: null,
