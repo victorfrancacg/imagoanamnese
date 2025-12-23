@@ -218,53 +218,46 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               />
             </>
           )}
-          {/* Questões de Segurança - Tomografia */}
+          {/* Questões de Segurança - Tomografia Computadorizada */}
           {tipoExame === 'tomografia' && (
             <>
-              <InfoRow 
-                label="Contraindicação" 
-                value={formatBoolean(data.temContraindicacao)} 
-                highlight={data.temContraindicacao === true}
-              />
-              {data.temContraindicacao && data.contraindicacaoDetalhes && (
-                <InfoRow label="Detalhes" value={data.contraindicacaoDetalhes} />
-              )}
-              <InfoRow label="Tomografia anterior (12 meses)" value={formatBoolean(data.tomografiaAnterior)} />
-              <InfoRow 
-                label="Alergia a contraste" 
-                value={formatBoolean(data.alergia)} 
-                highlight={data.alergia === true}
-              />
-              {data.alergia && data.alergiaDetalhes && (
-                <InfoRow label="Detalhes da alergia" value={data.alergiaDetalhes} />
-              )}
               {data.sexo === 'feminino' && (
-                <InfoRow 
-                  label="Gravidez" 
-                  value={formatBoolean(data.gravida)} 
-                  highlight={data.gravida === true}
-                />
+                <>
+                  <InfoRow 
+                    label="Possibilidade de gravidez" 
+                    value={formatBoolean(data.tcGravida)} 
+                    highlight={data.tcGravida === true}
+                  />
+                  <InfoRow 
+                    label="Está amamentando" 
+                    value={formatBoolean(data.tcAmamentando)} 
+                  />
+                </>
               )}
               <InfoRow 
                 label="Uso de metformina" 
-                value={formatBoolean(data.usaMetformina)} 
+                value={formatBoolean(data.tcUsaMetformina)} 
+              />
+              <InfoRow 
+                label="Marcapasso ou desfibrilador" 
+                value={formatBoolean(data.tcMarcapasso)} 
+                highlight={data.tcMarcapasso === true}
+              />
+              <InfoRow 
+                label="Alergia ao contraste de TC" 
+                value={formatBoolean(data.tcAlergiaContraste)} 
+                highlight={data.tcAlergiaContraste === true}
               />
               <InfoRow 
                 label="Cirurgia renal" 
-                value={formatBoolean(data.cirurgiaRenal)} 
-                highlight={data.cirurgiaRenal === true}
+                value={formatBoolean(data.tcCirurgiaRenal)} 
+                highlight={data.tcCirurgiaRenal === true}
               />
-              {data.cirurgiaRenal && data.cirurgiaRenalDetalhes && (
-                <InfoRow label="Detalhes" value={data.cirurgiaRenalDetalhes} />
-              )}
               <InfoRow 
                 label="Doença renal" 
-                value={formatBoolean(data.doencaRenal)} 
-                highlight={data.doencaRenal === true}
+                value={formatBoolean(data.tcDoencaRenal)} 
+                highlight={data.tcDoencaRenal === true}
               />
-              {data.doencaRenal && data.doencaRenalDetalhes && (
-                <InfoRow label="Detalhes" value={data.doencaRenalDetalhes} />
-              )}
             </>
           )}
           {/* Campos de Segurança Densitometria */}

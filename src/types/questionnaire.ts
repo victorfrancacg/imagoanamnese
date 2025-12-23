@@ -12,18 +12,17 @@ export interface QuestionnaireData {
   tipoExame: TipoExame | '';
   dataExame: string;
 
-  // Questões de Segurança - Tomografia
-  temContraindicacao: boolean | null;
-  contraindicacaoDetalhes?: string;
-  tomografiaAnterior: boolean | null;
-  alergia: boolean | null;
-  alergiaDetalhes?: string;
+  // Questões de Segurança - Tomografia Computadorizada
+  tcGravida: boolean | null;
+  tcAmamentando: boolean | null;
+  tcUsaMetformina: boolean | null;
+  tcMarcapasso: boolean | null;
+  tcAlergiaContraste: boolean | null;
+  tcCirurgiaRenal: boolean | null;
+  tcDoencaRenal: boolean | null;
+  
+  // Campo genérico de gravidez (para mamografia e densitometria)
   gravida: boolean | null;
-  usaMetformina: boolean | null;
-  cirurgiaRenal: boolean | null;
-  cirurgiaRenalDetalhes?: string;
-  doencaRenal: boolean | null;
-  doencaRenalDetalhes?: string;
   
   // Questões de Segurança - Ressonância Magnética
   rmGravida: boolean | null;
@@ -133,17 +132,15 @@ export const initialData: QuestionnaireData = {
   altura: null,
   tipoExame: '',
   dataExame: '',
-  temContraindicacao: null,
-  contraindicacaoDetalhes: '',
-  tomografiaAnterior: null,
-  alergia: null,
-  alergiaDetalhes: '',
+  // Tomografia Computadorizada - Segurança
+  tcGravida: null,
+  tcAmamentando: null,
+  tcUsaMetformina: null,
+  tcMarcapasso: null,
+  tcAlergiaContraste: null,
+  tcCirurgiaRenal: null,
+  tcDoencaRenal: null,
   gravida: null,
-  usaMetformina: null,
-  cirurgiaRenal: null,
-  cirurgiaRenalDetalhes: '',
-  doencaRenal: null,
-  doencaRenalDetalhes: '',
   // Ressonância Magnética - Segurança
   rmGravida: null,
   rmAmamentando: null,

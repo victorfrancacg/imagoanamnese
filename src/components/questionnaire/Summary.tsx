@@ -194,50 +194,46 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
             </>
           )}
 
-          {/* Tomografia */}
+          {/* Tomografia Computadorizada */}
           {isTomografia && (
             <>
-              <SummaryItem 
-                label="Contraindicação" 
-                value={formatBoolean(data.temContraindicacao)} 
-                highlight={data.temContraindicacao === true}
-              />
-              {data.temContraindicacao && data.contraindicacaoDetalhes && (
-                <SummaryItem label="Detalhes" value={data.contraindicacaoDetalhes} />
-              )}
-              <SummaryItem label="Tomografia anterior (12 meses)" value={formatBoolean(data.tomografiaAnterior)} />
-              <SummaryItem 
-                label="Alergia a contraste" 
-                value={formatBoolean(data.alergia)} 
-                highlight={data.alergia === true}
-              />
-              {data.alergia && data.alergiaDetalhes && (
-                <SummaryItem label="Detalhes da alergia" value={data.alergiaDetalhes} />
-              )}
               {isFeminino && (
-                <SummaryItem 
-                  label="Gravidez" 
-                  value={formatBoolean(data.gravida)} 
-                  highlight={data.gravida === true}
-                />
+                <>
+                  <SummaryItem 
+                    label="Possibilidade de gravidez" 
+                    value={formatBoolean(data.tcGravida)} 
+                    highlight={data.tcGravida === true}
+                  />
+                  <SummaryItem 
+                    label="Amamentando" 
+                    value={formatBoolean(data.tcAmamentando)} 
+                  />
+                </>
               )}
-              <SummaryItem label="Uso de metformina" value={formatBoolean(data.usaMetformina)} />
+              <SummaryItem 
+                label="Uso de metformina" 
+                value={formatBoolean(data.tcUsaMetformina)} 
+              />
+              <SummaryItem 
+                label="Marcapasso ou desfibrilador" 
+                value={formatBoolean(data.tcMarcapasso)} 
+                highlight={data.tcMarcapasso === true}
+              />
+              <SummaryItem 
+                label="Alergia ao contraste de TC" 
+                value={formatBoolean(data.tcAlergiaContraste)} 
+                highlight={data.tcAlergiaContraste === true}
+              />
               <SummaryItem 
                 label="Cirurgia renal" 
-                value={formatBoolean(data.cirurgiaRenal)} 
-                highlight={data.cirurgiaRenal === true}
+                value={formatBoolean(data.tcCirurgiaRenal)} 
+                highlight={data.tcCirurgiaRenal === true}
               />
-              {data.cirurgiaRenal && data.cirurgiaRenalDetalhes && (
-                <SummaryItem label="Detalhes cirurgia renal" value={data.cirurgiaRenalDetalhes} />
-              )}
               <SummaryItem 
                 label="Doença renal" 
-                value={formatBoolean(data.doencaRenal)} 
-                highlight={data.doencaRenal === true}
+                value={formatBoolean(data.tcDoencaRenal)} 
+                highlight={data.tcDoencaRenal === true}
               />
-              {data.doencaRenal && data.doencaRenalDetalhes && (
-                <SummaryItem label="Detalhes doença renal" value={data.doencaRenalDetalhes} />
-              )}
             </>
           )}
 
