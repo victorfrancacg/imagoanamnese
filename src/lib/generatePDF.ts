@@ -173,29 +173,41 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   // ========== QUESTÕES DE SEGURANÇA ==========
   addSection("QUESTÕES DE SEGURANÇA");
 
-  // Campos segurança para Tomografia e Ressonância
-  if (isTomografia || isRessonancia) {
+  // Campos segurança para Ressonância Magnética (novo formato)
+  if (isRessonancia) {
+    if (isFeminino) {
+      addDataRow("Gravidez", formatBoolean(data.rmGravida), data.rmGravida === true);
+      addDataRow("Amamentando", formatBoolean(data.rmAmamentando));
+    }
+    addDataRow("Implante medicamentoso", formatBoolean(data.rmImplanteMedicamentoso), data.rmImplanteMedicamentoso === true);
+    addDataRow("Marcapasso/Desfibrilador", formatBoolean(data.rmMarcapasso), data.rmMarcapasso === true);
+    addDataRow("Fragmento metálico/Projétil", formatBoolean(data.rmFragmentoMetalico), data.rmFragmentoMetalico === true);
+    addDataRow("Eletroestimulador implantado", formatBoolean(data.rmEletroestimulador), data.rmEletroestimulador === true);
+    addDataRow("Clipe de aneurisma na cabeça", formatBoolean(data.rmClipeAneurisma), data.rmClipeAneurisma === true);
+    addDataRow("Expansor tecidual", formatBoolean(data.rmExpansorTecidual), data.rmExpansorTecidual === true);
+    addDataRow("Clipe gástrico/esofágico/microcâmera", formatBoolean(data.rmClipeGastrico), data.rmClipeGastrico === true);
+    addDataRow("Implante coclear/eletrônico", formatBoolean(data.rmImplanteCoclear), data.rmImplanteCoclear === true);
+    addDataRow("Lesão de olho por metal", formatBoolean(data.rmLesaoOlhoMetal), data.rmLesaoOlhoMetal === true);
+    addDataRow("Tatuagem recente (menos de 15 dias)", formatBoolean(data.rmTatuagemRecente), data.rmTatuagemRecente === true);
+    addDataRow("Cirurgia renal", formatBoolean(data.rmCirurgiaRenal), data.rmCirurgiaRenal === true);
+    addDataRow("Doença renal", formatBoolean(data.rmDoencaRenal), data.rmDoencaRenal === true);
+    addDataRow("Alergia ao contraste de RM", formatBoolean(data.rmAlergiaContraste), data.rmAlergiaContraste === true);
+  }
+
+  // Campos segurança para Tomografia
+  if (isTomografia) {
     addDataRow("Possui contraindicação", formatBoolean(data.temContraindicacao), data.temContraindicacao === true);
     if (data.temContraindicacao && data.contraindicacaoDetalhes) {
       addDataRow("Detalhes da contraindicação", data.contraindicacaoDetalhes);
     }
-    
-    const exameAnteriorLabel = isRessonancia 
-      ? 'Ressonância anterior (12 meses)' 
-      : 'Tomografia anterior (12 meses)';
-    addDataRow(exameAnteriorLabel, formatBoolean(data.tomografiaAnterior));
+    addDataRow("Tomografia anterior (12 meses)", formatBoolean(data.tomografiaAnterior));
     addDataRow("Alergia a contraste", formatBoolean(data.alergia), data.alergia === true);
     if (data.alergia && data.alergiaDetalhes) {
       addDataRow("Detalhes da alergia", data.alergiaDetalhes);
     }
-  }
-
-  if (isFeminino) {
-    addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
-  }
-  
-  // Campos específicos de Tomografia (Segurança)
-  if (isTomografia) {
+    if (isFeminino) {
+      addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
+    }
     addDataRow("Uso de metformina", formatBoolean(data.usaMetformina));
     addDataRow("Cirurgia renal", formatBoolean(data.cirurgiaRenal), data.cirurgiaRenal === true);
     if (data.cirurgiaRenal && data.cirurgiaRenalDetalhes) {
@@ -205,6 +217,11 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     if (data.doencaRenal && data.doencaRenalDetalhes) {
       addDataRow("Detalhes doença renal", data.doencaRenalDetalhes);
     }
+  }
+
+  // Mamografia
+  if (isMamografia && isFeminino) {
+    addDataRow("Gravidez", formatBoolean(data.gravida), data.gravida === true);
   }
 
   // Campos específicos de Densitometria (Segurança)
