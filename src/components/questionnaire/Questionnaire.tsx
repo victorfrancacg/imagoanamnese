@@ -9,7 +9,7 @@ import { ConsentimentoStep } from "./steps/ConsentimentoStep";
 import { Summary } from "./Summary";
 import { QuestionnaireData, initialData } from "@/types/questionnaire";
 import { saveQuestionario } from "@/hooks/useQuestionarioSave";
-import { Stethoscope } from "lucide-react";
+import imagoLogo from "@/assets/imago-logo.png";
 
 export function Questionnaire() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -138,15 +138,14 @@ export function Questionnaire() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-glow mb-4 shadow-glow">
-            <Stethoscope className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            Questionário Clínico
-          </h1>
+          <img 
+            src={imagoLogo} 
+            alt="IMAGO - Diagnóstico por Imagem" 
+            className="h-14 md:h-16 mx-auto mb-4 object-contain"
+          />
           {currentStep > 1 && data.tipoExame && (
-            <p className="text-muted-foreground">
-              Exame de {getExamTypeLabel()}
+            <p className="text-muted-foreground text-sm">
+              Questionário de {getExamTypeLabel()}
             </p>
           )}
         </div>

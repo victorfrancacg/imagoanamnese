@@ -101,17 +101,20 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   const isFeminino = data.sexo === 'feminino';
 
   // ========== CABEÇALHO ==========
-  // Adicionar logo IMAGO
+  // Adicionar logo IMAGO - usando proporção correta 4.5:1
+  const logoWidth = 50;
+  const logoHeight = 12;
   try {
-    doc.addImage(imagoLogo, 'PNG', margin, yPos, 45, 15);
+    doc.addImage(imagoLogo, 'PNG', margin, yPos, logoWidth, logoHeight);
   } catch (e) {
     // Fallback: texto do logo
-    doc.setFontSize(20);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...COLORS.primary);
-    doc.text("IMAGO", margin, yPos + 10);
-    doc.setFontSize(7);
-    doc.text("DIAGNÓSTICO POR IMAGEM", margin, yPos + 14);
+    doc.text("IMAGO", margin, yPos + 8);
+    doc.setFontSize(6);
+    doc.setFont("helvetica", "normal");
+    doc.text("DIAGNÓSTICO POR IMAGEM", margin, yPos + 11);
   }
 
   // Badge do tipo de exame
