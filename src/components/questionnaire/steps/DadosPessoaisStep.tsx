@@ -127,9 +127,9 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
       title="Dados Pessoais"
       subtitle="Por favor, preencha suas informações pessoais"
     >
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="nome" className="text-base font-medium">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="nome" className="text-sm sm:text-base font-medium">
             Nome Completo
           </Label>
           <Input
@@ -138,12 +138,12 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             placeholder="Digite seu nome completo"
             value={data.nome}
             onChange={(e) => updateData({ nome: e.target.value })}
-            className="h-12 text-base"
+            className="h-10 sm:h-12 text-sm sm:text-base"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="cpf" className="text-base font-medium">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="cpf" className="text-sm sm:text-base font-medium">
             CPF
           </Label>
           <Input
@@ -152,12 +152,12 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             placeholder="000.000.000-00"
             value={data.cpf}
             onChange={handleCPFChange}
-            className="h-12 text-base"
+            className="h-10 sm:h-12 text-sm sm:text-base"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="dataNascimento" className="text-base font-medium">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="dataNascimento" className="text-sm sm:text-base font-medium">
             Data de Nascimento
           </Label>
           <Input
@@ -166,35 +166,35 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             placeholder="dd/mm/aaaa"
             value={dataNascimentoInput}
             onChange={handleDataNascimentoChange}
-            className="h-12 text-base"
+            className="h-10 sm:h-12 text-sm sm:text-base"
             maxLength={10}
           />
         </div>
 
         {/* Só mostra pergunta de sexo se NÃO for mamografia */}
         {!isMamografia && (
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Sexo</Label>
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="text-sm sm:text-base font-medium">Sexo</Label>
             <RadioGroup
               value={data.sexo ?? ''}
               onValueChange={(value) => updateData({ sexo: value as Sex })}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
-              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="masculino" id="masculino" />
-                <Label htmlFor="masculino" className="cursor-pointer flex-1">Masculino</Label>
+                <Label htmlFor="masculino" className="cursor-pointer flex-1 text-sm sm:text-base">Masculino</Label>
               </div>
-              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-center space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="feminino" id="feminino" />
-                <Label htmlFor="feminino" className="cursor-pointer flex-1">Feminino</Label>
+                <Label htmlFor="feminino" className="cursor-pointer flex-1 text-sm sm:text-base">Feminino</Label>
               </div>
             </RadioGroup>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="peso" className="text-base font-medium">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="peso" className="text-sm sm:text-base font-medium">
               Peso (kg)
             </Label>
             <Input
@@ -206,12 +206,12 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
               step={0.1}
               value={data.peso ?? ''}
               onChange={(e) => updateData({ peso: e.target.value ? parseFloat(e.target.value) : null })}
-              className="h-12 text-base"
+              className="h-10 sm:h-12 text-sm sm:text-base"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="altura" className="text-base font-medium">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="altura" className="text-sm sm:text-base font-medium">
               Altura (cm)
             </Label>
             <Input
@@ -222,13 +222,13 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
               max={300}
               value={data.altura ?? ''}
               onChange={(e) => updateData({ altura: e.target.value ? parseFloat(e.target.value) : null })}
-              className="h-12 text-base"
+              className="h-10 sm:h-12 text-sm sm:text-base"
             />
           </div>
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="dataExame" className="text-base font-medium">
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="dataExame" className="text-sm sm:text-base font-medium">
             Data do Exame
           </Label>
           <Input
@@ -237,7 +237,7 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             placeholder="dd/mm/aaaa"
             value={dataExameInput}
             onChange={handleDataExameChange}
-            className="h-12 text-base"
+            className="h-10 sm:h-12 text-sm sm:text-base"
             maxLength={10}
           />
         </div>

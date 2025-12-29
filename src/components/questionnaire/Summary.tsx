@@ -28,12 +28,12 @@ function formatDate(dateString: string): string {
 
 function SummarySection({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="space-y-3">
-      <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-        <Icon className="w-5 h-5 text-primary" />
+    <div className="space-y-2 sm:space-y-3">
+      <h3 className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
         {title}
       </h3>
-      <div className="pl-7 space-y-2">
+      <div className="pl-5 sm:pl-7 space-y-1 sm:space-y-2">
         {children}
       </div>
     </div>
@@ -42,9 +42,9 @@ function SummarySection({ title, icon: Icon, children }: { title: string; icon: 
 
 function SummaryItem({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="flex flex-wrap justify-between gap-2 py-2 border-b border-border/50 last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={`font-medium ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
+    <div className="flex flex-col xs:flex-row xs:flex-wrap xs:justify-between gap-0.5 xs:gap-2 py-1.5 sm:py-2 border-b border-border/50 last:border-0">
+      <span className="text-xs sm:text-sm text-muted-foreground">{label}</span>
+      <span className={`text-sm sm:text-base font-medium ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
     </div>
   );
 }
@@ -80,21 +80,21 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
   return (
     <div className="w-full max-w-2xl mx-auto animate-slide-up">
       {/* Success Message */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-4">
-          <CheckCircle2 className="w-10 h-10 text-success" />
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-success/10 mb-3 sm:mb-4">
+          <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-success" />
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-1.5 sm:mb-2">
           Questionário Preenchido com Sucesso!
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground px-2">
           Você preencheu com sucesso o questionário de anamnese para o exame de {getExamTypeLabel(data.tipoExame)}.
         </p>
       </div>
 
       {/* Summary Card */}
-      <div className="bg-card rounded-2xl p-8 shadow-lg space-y-8">
-        <h2 className="text-xl font-semibold text-center text-foreground border-b border-border pb-4">
+      <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg space-y-6 sm:space-y-8">
+        <h2 className="text-lg sm:text-xl font-semibold text-center text-foreground border-b border-border pb-3 sm:pb-4">
           Resumo das Respostas
         </h2>
 
@@ -345,11 +345,11 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center">
         <Button
           variant="outline"
           onClick={onReset}
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2 h-10 sm:h-11"
         >
           <RotateCcw className="w-4 h-4" />
           Novo Questionário

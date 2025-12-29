@@ -30,23 +30,23 @@ function YesNoQuestion({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="space-y-3 animate-fade-in">
-      <Label className="text-base font-medium flex items-center gap-2">
-        {showWarning && <AlertTriangle className="w-4 h-4 text-warning" />}
-        {label}
+    <div className="space-y-2 sm:space-y-3 animate-fade-in">
+      <Label className="text-sm sm:text-base font-medium flex items-center gap-2">
+        {showWarning && <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0" />}
+        <span>{label}</span>
       </Label>
       <RadioGroup
         value={value === null ? '' : value ? 'sim' : 'nao'}
         onValueChange={(v) => onChange(v === 'sim')}
-        className="flex gap-4"
+        className="flex gap-2 sm:gap-4"
       >
-        <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+        <div className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
           <RadioGroupItem value="sim" id={`${id}-sim`} />
-          <Label htmlFor={`${id}-sim`} className="cursor-pointer">Sim</Label>
+          <Label htmlFor={`${id}-sim`} className="cursor-pointer text-sm sm:text-base">Sim</Label>
         </div>
-        <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+        <div className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
           <RadioGroupItem value="nao" id={`${id}-nao`} />
-          <Label htmlFor={`${id}-nao`} className="cursor-pointer">Não</Label>
+          <Label htmlFor={`${id}-nao`} className="cursor-pointer text-sm sm:text-base">Não</Label>
         </div>
       </RadioGroup>
       {children}
@@ -129,7 +129,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
       title="Questões de Segurança"
       subtitle="Informações importantes para a realização do exame"
     >
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         
         {/* ========== RESSONÂNCIA MAGNÉTICA ========== */}
         {isRessonancia && (
