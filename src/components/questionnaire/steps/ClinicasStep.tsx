@@ -129,6 +129,9 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
     if (tipoExame === 'densitometria') {
       return 'Por que seu médico solicitou esse exame de Densitometria?';
     }
+    if (tipoExame === 'mamografia') {
+      return 'Motivo do exame de Mamografia';
+    }
     return 'Motivo do Exame';
   };
 
