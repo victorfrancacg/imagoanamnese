@@ -152,21 +152,21 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
       title="Questões Clínicas"
       subtitle="Informações sobre o motivo do exame"
     >
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* Bloco de Regiões do Exame - Apenas para Tomografia e Ressonância */}
         {isTomografiaOuRessonancia && (
-          <div className="space-y-4 p-4 rounded-lg bg-accent/30 border border-border animate-fade-in">
-            <Label className="text-base font-medium">
+          <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 rounded-lg bg-accent/30 border border-border animate-fade-in">
+            <Label className="text-sm sm:text-base font-medium">
               Regiões submetidas ao exame <span className="text-destructive">*</span>
             </Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Selecione todas as regiões do corpo que serão examinadas:
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
               {regioesDisponiveis.map((regiao) => (
                 <div 
                   key={regiao.id}
-                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => handleRegiaoChange(regiao.id, !(data.regioesExame || []).includes(regiao.id))}
                 >
                   <Checkbox
@@ -174,7 +174,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     checked={(data.regioesExame || []).includes(regiao.id)}
                     onCheckedChange={(checked) => handleRegiaoChange(regiao.id, checked as boolean)}
                   />
-                  <Label htmlFor={`regiao-${regiao.id}`} className="cursor-pointer font-normal">
+                  <Label htmlFor={`regiao-${regiao.id}`} className="cursor-pointer font-normal text-sm sm:text-base">
                     {regiao.label}
                   </Label>
                 </div>
@@ -183,8 +183,8 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
           </div>
         )}
 
-        <div className="space-y-3">
-          <Label htmlFor="motivo" className="text-base font-medium">
+        <div className="space-y-2 sm:space-y-3">
+          <Label htmlFor="motivo" className="text-sm sm:text-base font-medium">
             {getMotivoLabel()}
           </Label>
           <Textarea
@@ -192,7 +192,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
             placeholder={getMotivoPlaceholder()}
             value={data.motivoExame}
             onChange={(e) => updateData({ motivoExame: e.target.value })}
-            className="min-h-[120px]"
+            className="min-h-[100px] sm:min-h-[120px] text-sm sm:text-base"
           />
         </div>
 

@@ -42,10 +42,10 @@ function SectionCard({
   onEdit: () => void;
 }) {
   return (
-    <div className="p-4 rounded-lg bg-accent/30 border border-border">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="flex items-center gap-2 text-base font-semibold text-foreground">
-          <Icon className="w-4 h-4 text-primary" />
+    <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <h3 className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base font-semibold text-foreground">
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
           {title}
         </h3>
         <Button
@@ -53,13 +53,13 @@ function SectionCard({
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          className="text-primary hover:text-primary-glow"
+          className="text-primary hover:text-primary-glow text-xs sm:text-sm h-8 px-2 sm:px-3"
         >
-          <Edit2 className="w-4 h-4 mr-1" />
-          Editar
+          <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+          <span className="hidden xs:inline">Editar</span>
         </Button>
       </div>
-      <div className="space-y-1 text-sm">
+      <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
         {children}
       </div>
     </div>
@@ -68,9 +68,9 @@ function SectionCard({
 
 function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="flex justify-between gap-2 py-1">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={`font-medium text-right ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
+    <div className="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-2 py-0.5 sm:py-1">
+      <span className="text-muted-foreground text-xs sm:text-sm">{label}</span>
+      <span className={`font-medium text-xs sm:text-sm text-right ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
     </div>
   );
 }
@@ -135,7 +135,7 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
       title="Revisão das Respostas"
       subtitle="Confira suas respostas antes de assinar o termo de consentimento. Você pode editar qualquer seção clicando em 'Editar'."
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Tipo de Exame */}
         <SectionCard title="Tipo de Exame" icon={FileText} onEdit={() => onEditStep(1)}>
           <InfoRow label="Exame selecionado" value={tipoExameLabel} />

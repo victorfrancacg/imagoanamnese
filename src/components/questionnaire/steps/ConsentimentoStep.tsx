@@ -130,31 +130,31 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
     if (data.tipoExame === 'tomografia') {
       return (
         <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento - Tomografia Computadorizada</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+        <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+            <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento - Tomografia Computadorizada</h4>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
               A Tomografia Computadorizada (TC) é um método de exame por imagem que envolve o uso de radiação ionizante (raios x) para produzir imagens de interesse médico da parte do corpo que se quer estudar. Para completar seu exame, uma injeção intravenosa de agente de contraste iodado pode ser necessária para o implemento das imagens geradas, com melhoria da capacidade diagnóstica do método. O procedimento é simples, com poucos efeitos colaterais potenciais e pouco frequentes (em torno de 0,6% dos exames), em sua maioria correspondendo a reações alérgicas leves, como urticária, coceira, sensação de calor, náusea e cefaleia. Em raros casos, reações alérgicas moderadas e graves podem ocorrer num curto espaço de tempo após a infusão do fármaco, devendo ser prontamente tratadas para evitar desfechos negativos.
             </p>
           </div>
           
-          <div className="space-y-3">
-            <Label className="text-base font-medium">
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="text-sm sm:text-base font-medium">
               Selecione uma opção abaixo:
             </Label>
             <RadioGroup
               value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'autorizo' : 'nao_autorizo'}
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-2 sm:gap-3"
             >
-              <div className="flex items-start space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="autorizo" id="tc-autorizo" className="mt-1" />
-                <Label htmlFor="tc-autorizo" className="cursor-pointer text-sm leading-relaxed">
+                <Label htmlFor="tc-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso e autorizo sua injeção.
                 </Label>
               </div>
-              <div className="flex items-start space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="nao_autorizo" id="tc-nao-autorizo" className="mt-1" />
-                <Label htmlFor="tc-nao-autorizo" className="cursor-pointer text-sm leading-relaxed">
+                <Label htmlFor="tc-nao-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
                   Após o exposto, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso, entretanto NÃO autorizo sua injeção.
                 </Label>
               </div>
@@ -167,31 +167,31 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
     if (data.tipoExame === 'ressonancia') {
       return (
         <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento - Ressonância Magnética</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+        <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+            <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento - Ressonância Magnética</h4>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
               A Ressonância magnética (RM) é um método de diagnóstico por imagem que envolve o uso de ondas de radiofrequência e um forte campo eletromagnético para produzir imagens de interesse médico da parte do corpo que se quer estudar, funcionando como um potente imã que atua de forma contínua, mesmo quando não está em realização de exames. Objetos metálicos, alguns clipes e próteses cirúrgicos, dispositivos médicos implantáveis, pigmentos cutâneos de base metálica e adornos podem gerar acidentes potencialmente graves, não devendo o paciente ou o acompanhante ter acesso à sala de exames quando se enquadrar nestas situações, salvo após ciência da equipe e liberação pela mesma e preenchimento do questionário de segurança. Para completar seu exame, uma injeção intravenosa de agente de contraste à base de gadolínio pode ser necessária para o implemento das imagens geradas, com melhoria da capacidade diagnóstica do método. O procedimento é simples, com poucos efeitos colaterais potenciais e pouco frequentes (em torno de 0,2% dos exames), em sua maioria correspondendo a reações alérgicas leves, como urticária, coceira, sensação de calor, náusea e cefaleia. Em raros casos, reações alérgicas moderadas e graves podem ocorrer num curto espaço de tempo após a infusão do fármaco, devendo ser prontamente tratadas para evitar desfechos negativos. Em casos ainda mais raros descritos na literatura médica, a fibrose sistêmica nefrogênica pode ocorrer em alguns pacientes com insuficiência renal grave, sendo nestes casos imperativo a avaliação pelo médico responsável antes de proceder o uso do meio de contraste endovenoso. Em caso de dúvidas, procure o responsável pelo setor.
             </p>
           </div>
           
-          <div className="space-y-3">
-            <Label className="text-base font-medium">
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="text-sm sm:text-base font-medium">
               Selecione uma opção abaixo:
             </Label>
             <RadioGroup
               value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'autorizo' : 'nao_autorizo'}
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-2 sm:gap-3"
             >
-              <div className="flex items-start space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="autorizo" id="rm-autorizo" className="mt-1" />
-                <Label htmlFor="rm-autorizo" className="cursor-pointer text-sm leading-relaxed">
+                <Label htmlFor="rm-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionados a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e AUTORIZO SUA INJEÇÃO.
                 </Label>
               </div>
-              <div className="flex items-start space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="nao_autorizo" id="rm-nao-autorizo" className="mt-1" />
-                <Label htmlFor="rm-nao-autorizo" className="cursor-pointer text-sm leading-relaxed">
+                <Label htmlFor="rm-nao-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionado a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e NÃO AUTORIZO SUA INJEÇÃO.
                 </Label>
               </div>
@@ -311,22 +311,22 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
       title="Termo de Consentimento"
       subtitle="Por favor, leia atentamente e concorde com os termos abaixo"
     >
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* Termo específico por tipo de exame */}
         {renderTermoConsentimento()}
 
         {/* Assinatura Digital */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">Assinatura Digital</Label>
+            <Label className="text-sm sm:text-base font-medium">Assinatura Digital</Label>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={clearSignature}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-8 text-xs sm:text-sm"
             >
-              <Eraser className="w-4 h-4 mr-2" />
+              <Eraser className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Limpar
             </Button>
           </div>

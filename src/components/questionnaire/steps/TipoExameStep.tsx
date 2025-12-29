@@ -51,7 +51,7 @@ export function TipoExameStep({ data, updateData, onNext }: TipoExameStepProps) 
       title="Tipo de Exame"
       subtitle="Selecione o exame que você irá realizar"
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {EXAM_TYPES.map((exam) => {
           const Icon = exam.icon;
           const isSelected = data.tipoExame === exam.id;
@@ -60,25 +60,25 @@ export function TipoExameStep({ data, updateData, onNext }: TipoExameStepProps) 
             <button
               key={exam.id}
               onClick={() => handleSelect(exam.id)}
-              className={`w-full p-5 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
+              className={`w-full p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
                 isSelected 
                   ? 'border-primary bg-primary/5 shadow-md' 
                   : 'border-border hover:border-primary/50 hover:bg-accent/50'
               }`}
             >
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-lg ${
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className={`p-2 sm:p-3 rounded-lg flex-shrink-0 ${
                   isSelected 
                     ? 'bg-primary text-primary-foreground' 
                     : 'bg-muted text-muted-foreground'
                 }`}>
-                  <Icon className="w-6 h-6" />
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-lg">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground text-base sm:text-lg truncate">
                     {exam.label}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                     {exam.description}
                   </p>
                 </div>

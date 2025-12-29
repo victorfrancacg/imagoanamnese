@@ -144,17 +144,17 @@ export function Questionnaire() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-background py-4 sm:py-6 md:py-8 px-3 sm:px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 animate-fade-in">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8 animate-fade-in">
           <img 
             src={imagoLogo} 
             alt="IMAGO - Diagnóstico por Imagem" 
-            className="h-14 md:h-16 mx-auto mb-4 object-contain"
+            className="h-10 sm:h-12 md:h-16 mx-auto mb-2 sm:mb-4 object-contain"
           />
           {currentStep > 1 && data.tipoExame && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Questionário de {getExamTypeLabel()}
             </p>
           )}
@@ -162,7 +162,7 @@ export function Questionnaire() {
 
         {/* Progress Bar - only show during questionnaire */}
         {!isCompleted && (
-          <div className="mb-8 animate-fade-in">
+          <div className="mb-4 sm:mb-6 md:mb-8 animate-fade-in">
             <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
           </div>
         )}
