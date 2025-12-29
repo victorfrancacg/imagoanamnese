@@ -104,6 +104,21 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
   const showCirurgiaCorpo = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const showHistoricoCancer = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
   const showExamesRelacionados = tipoExame === 'ressonancia';
+  const showRegioes = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+
+  // Labels das regiões
+  const regioesLabels: Record<string, string> = {
+    cabeca: 'Cabeça',
+    pescoco: 'Pescoço',
+    tronco: 'Tronco',
+    membros_superiores: 'Membros Superiores',
+    membros_inferiores: 'Membros Inferiores',
+  };
+
+  const formatRegioes = () => {
+    if (!data.regioesExame || data.regioesExame.length === 0) return '-';
+    return data.regioesExame.map(r => regioesLabels[r] || r).join(', ');
+  };
 
   // Labels dinâmicos para exame anterior
   const exameAnteriorLabel = tipoExame === 'ressonancia' 
@@ -310,6 +325,10 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
 
         {/* Questões Clínicas */}
         <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(4)}>
+          {/* Regiões do exame para TC e RM */}
+          {showRegioes && (
+            <InfoRow label="Regiões do exame" value={formatRegioes()} />
+          )}
           <InfoRow label={isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame"} value={data.motivoExame || '-'} />
           {/* Campos Mamografia */}
           {isMamografia && (
