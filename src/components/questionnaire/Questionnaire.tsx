@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { ProgressBar } from "./ProgressBar";
 import { TipoExameStep } from "./steps/TipoExameStep";
 import { DadosPessoaisStep } from "./steps/DadosPessoaisStep";
+import { LGPDStep } from "./steps/LGPDStep";
 import { SegurancaStep } from "./steps/SegurancaStep";
 import { ClinicasStep } from "./steps/ClinicasStep";
 import { RevisaoStep } from "./steps/RevisaoStep";
@@ -19,7 +20,7 @@ export function Questionnaire() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const totalSteps = 6; // Tipo Exame, Dados Pessoais, Segurança, Clínicas, Revisão, Consentimento
+  const totalSteps = 7; // Tipo Exame, Dados Pessoais, LGPD, Segurança, Clínicas, Revisão, Consentimento
 
   const updateData = useCallback((updates: Partial<QuestionnaireData>) => {
     setData((prev) => ({ ...prev, ...updates }));
@@ -83,7 +84,7 @@ export function Questionnaire() {
         );
       case 3:
         return (
-          <SegurancaStep
+          <LGPDStep
             data={data}
             updateData={updateData}
             onNext={handleNext}
@@ -92,7 +93,7 @@ export function Questionnaire() {
         );
       case 4:
         return (
-          <ClinicasStep
+          <SegurancaStep
             data={data}
             updateData={updateData}
             onNext={handleNext}
@@ -101,6 +102,15 @@ export function Questionnaire() {
         );
       case 5:
         return (
+          <ClinicasStep
+            data={data}
+            updateData={updateData}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        );
+      case 6:
+        return (
           <RevisaoStep
             data={data}
             onNext={handleNext}
@@ -108,7 +118,7 @@ export function Questionnaire() {
             onEditStep={handleEditStep}
           />
         );
-      case 6:
+      case 7:
         return (
           <ConsentimentoStep
             data={data}

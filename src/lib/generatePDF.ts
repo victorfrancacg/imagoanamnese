@@ -471,7 +471,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
 
   // Campos de aceite
   doc.setFillColor(...COLORS.background);
-  doc.rect(margin, yPos - 3, pageWidth - margin * 2, 14, 'F');
+  doc.rect(margin, yPos - 3, pageWidth - margin * 2, 21, 'F');
   
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
@@ -484,7 +484,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   yPos += 7;
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.textLight);
-  doc.text("Autoriza compartilhamento de dados para fins médicos:", margin + 5, yPos + 3);
+  doc.text("Aceita Termo LGPD (tratamento de dados pessoais):", margin + 5, yPos + 3);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
   doc.text(formatBoolean(data.aceitaCompartilhamento), pageWidth - margin - 5, yPos + 3, { align: "right" });
