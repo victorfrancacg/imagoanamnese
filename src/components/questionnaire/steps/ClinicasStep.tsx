@@ -149,7 +149,11 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
 
   return (
     <QuestionCard
-      title="Questões Clínicas"
+      title={`Questões Clínicas para o exame de ${
+        tipoExame === 'tomografia' ? 'Tomografia Computadorizada' :
+        tipoExame === 'ressonancia' ? 'Ressonância Magnética' :
+        tipoExame === 'mamografia' ? 'Mamografia' : 'Densitometria'
+      }`}
       subtitle="Informações sobre o motivo do exame"
     >
       <div className="space-y-6 sm:space-y-8">
