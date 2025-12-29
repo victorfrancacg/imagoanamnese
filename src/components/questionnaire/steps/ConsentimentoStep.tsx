@@ -22,7 +22,6 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
 
   const canProceed = 
     data.aceitaRiscos !== null && 
-    data.aceitaCompartilhamento === true && 
     hasSignature;
 
   useEffect(() => {
@@ -246,39 +245,6 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
         {/* Termo específico por tipo de exame */}
         {renderTermoConsentimento()}
 
-        {/* Compartilhamento de Dados */}
-        <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-2">Compartilhamento de Dados Pessoais</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Para a realização do exame e acompanhamento médico adequado, seus dados pessoais e 
-              informações de saúde serão armazenados e poderão ser compartilhados com a equipe médica 
-              da EMPRESA e profissionais de saúde envolvidos no seu atendimento, conforme a Lei Geral 
-              de Proteção de Dados (LGPD).
-            </p>
-          </div>
-          
-          <div className="space-y-3">
-            <Label className="text-base font-medium">
-              Você autoriza o compartilhamento dos seus dados pessoais com a EMPRESA?
-            </Label>
-            <RadioGroup
-              value={data.aceitaCompartilhamento === null ? '' : data.aceitaCompartilhamento ? 'sim' : 'nao'}
-              onValueChange={(value) => updateData({ aceitaCompartilhamento: value === 'sim' })}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                <RadioGroupItem value="sim" id="dados-sim" />
-                <Label htmlFor="dados-sim" className="cursor-pointer">Sim, autorizo</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
-                <RadioGroupItem value="nao" id="dados-nao" />
-                <Label htmlFor="dados-nao" className="cursor-pointer">Não autorizo</Label>
-              </div>
-            </RadioGroup>
-          </div>
-        </div>
-
         {/* Assinatura Digital */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -312,14 +278,6 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
             Assine no campo acima usando o mouse ou o dedo (em dispositivos touch)
           </p>
         </div>
-
-        {!data.aceitaCompartilhamento && data.aceitaCompartilhamento !== null && (
-          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
-            <p className="text-sm text-destructive">
-              Para prosseguir com o exame, é necessário autorizar o compartilhamento de dados.
-            </p>
-          </div>
-        )}
       </div>
 
       <NavigationButtons

@@ -152,8 +152,17 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
           <InfoRow label="Data do Exame" value={formatDate(data.dataExame)} />
         </SectionCard>
 
+        {/* LGPD */}
+        <SectionCard title="Consentimento LGPD" icon={Shield} onEdit={() => onEditStep(3)}>
+          <InfoRow 
+            label="Aceita termo de tratamento de dados" 
+            value={formatBoolean(data.aceitaCompartilhamento)} 
+            highlight={data.aceitaCompartilhamento !== true}
+          />
+        </SectionCard>
+
         {/* Questões de Segurança */}
-        <SectionCard title="Questões de Segurança" icon={Shield} onEdit={() => onEditStep(3)}>
+        <SectionCard title="Questões de Segurança" icon={Shield} onEdit={() => onEditStep(4)}>
           {/* Questões de Segurança - Ressonância Magnética */}
           {tipoExame === 'ressonancia' && (
             <>
@@ -324,7 +333,7 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         </SectionCard>
 
         {/* Questões Clínicas */}
-        <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(4)}>
+        <SectionCard title="Questões Clínicas" icon={Stethoscope} onEdit={() => onEditStep(5)}>
           {/* Regiões do exame para TC e RM */}
           {showRegioes && (
             <InfoRow label="Regiões do exame" value={formatRegioes()} />
