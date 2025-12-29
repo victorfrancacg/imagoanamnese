@@ -157,7 +157,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
         {isTomografiaOuRessonancia && (
           <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 rounded-lg bg-accent/30 border border-border animate-fade-in">
             <Label className="text-sm sm:text-base font-medium">
-              Regiões submetidas ao exame <span className="text-destructive">*</span>
+              Regiões submetidas ao exame de {tipoExame === 'ressonancia' ? 'Ressonância Magnética' : 'Tomografia Computadorizada'} <span className="text-destructive">*</span>
             </Label>
             <p className="text-xs sm:text-sm text-muted-foreground">
               Selecione todas as regiões do corpo que serão examinadas:
