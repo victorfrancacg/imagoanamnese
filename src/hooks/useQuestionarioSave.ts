@@ -104,9 +104,50 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string, pdfUrl: s
   }
 }
 
+async function syncToExternalDatabase(data: QuestionnaireData, lovableCloudId: string, pdfUrl: string | null): Promise<void> {
+  try {
+    const payload = {
+      nome: data.nome,
+      cpf: data.cpf,
+      data_nascimento: data.dataNascimento || null,
+      sexo: data.sexo,
+      peso: data.peso,
+      altura: data.altura,
+      tipo_exame: data.tipoExame || null,
+      data_exame: data.dataExame || null,
+      gravida: data.gravida,
+      motivo_exame: data.motivoExame || null,
+      sintomas: data.sintomas,
+      sintomas_outros: data.sintomasOutros || null,
+      cancer_mama: data.cancerMama,
+      amamentando: data.amamentando,
+      problema_prostata: data.problemaProstata,
+      dificuldade_urinaria: data.dificuldadeUrinaria,
+      aceita_riscos: data.aceitaRiscos ?? false,
+      aceita_compartilhamento: data.aceitaCompartilhamento ?? false,
+      assinatura_data: data.assinaturaData || null,
+      pdf_url: pdfUrl,
+      lovable_cloud_id: lovableCloudId,
+    };
+
+    const { data: response, error } = await supabase.functions.invoke('sync-external-db', {
+      body: payload,
+    });
+
+    if (error) {
+      console.error('Erro ao sincronizar com banco externo:', error);
+      return;
+    }
+
+    console.log('Dados sincronizados com banco externo:', response);
+  } catch (error) {
+    console.error('Erro ao sincronizar com banco externo:', error);
+  }
+}
+
 export async function saveQuestionario(data: QuestionnaireData): Promise<{ success: boolean; id?: string; pdfUrl?: string }> {
   try {
-    // 1. Salvar dados no banco
+    // 1. Salvar dados no banco local (Lovable Cloud)
     const { data: result, error } = await supabase
       .from('questionarios')
       .insert({
@@ -154,8 +195,11 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       await updateQuestionarioWithPdfUrl(result.id, pdfUrl);
     }
 
-    // 5. Enviar dados para o webhook n8n
-    await sendToWebhook(data, result.id, pdfUrl);
+    // 5. Enviar dados para webhook n8n e sincronizar com banco externo em paralelo
+    await Promise.all([
+      sendToWebhook(data, result.id, pdfUrl),
+      syncToExternalDatabase(data, result.id, pdfUrl),
+    ]);
 
     toast({
       title: "Questionário salvo!",
