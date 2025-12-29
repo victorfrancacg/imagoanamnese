@@ -237,6 +237,21 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   // ========== QUESTÕES CLÍNICAS ==========
   addSection("QUESTÕES CLÍNICAS");
 
+  // Regiões do exame para Tomografia e Ressonância
+  if (isTomografia || isRessonancia) {
+    const regioesLabels: Record<string, string> = {
+      cabeca: 'Cabeça',
+      pescoco: 'Pescoço',
+      tronco: 'Tronco',
+      membros_superiores: 'Membros Superiores',
+      membros_inferiores: 'Membros Inferiores',
+    };
+    const regioesFormatted = data.regioesExame && data.regioesExame.length > 0
+      ? data.regioesExame.map(r => regioesLabels[r] || r).join(', ')
+      : '-';
+    addDataRow("Regiões do exame", regioesFormatted);
+  }
+
   addDataRow(isDensitometria ? "Motivo (Densitometria)" : "Motivo do Exame", data.motivoExame || '-');
   
   // Campos específicos de Mamografia

@@ -52,6 +52,9 @@ export interface QuestionnaireData {
   parenteOsteoporose: boolean | null;
   parenteOsteoporoseDetalhes?: string;
 
+  // Regiões do exame (para Tomografia e Ressonância)
+  regioesExame: string[];
+  
   // Questões Clínicas
   motivoExame: string;
   sintomas: string[];
@@ -167,6 +170,8 @@ export const initialData: QuestionnaireData = {
   quedas12Meses: null,
   parenteOsteoporose: null,
   parenteOsteoporoseDetalhes: '',
+  // Regiões do exame
+  regioesExame: [],
   // Clínicas
   motivoExame: '',
   sintomas: [],

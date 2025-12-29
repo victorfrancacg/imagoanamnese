@@ -21,6 +21,25 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const isMasculino = data.sexo === 'masculino';
   const isDensitometria = tipoExame === 'densitometria';
   const isMamografia = tipoExame === 'mamografia';
+  const isTomografiaOuRessonancia = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
+
+  // Regiões disponíveis para seleção
+  const regioesDisponiveis = [
+    { id: 'cabeca', label: 'Cabeça' },
+    { id: 'pescoco', label: 'Pescoço' },
+    { id: 'tronco', label: 'Tronco' },
+    { id: 'membros_superiores', label: 'Membros Superiores' },
+    { id: 'membros_inferiores', label: 'Membros Inferiores' },
+  ];
+
+  const handleRegiaoChange = (regiaoId: string, checked: boolean) => {
+    const currentRegioes = data.regioesExame || [];
+    if (checked) {
+      updateData({ regioesExame: [...currentRegioes, regiaoId] });
+    } else {
+      updateData({ regioesExame: currentRegioes.filter(r => r !== regiaoId) });
+    }
+  };
 
   // Novas perguntas específicas para Tomografia e Ressonância
   const showTraumaRegiao = tipoExame === 'tomografia' || tipoExame === 'ressonancia';
@@ -32,6 +51,9 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   const showAmamentando = isFeminino && tipoExame === 'tomografia';
   const showProstata = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
   const showDificuldadeUrinaria = isMasculino && (tipoExame === 'tomografia' || tipoExame === 'ressonancia');
+
+  // Validação das regiões (obrigatória para TC e RM)
+  const regioesValid = !isTomografiaOuRessonancia || (data.regioesExame && data.regioesExame.length > 0);
 
   // Validate required fields
   const baseValid = data.motivoExame.trim() !== '';
@@ -101,7 +123,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
   
   const canProceed = baseValid && amamentandoValid && masculinoValid && urinariaValid && 
                      traumaValid && cirurgiaCorpoValid && cirurgiaCorpoDetalhesValid && historicoCancerValid && historicoCancerDetalhesValid &&
-                     examesRelacionadosValid && examesRelacionadosDetalhesValid && densitometriaValid && densitometriaFemininoValid && mamografiaValid;
+                     examesRelacionadosValid && examesRelacionadosDetalhesValid && densitometriaValid && densitometriaFemininoValid && mamografiaValid && regioesValid;
 
   const getMotivoLabel = () => {
     if (tipoExame === 'densitometria') {
@@ -131,6 +153,36 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
       subtitle="Informações sobre o motivo do exame"
     >
       <div className="space-y-8">
+        {/* Bloco de Regiões do Exame - Apenas para Tomografia e Ressonância */}
+        {isTomografiaOuRessonancia && (
+          <div className="space-y-4 p-4 rounded-lg bg-accent/30 border border-border animate-fade-in">
+            <Label className="text-base font-medium">
+              Regiões submetidas ao exame <span className="text-destructive">*</span>
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Selecione todas as regiões do corpo que serão examinadas:
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {regioesDisponiveis.map((regiao) => (
+                <div 
+                  key={regiao.id}
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
+                  onClick={() => handleRegiaoChange(regiao.id, !(data.regioesExame || []).includes(regiao.id))}
+                >
+                  <Checkbox
+                    id={`regiao-${regiao.id}`}
+                    checked={(data.regioesExame || []).includes(regiao.id)}
+                    onCheckedChange={(checked) => handleRegiaoChange(regiao.id, checked as boolean)}
+                  />
+                  <Label htmlFor={`regiao-${regiao.id}`} className="cursor-pointer font-normal">
+                    {regiao.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           <Label htmlFor="motivo" className="text-base font-medium">
             {getMotivoLabel()}
