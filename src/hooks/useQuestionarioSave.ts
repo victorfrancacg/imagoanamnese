@@ -3,7 +3,7 @@ import { QuestionnaireData } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
 import { generateQuestionnairePDF } from "@/lib/generatePDF";
 
-const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook/fa6f0ca1-b005-4648-9d1d-e01b9186c622";
+const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/fa6f0ca1-b005-4648-9d1d-e01b9186c622";
 
 async function uploadPDF(pdfBlob: Blob, questionarioId: string): Promise<string | null> {
   try {
