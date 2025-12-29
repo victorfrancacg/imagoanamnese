@@ -201,7 +201,77 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
       );
     }
 
-    // Termo genérico para outros tipos de exame (mamografia, etc.)
+    if (data.tipoExame === 'densitometria') {
+      return (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-accent/30 border border-border">
+            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento – Densitometria Óssea</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+              Declaro que fui informado(a) sobre o exame de densitometria óssea (DXA), que utiliza raios X em baixíssima dose para avaliação da densidade mineral óssea, auxiliando no diagnóstico e acompanhamento de osteopenia, osteoporose e risco de fraturas.
+
+              Compreendo que se trata de um exame não invasivo, rápido e indolor, com mínima exposição à radiação. Informei previamente à equipe sobre gravidez ou suspeita, uso recente de contrastes radiológicos, presença de próteses metálicas ou cirurgias que possam interferir no resultado.
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <Label className="text-base font-medium">
+              Você declara estar ciente e concorda em realizar o exame?
+            </Label>
+            <RadioGroup
+              value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="densi-sim" />
+                <Label htmlFor="densi-sim" className="cursor-pointer">Sim, estou ciente e concordo</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="densi-nao" />
+                <Label htmlFor="densi-nao" className="cursor-pointer">Não concordo</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      );
+    }
+
+    if (data.tipoExame === 'mamografia') {
+      return (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-accent/30 border border-border">
+            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento – Mamografia</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+              Declaro que fui devidamente informado(a) sobre o exame de mamografia, que utiliza raios X em baixa dose para avaliação das mamas, com finalidade diagnóstica e/ou de rastreamento. Compreendo que o exame envolve a compressão das mamas, necessária para obtenção de imagens adequadas, podendo causar desconforto ou dor transitória.
+
+              Estou ciente de que, em pacientes com próteses mamárias, a mamografia pode apresentar limitações técnicas, exigir manobras adicionais, e, embora raro, existe risco mínimo de deslocamento ou dano à prótese. Declaro que informei corretamente à equipe sobre a presença de prótese, cirurgias prévias, gestação suspeita ou confirmada, e outras condições relevantes.
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <Label className="text-base font-medium">
+              Você declara estar ciente e concorda em realizar o exame?
+            </Label>
+            <RadioGroup
+              value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'sim' : 'nao'}
+              onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="sim" id="mamo-sim" />
+                <Label htmlFor="mamo-sim" className="cursor-pointer">Sim, estou ciente e concordo</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <RadioGroupItem value="nao" id="mamo-nao" />
+                <Label htmlFor="mamo-nao" className="cursor-pointer">Não concordo</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      );
+    }
+
+    // Termo genérico para outros tipos de exame
     return (
       <div className="space-y-4">
         <div className="p-4 rounded-lg bg-accent/30 border border-border">
