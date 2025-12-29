@@ -63,17 +63,16 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
     return false;
   };
 
-  // Adiciona seção com título
+  // Adiciona seção com título centralizado
   const addSection = (title: string, y: number): number => {
     checkPageBreak(20);
-    const textWidth = doc.getTextWidth(title) + 12;
     doc.setFillColor(...COLORS.primary);
-    doc.roundedRect(margin, y - 5, textWidth, 8, 2, 2, 'F');
+    doc.roundedRect(margin, y - 5, contentWidth, 8, 2, 2, 'F');
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...COLORS.white);
-    doc.text(title, margin + 6, y);
+    doc.text(title, pageWidth / 2, y, { align: "center" });
     return y + 12;
   };
 
@@ -180,12 +179,14 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   doc.line(margin, yPos, pageWidth - margin, yPos);
   yPos += 8;
 
-  // Data do documento
-  const currentDate = new Date().toLocaleDateString('pt-BR');
+  // Data e hora do documento
+  const now = new Date();
+  const currentDate = now.toLocaleDateString('pt-BR');
+  const currentTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.textLight);
   doc.setFont("helvetica", "normal");
-  doc.text(`Gerado em: ${currentDate}`, pageWidth - margin, yPos, { align: "right" });
+  doc.text(`Gerado em: ${currentDate} às ${currentTime}`, pageWidth - margin, yPos, { align: "right" });
   yPos += 10;
 
   // ========== DADOS PESSOAIS ==========
