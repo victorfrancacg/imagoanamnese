@@ -145,6 +145,7 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         <SectionCard title="Dados Pessoais" icon={User} onEdit={() => onEditStep(2)}>
           <InfoRow label="Nome" value={data.nome || '-'} />
           <InfoRow label="CPF" value={data.cpf || '-'} />
+          <InfoRow label="Telefone" value={data.telefone || '-'} />
           <InfoRow label="Data de Nascimento" value={formatDate(data.dataNascimento)} />
           <InfoRow label="Sexo" value={sexoLabel} />
           <InfoRow label="Peso" value={data.peso ? `${data.peso} kg` : '-'} />
