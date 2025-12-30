@@ -176,7 +176,7 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
           <Input
             id="telefone"
             type="text"
-            placeholder=""
+            placeholder="(XX) XXXXX-XXXX"
             value={data.telefone}
             onChange={handleTelefoneChange}
             className="h-10 sm:h-12 text-sm sm:text-base"
