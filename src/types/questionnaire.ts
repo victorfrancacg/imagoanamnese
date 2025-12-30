@@ -5,6 +5,7 @@ export interface QuestionnaireData {
   // Dados Pessoais
   nome: string;
   cpf: string;
+  telefone: string;
   dataNascimento: string;
   sexo: Sex | null;
   peso: number | null;
@@ -129,6 +130,7 @@ export interface QuestionnaireData {
 export const initialData: QuestionnaireData = {
   nome: '',
   cpf: '',
+  telefone: '',
   dataNascimento: '',
   sexo: null,
   peso: null,

@@ -21,6 +21,13 @@ function formatCPF(value: string): string {
   return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
 }
 
+// Formata o telefone para exibição ((XX)XXXXXXXXX)
+function formatTelefone(value: string): string {
+  const numbers = value.replace(/\D/g, '').slice(0, 11);
+  if (numbers.length <= 2) return numbers;
+  return `(${numbers.slice(0, 2)})${numbers.slice(2)}`;
+}
+
 // Formata a data para exibição (dd/mm/yyyy)
 function formatDateInput(value: string): string {
   const numbers = value.replace(/\D/g, '').slice(0, 8);
@@ -79,6 +86,7 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
   const canProceed = 
     data.nome.trim() !== '' && 
     data.cpf.replace(/\D/g, '').length === 11 &&
+    data.telefone.replace(/\D/g, '').length === 11 &&
     isValidDate(dataNascimentoInput) &&
     (isMamografia || data.sexo !== null) &&
     data.peso !== null &&
@@ -88,6 +96,11 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
     updateData({ cpf: formatted });
+  };
+
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatTelefone(e.target.value);
+    updateData({ telefone: formatted });
   };
 
   const handleDataNascimentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,6 +166,21 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             value={data.cpf}
             onChange={handleCPFChange}
             className="h-10 sm:h-12 text-sm sm:text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5 sm:space-y-2">
+          <Label htmlFor="telefone" className="text-sm sm:text-base font-medium">
+            Telefone
+          </Label>
+          <Input
+            id="telefone"
+            type="text"
+            placeholder="(83)999506267"
+            value={data.telefone}
+            onChange={handleTelefoneChange}
+            className="h-10 sm:h-12 text-sm sm:text-base"
+            maxLength={13}
           />
         </div>
 

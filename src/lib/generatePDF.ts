@@ -201,6 +201,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   const dadosPessoaisItems: DataRowItem[] = [
     { label: "Nome do Paciente", value: data.nome || '-' },
     { label: "CPF", value: data.cpf || '-' },
+    { label: "Telefone", value: data.telefone || '-' },
     { label: "Data de Nascimento", value: formatDate(data.dataNascimento) },
     { label: "Sexo", value: sexoLabel },
     { label: "Peso", value: data.peso ? `${data.peso} kg` : '-' },
