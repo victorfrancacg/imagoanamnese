@@ -3,6 +3,7 @@ import { NavigationButtons } from "../NavigationButtons";
 import { QuestionnaireData, TipoExame } from "@/types/questionnaire";
 import { User, Shield, Stethoscope, Edit2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatCpf } from "@/lib/utils";
 
 interface RevisaoStepProps {
   data: QuestionnaireData;
@@ -144,7 +145,7 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
         {/* Dados Pessoais */}
         <SectionCard title="Dados Pessoais" icon={User} onEdit={() => onEditStep(2)}>
           <InfoRow label="Nome" value={data.nome || '-'} />
-          <InfoRow label="CPF" value={data.cpf || '-'} />
+          <InfoRow label="CPF" value={formatCpf(data.cpf) || '-'} />
           <InfoRow label="Telefone" value={data.telefone || '-'} />
           <InfoRow label="Data de Nascimento" value={formatDate(data.dataNascimento)} />
           <InfoRow label="Sexo" value={sexoLabel} />

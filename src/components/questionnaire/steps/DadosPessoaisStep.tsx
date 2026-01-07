@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { QuestionnaireData, Sex } from "@/types/questionnaire";
+import { formatCpf as formatCpfUtil } from "@/lib/utils";
 
 interface DadosPessoaisStepProps {
   data: QuestionnaireData;
@@ -96,7 +97,9 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
-    updateData({ cpf: formatted });
+    // Salva apenas números no estado, mas exibe formatado
+    const onlyNumbers = formatted.replace(/\D/g, '');
+    updateData({ cpf: onlyNumbers });
   };
 
   const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +167,7 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
             id="cpf"
             type="text"
             placeholder="000.000.000-00"
-            value={data.cpf}
+            value={formatCpfUtil(data.cpf)}
             onChange={handleCPFChange}
             className="h-10 sm:h-12 text-sm sm:text-base"
           />

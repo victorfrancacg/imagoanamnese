@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { QuestionnaireData } from "@/types/questionnaire";
 import imagoLogo from "@/assets/imago-logo.png";
+import { formatCpf } from "./utils";
 
 function formatBoolean(value: boolean | null): string {
   if (value === null) return '-';
@@ -200,7 +201,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
 
   const dadosPessoaisItems: DataRowItem[] = [
     { label: "Nome do Paciente", value: data.nome || '-' },
-    { label: "CPF", value: data.cpf || '-' },
+    { label: "CPF", value: formatCpf(data.cpf) || '-' },
     { label: "Telefone", value: data.telefone || '-' },
     { label: "Data de Nascimento", value: formatDate(data.dataNascimento) },
     { label: "Sexo", value: sexoLabel },
@@ -474,7 +475,7 @@ export function generateQuestionnairePDF(data: QuestionnaireData): Blob {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.textLight);
-  doc.text(`CPF: ${data.cpf || '-'}`, margin + 5, yPos + 9);
+  doc.text(`CPF: ${formatCpf(data.cpf) || '-'}`, margin + 5, yPos + 9);
   doc.text(`Exame: ${examTypeLabels[data.tipoExame] || '-'}`, margin + 70, yPos + 9);
   doc.text(`Data: ${formatDate(data.dataExame)}`, margin + 130, yPos + 9);
   

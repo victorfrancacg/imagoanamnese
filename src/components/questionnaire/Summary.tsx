@@ -1,6 +1,7 @@
 import { QuestionnaireData } from "@/types/questionnaire";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, User, Shield, Stethoscope, FileCheck, RotateCcw } from "lucide-react";
+import { formatCpf } from "@/lib/utils";
 
 interface SummaryProps {
   data: QuestionnaireData;
@@ -100,7 +101,7 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
 
         <SummarySection title="Dados Pessoais" icon={User}>
           <SummaryItem label="Nome" value={data.nome || '-'} />
-          <SummaryItem label="CPF" value={data.cpf || '-'} />
+          <SummaryItem label="CPF" value={formatCpf(data.cpf) || '-'} />
           <SummaryItem label="Data de Nascimento" value={formatDate(data.dataNascimento)} />
           <SummaryItem label="Sexo" value={sexoLabel} />
           <SummaryItem label="Peso" value={data.peso ? `${data.peso} kg` : '-'} />

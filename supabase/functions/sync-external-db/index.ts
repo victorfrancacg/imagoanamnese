@@ -43,6 +43,7 @@ serve(async (req) => {
     const externalData = {
       nome: payload.nome,
       cpf: payload.cpf || null,
+      telefone: payload.telefone || null,
       data_nascimento: payload.data_nascimento || null,
       sexo: payload.sexo || null,
       peso: payload.peso || null,

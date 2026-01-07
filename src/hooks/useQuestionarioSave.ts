@@ -2,6 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
 import { generateQuestionnairePDF } from "@/lib/generatePDF";
+import { cleanCpf, cleanTelefone } from "@/lib/utils";
+import { extractSecurityAnswers, extractClinicalAnswers } from "@/lib/questionnaireTransform";
 
 const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/fa6f0ca1-b005-4648-9d1d-e01b9186c622";
 
@@ -56,7 +58,8 @@ async function sendToWebhook(data: QuestionnaireData, savedId: string, pdfUrl: s
       pdfUrl: pdfUrl,
       paciente: {
         nome: data.nome,
-        cpf: data.cpf,
+        cpf: cleanCpf(data.cpf),
+        telefone: cleanTelefone(data.telefone),
         dataNascimento: data.dataNascimento,
         sexo: data.sexo,
         peso: data.peso,
@@ -108,7 +111,8 @@ async function syncToExternalDatabase(data: QuestionnaireData, lovableCloudId: s
   try {
     const payload = {
       nome: data.nome,
-      cpf: data.cpf,
+      cpf: cleanCpf(data.cpf),
+      telefone: cleanTelefone(data.telefone),
       data_nascimento: data.dataNascimento || null,
       sexo: data.sexo,
       peso: data.peso,
@@ -148,28 +152,44 @@ async function syncToExternalDatabase(data: QuestionnaireData, lovableCloudId: s
 export async function saveQuestionario(data: QuestionnaireData): Promise<{ success: boolean; id?: string; pdfUrl?: string }> {
   try {
     // 1. Salvar dados no banco local (Lovable Cloud)
+    const cpfLimpo = cleanCpf(data.cpf);
+    const telefoneLimpo = cleanTelefone(data.telefone);
+
     const { data: result, error } = await supabase
       .from('questionarios')
       .insert({
         nome: data.nome,
-        cpf: data.cpf,
-        data_nascimento: data.dataNascimento || null,
+        cpf: cpfLimpo,
+        telefone: telefoneLimpo,
         sexo: data.sexo,
-        peso: data.peso,
-        altura: data.altura,
+        data_nascimento: data.dataNascimento || null,
         tipo_exame: data.tipoExame || null,
         data_exame: data.dataExame || null,
-        gravida: data.gravida,
-        motivo_exame: data.motivoExame || null,
-        sintomas: data.sintomas,
-        sintomas_outros: data.sintomasOutros || null,
-        cancer_mama: data.cancerMama,
-        amamentando: data.amamentando,
-        problema_prostata: data.problemaProstata,
-        dificuldade_urinaria: data.dificuldadeUrinaria,
-        aceita_riscos: data.aceitaRiscos ?? false,
-        aceita_compartilhamento: data.aceitaCompartilhamento ?? false,
         assinatura_data: data.assinaturaData || null,
+        respostas_completas: {
+          versao: '1.0',
+          tipoExame: data.tipoExame || '',
+          dadosPessoais: {
+            nome: data.nome,
+            cpf: cpfLimpo,
+            dataNascimento: data.dataNascimento,
+            sexo: data.sexo,
+            peso: data.peso,
+            altura: data.altura,
+            telefone: data.telefone,
+            dataExame: data.dataExame,
+          },
+          seguranca: extractSecurityAnswers(data),
+          clinicas: extractClinicalAnswers(data),
+          consentimento: {
+            aceitaRiscos: data.aceitaRiscos ?? false,
+            aceitaCompartilhamento: data.aceitaCompartilhamento ?? false,
+            assinaturaData: data.assinaturaData || undefined,
+          },
+          metadata: {
+            preenchidoEm: new Date().toISOString(),
+          },
+        },
       })
       .select('id')
       .single();
