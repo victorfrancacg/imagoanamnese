@@ -98,19 +98,6 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Info Card */}
-      <Card className="border-blue-200 bg-blue-50/50">
-        <CardHeader>
-          <CardTitle className="text-blue-900">Fluxo de Trabalho</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-blue-800 space-y-2">
-          <p><strong>1.</strong> Buscar relatórios preenchidos pelos pacientes</p>
-          <p><strong>2.</strong> Acessar e revisar o relatório, podendo modificar respostas</p>
-          <p><strong>3.</strong> Ver resumo geral da versão final da anamnese</p>
-          <p><strong>4.</strong> Assinar digitalmente o documento</p>
-          <p><strong>5.</strong> Submeter para o banco de dados</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
