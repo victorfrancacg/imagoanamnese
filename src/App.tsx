@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -10,7 +10,6 @@ import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "@/components/tecnico/ProtectedRoute";
 import { TechnicianLayout } from "@/components/tecnico/TechnicianLayout";
 import Login from "./pages/tecnico/Login";
-import Dashboard from "./pages/tecnico/Dashboard";
 import QuestionnaireList from "./pages/tecnico/QuestionnaireList";
 import QuestionnaireDetail from "./pages/tecnico/QuestionnaireDetail";
 import QuestionnaireReview from "./pages/tecnico/QuestionnaireReview";
@@ -38,7 +37,7 @@ const App = () => (
               </ProtectedRoute>
             }
           >
-            <Route index element={<Dashboard />} />
+            <Route index element={<Navigate to="/tecnico/questionarios" replace />} />
             <Route path="questionarios" element={<QuestionnaireList />} />
             <Route path="questionario/:id" element={<QuestionnaireDetail />} />
             <Route path="questionario/:id/revisao" element={<QuestionnaireReview />} />

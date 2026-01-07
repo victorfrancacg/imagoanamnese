@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, FileText, LayoutDashboard } from 'lucide-react';
+import { LogOut, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function TechnicianLayout() {
@@ -33,7 +33,7 @@ export function TechnicianLayout() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link to="/tecnico" className="flex items-center gap-2">
+              <Link to="/tecnico/questionarios" className="flex items-center gap-2">
                 <img
                   src="/src/assets/imago-logo.png"
                   alt="IMAGO Radiologia"
@@ -43,12 +43,6 @@ export function TechnicianLayout() {
               </Link>
 
               <nav className="hidden md:flex items-center gap-4">
-                <Link to="/tecnico">
-                  <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </Button>
-                </Link>
                 <Link to="/tecnico/questionarios">
                   <Button variant="ghost" size="sm">
                     <FileText className="w-4 h-4 mr-2" />
