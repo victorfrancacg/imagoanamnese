@@ -1,12 +1,12 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading } = useAdminAuth();
   const location = useLocation();
 
   if (loading) {
@@ -21,10 +21,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!user) {
-    return <Navigate to="/tecnico/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  if (profile?.user_type !== 'tecnico') {
+  if (profile?.user_type !== 'admin') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
+import { supabaseAdmin as supabase } from '@/integrations/supabase/adminClient';
 
 export interface Profile {
   id: string;
@@ -12,7 +12,7 @@ export interface Profile {
   updated_at: string;
 }
 
-interface AuthContextType {
+interface AdminAuthContextType {
   user: User | null;
   profile: Profile | null;
   session: Session | null;
@@ -21,9 +21,9 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     try {
-      console.log('Loading profile for user:', userId);
+      console.log('[ADMIN] Loading profile for user:', userId);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -40,28 +40,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Profile load error:', error);
+        console.error('[ADMIN] Profile load error:', error);
 
         // Se o perfil não existe, criar um padrão
         if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating default profile');
+          console.log('[ADMIN] Profile not found, creating default profile');
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
             .insert({
               id: userId,
               nome: 'Usuário',
-              user_type: 'tecnico'
+              user_type: 'admin'
             })
             .select()
             .single();
 
           if (createError) {
-            console.error('Error creating profile:', createError);
+            console.error('[ADMIN] Error creating profile:', createError);
             setProfile(null);
             return null;
           }
 
-          console.log('Profile created successfully:', newProfile);
+          console.log('[ADMIN] Profile created successfully:', newProfile);
           setProfile(newProfile);
           return newProfile;
         }
@@ -69,11 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
 
-      console.log('Profile loaded successfully:', data);
+      console.log('[ADMIN] Profile loaded successfully:', data);
       setProfile(data);
       return data;
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('[ADMIN] Error loading profile:', error);
       setProfile(null);
       return null;
     }
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await loadProfile(session.user.id);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('[ADMIN] Error initializing auth:', error);
       } finally {
         setLoading(false);
       }
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('Auth state changed:', _event);
+      console.log('[ADMIN] Auth state changed:', _event);
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Limpar sessionStorage manualmente
     Object.keys(sessionStorage).forEach(key => {
-      if (key.startsWith('tecnico-')) {
+      if (key.startsWith('admin-')) {
         sessionStorage.removeItem(key);
       }
     });
@@ -145,16 +145,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, session, loading, signIn, signOut }}>
+    <AdminAuthContext.Provider value={{ user, profile, session, loading, signIn, signOut }}>
       {children}
-    </AuthContext.Provider>
+    </AdminAuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
+export function useAdminAuth() {
+  const context = useContext(AdminAuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAdminAuth must be used within an AdminAuthProvider');
   }
   return context;
 }

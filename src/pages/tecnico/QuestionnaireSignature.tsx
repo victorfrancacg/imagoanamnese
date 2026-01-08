@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { SignatureCanvas } from '@/components/tecnico/SignatureCanvas';
 

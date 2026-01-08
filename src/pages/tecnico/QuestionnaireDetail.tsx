@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Edit, Eye, Loader2, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import { useToast } from '@/hooks/use-toast';
 import { formatCpf, formatDate } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';

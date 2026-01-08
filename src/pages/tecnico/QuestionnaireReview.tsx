@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { QuestionnaireAnswers } from '@/components/tecnico/QuestionnaireAnswers';
 import { formatCpf, formatDate } from '@/lib/utils';

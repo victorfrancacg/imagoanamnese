@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Search, FileText, Loader2, Eye, X, Lock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import { useToast } from '@/hooks/use-toast';
 import { formatCpf, cleanCpf, formatDateTime } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
