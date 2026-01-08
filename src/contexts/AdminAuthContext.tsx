@@ -80,10 +80,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+    let isInitializing = true;
+
     // Check active session
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -93,7 +99,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('[ADMIN] Error initializing auth:', error);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          isInitializing = false;
+        }
       }
     };
 
@@ -104,18 +113,33 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log('[ADMIN] Auth state changed:', _event);
-      setSession(session);
-      setUser(session?.user ?? null);
 
-      if (session?.user) {
-        await loadProfile(session.user.id);
-      } else {
-        setProfile(null);
+      // Ignorar eventos durante inicialização
+      if (isInitializing) {
+        console.log('[ADMIN] Still initializing, skipping event');
+        return;
       }
-      setLoading(false);
+
+      if (!mounted) return;
+
+      try {
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await loadProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('[ADMIN] Error in auth state change:', error);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

@@ -27,7 +27,12 @@ export default function QuestionnaireList() {
     queryFn: async () => {
       if (!searchTerm) return [];
 
+      console.log('[QuestionnaireList] Starting search for:', searchTerm);
       const cpfLimpo = cleanCpf(searchTerm);
+      console.log('[QuestionnaireList] Cleaned CPF:', cpfLimpo);
+
+      const queryStartTime = Date.now();
+      console.log('[QuestionnaireList] Executing Supabase query...');
 
       const { data, error } = await supabase
         .from('questionarios')
@@ -35,6 +40,9 @@ export default function QuestionnaireList() {
         .ilike('cpf', `%${cpfLimpo}%`)
         .order('created_at', { ascending: false })
         .limit(50);
+
+      console.log('[QuestionnaireList] Query completed in:', Date.now() - queryStartTime, 'ms');
+      console.log('[QuestionnaireList] Results:', { count: data?.length, error });
 
       if (error) throw error;
       return data as Questionario[];

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabaseAdmin } from '@/integrations/supabase/adminClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Clock, CheckCircle, FileSignature } from 'lucide-react';
+import { FileText, Clock, CheckCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
@@ -15,10 +15,9 @@ export default function Dashboard() {
 
       const total = data.length;
       const aguardandoRevisao = data.filter(q => q.status === 'aguardando_revisao').length;
-      const revisados = data.filter(q => q.status === 'revisado').length;
-      const assinados = data.filter(q => q.status === 'assinado').length;
+      const finalizados = data.filter(q => q.status === 'finalizado').length;
 
-      return { total, aguardandoRevisao, revisados, assinados };
+      return { total, aguardandoRevisao, finalizados };
     },
   });
 
@@ -38,18 +37,11 @@ export default function Dashboard() {
       color: 'text-orange-600',
     },
     {
-      title: 'Revisados',
-      value: stats?.revisados ?? 0,
+      title: 'Finalizados',
+      value: stats?.finalizados ?? 0,
       icon: CheckCircle,
-      description: 'Questionários já revisados',
+      description: 'Questionários finalizados',
       color: 'text-green-600',
-    },
-    {
-      title: 'Assinados',
-      value: stats?.assinados ?? 0,
-      icon: FileSignature,
-      description: 'Questionários com assinatura',
-      color: 'text-purple-600',
     },
   ];
 
@@ -73,7 +65,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
