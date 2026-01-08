@@ -8,6 +8,7 @@ export interface Profile {
   cpf: string | null;
   user_type: 'tecnico' | 'admin';
   professional_id: string | null;
+  status: 'pendente' | 'ativo' | 'inativo';
   created_at: string;
   updated_at: string;
 }
@@ -143,11 +144,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw error;
+
+    // Verificar status do perfil
+    if (data.user) {
+      const profile = await loadProfile(data.user.id);
+
+      if (!profile) {
+        await supabase.auth.signOut();
+        throw new Error('Perfil não encontrado. Entre em contato com o administrador.');
+      }
+
+      if (profile.status === 'pendente') {
+        await supabase.auth.signOut();
+        throw new Error('Seu cadastro ainda está aguardando aprovação do administrador.');
+      }
+
+      if (profile.status === 'inativo') {
+        await supabase.auth.signOut();
+        throw new Error('Sua conta foi desativada. Entre em contato com o administrador.');
+      }
+    }
   };
 
   const signOut = async () => {

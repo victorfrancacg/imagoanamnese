@@ -8,6 +8,7 @@ export interface Profile {
   cpf: string | null;
   user_type: 'tecnico' | 'admin';
   professional_id: string | null;
+  status: 'pendente' | 'ativo' | 'inativo';
   created_at: string;
   updated_at: string;
 }

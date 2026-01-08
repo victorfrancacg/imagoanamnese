@@ -11,6 +11,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/tecnico/ProtectedRoute";
 import { TechnicianLayout } from "@/components/tecnico/TechnicianLayout";
 import Login from "./pages/tecnico/Login";
+import Register from "./pages/tecnico/Register";
 import QuestionnaireList from "./pages/tecnico/QuestionnaireList";
 import QuestionnaireDetail from "./pages/tecnico/QuestionnaireDetail";
 import QuestionnaireReview from "./pages/tecnico/QuestionnaireReview";
@@ -22,6 +23,7 @@ import { ProtectedRoute as AdminProtectedRoute } from "@/components/admin/Protec
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import PendingTechnicians from "./pages/admin/PendingTechnicians";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +39,7 @@ const App = () => (
 
           {/* Technician routes - wrapped with AuthProvider */}
           <Route path="/tecnico/login" element={<AuthProvider><Login /></AuthProvider>} />
+          <Route path="/tecnico/register" element={<Register />} />
           <Route
             path="/tecnico"
             element={
@@ -67,6 +70,7 @@ const App = () => (
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="tecnicos-pendentes" element={<PendingTechnicians />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -52,7 +52,7 @@ export default function Login() {
             className="h-12 mx-auto"
           />
           <div>
-            <CardTitle className="text-2xl">Portal Admin</CardTitle>
+            <CardTitle className="text-2xl">Portal do Administrador</CardTitle>
             <CardDescription>
               Faça login para acessar o painel administrativo
             </CardDescription>

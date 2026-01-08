@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard } from 'lucide-react';
+import { LogOut, LayoutDashboard, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function AdminLayout() {
@@ -47,6 +47,12 @@ export function AdminLayout() {
                   <Button variant="ghost" size="sm">
                     <LayoutDashboard className="w-4 h-4 mr-2" />
                     Dashboard
+                  </Button>
+                </Link>
+                <Link to="/admin/tecnicos-pendentes">
+                  <Button variant="ghost" size="sm">
+                    <UserCheck className="w-4 h-4 mr-2" />
+                    Técnicos Pendentes
                   </Button>
                 </Link>
               </nav>
