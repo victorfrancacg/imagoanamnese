@@ -10,6 +10,7 @@ import { Search, FileText, Loader2, Eye, X, Lock } from 'lucide-react';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import { useToast } from '@/hooks/use-toast';
 import { formatCpf, cleanCpf, formatDateTime } from '@/lib/utils';
+import { getTipoExameBadge, getStatusBadge } from '@/lib/badge-helpers';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Questionario = Tables<'questionarios'>;
@@ -97,42 +98,6 @@ export default function QuestionnaireList() {
 
     // Navega diretamente para a página de detalhes (sem mudar status)
     navigate(`/tecnico/questionario/${questionario.id}`);
-  };
-
-  const getTipoExameBadge = (tipo: string | null) => {
-    if (!tipo) return <Badge variant="outline">Não especificado</Badge>;
-
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      tomografia: 'default',
-      ressonancia: 'secondary',
-      densitometria: 'outline',
-      mamografia: 'destructive',
-    };
-
-    const labels: Record<string, string> = {
-      tomografia: 'Tomografia',
-      ressonancia: 'Ressonância',
-      densitometria: 'Densitometria',
-      mamografia: 'Mamografia',
-    };
-
-    return (
-      <Badge variant={variants[tipo] || 'outline'}>
-        {labels[tipo] || tipo}
-      </Badge>
-    );
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<StatusQuestionario, { variant: 'default' | 'secondary' | 'destructive' | 'outline', label: string }> = {
-      aguardando_revisao: { variant: 'outline', label: 'Aguardando Revisão' },
-      finalizado: { variant: 'secondary', label: 'Finalizado' },
-      cancelado: { variant: 'destructive', label: 'Cancelado' },
-    };
-
-    const statusInfo = statusMap[status as StatusQuestionario] || { variant: 'outline', label: status };
-
-    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
   const isQuestionarioBlocked = (status: string): boolean => {

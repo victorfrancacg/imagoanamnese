@@ -51,6 +51,7 @@ export type Database = {
           data_exame: string | null
           data_finalizacao: string | null
           data_nascimento: string | null
+          final_pdf_url: string | null
           id: string
           nome: string
           pdf_url: string | null
@@ -69,6 +70,7 @@ export type Database = {
           data_exame?: string | null
           data_finalizacao?: string | null
           data_nascimento?: string | null
+          final_pdf_url?: string | null
           id?: string
           nome: string
           pdf_url?: string | null
@@ -87,6 +89,7 @@ export type Database = {
           data_exame?: string | null
           data_finalizacao?: string | null
           data_nascimento?: string | null
+          final_pdf_url?: string | null
           id?: string
           nome?: string
           pdf_url?: string | null

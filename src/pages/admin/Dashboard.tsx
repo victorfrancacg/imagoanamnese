@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabaseAdmin } from '@/integrations/supabase/adminClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QuestionnaireSearchTab } from '@/components/admin/QuestionnaireSearchTab';
 import { FileText, Clock, CheckCircle } from 'lucide-react';
 
 export default function Dashboard() {
@@ -65,27 +67,40 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.title}
-                </CardTitle>
-                <Icon className={`h-4 w-4 ${card.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {card.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <Tabs defaultValue="estatisticas" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="estatisticas">Estatísticas</TabsTrigger>
+          <TabsTrigger value="buscar">Buscar Questionários</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="estatisticas" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {cards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Card key={card.title}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {card.title}
+                    </CardTitle>
+                    <Icon className={`h-4 w-4 ${card.color}`} />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{card.value}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {card.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="buscar">
+          <QuestionnaireSearchTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -8,8 +8,68 @@ import { useToast } from '@/hooks/use-toast';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { SignatureCanvas } from '@/components/tecnico/SignatureCanvas';
+import { generateFinalQuestionnairePDF } from '@/lib/generatePDF';
+import { QuestionnaireData } from '@/types/questionnaire';
 
 type Questionario = Tables<'questionarios'>;
+
+// Função para converter dados do banco para QuestionnaireData
+function convertToQuestionnaireData(questionario: Questionario): QuestionnaireData {
+  const respostas = questionario.respostas_completas;
+
+  return {
+    // Dados pessoais
+    nome: respostas.dadosPessoais.nome,
+    cpf: respostas.dadosPessoais.cpf,
+    telefone: respostas.dadosPessoais.telefone,
+    dataNascimento: respostas.dadosPessoais.dataNascimento,
+    sexo: respostas.dadosPessoais.sexo,
+    peso: respostas.dadosPessoais.peso,
+    altura: respostas.dadosPessoais.altura,
+    tipoExame: respostas.tipoExame as any,
+    dataExame: respostas.dadosPessoais.dataExame,
+
+    // Consentimento
+    aceitaRiscos: respostas.consentimento.aceitaRiscos,
+    aceitaCompartilhamento: respostas.consentimento.aceitaCompartilhamento,
+    assinaturaData: questionario.assinatura_data || respostas.consentimento.assinaturaData,
+
+    // Segurança
+    ...respostas.seguranca,
+
+    // Clínicas
+    ...respostas.clinicas,
+  } as QuestionnaireData;
+}
+
+// Função para fazer upload do PDF final
+async function uploadFinalPDF(pdfBlob: Blob, questionarioId: string): Promise<string | null> {
+  try {
+    const fileName = `questionario_final_${questionarioId}_${Date.now()}.pdf`;
+
+    const { data, error } = await supabase.storage
+      .from('questionarios-pdfs')
+      .upload(fileName, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Erro ao fazer upload do PDF final:', error);
+      return null;
+    }
+
+    // Obter URL pública do PDF
+    const { data: publicUrlData } = supabase.storage
+      .from('questionarios-pdfs')
+      .getPublicUrl(data.path);
+
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('Erro ao fazer upload do PDF final:', error);
+    return null;
+  }
+}
 
 export default function QuestionnaireSignature() {
   const { id } = useParams();
@@ -41,12 +101,27 @@ export default function QuestionnaireSignature() {
         throw new Error('Assinatura é obrigatória');
       }
 
+      if (!questionario) {
+        throw new Error('Questionário não encontrado');
+      }
+
+      // Converter dados do banco para formato QuestionnaireData
+      const questionnaireData = convertToQuestionnaireData(questionario);
+
+      // Gerar PDF final com assinatura do técnico
+      const pdfBlob = generateFinalQuestionnairePDF(questionnaireData, assinaturaTecnico);
+
+      // Fazer upload do PDF final
+      const finalPdfUrl = await uploadFinalPDF(pdfBlob, id!);
+
+      // Atualizar questionário com assinatura, status e URL do PDF final
       const { error } = await supabase
         .from('questionarios')
         .update({
           assinatura_tecnico: assinaturaTecnico,
           status: 'finalizado',
           data_finalizacao: new Date().toISOString(),
+          final_pdf_url: finalPdfUrl,
         })
         .eq('id', id!);
 
