@@ -8,6 +8,9 @@ import { CheckCircle, XCircle, Loader2, UserCheck, Clock } from 'lucide-react';
 import { Profile } from '@/contexts/AdminAuthContext';
 import { formatCpf } from '@/lib/utils';
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
 export default function PendingTechnicians() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -31,26 +34,31 @@ export default function PendingTechnicians() {
   // Mutation para aprovar técnico
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      // 1. Confirmar email do usuário automaticamente (admin approval substitui confirmação por email)
-      const { error: emailError } = await supabaseAdmin.auth.admin.updateUserById(id, {
-        email_confirm: true,
+      // Obter o token do admin logado
+      const { data: { session } } = await supabaseAdmin.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error('Sessão de administrador não encontrada.');
+      }
+
+      // Chamar Edge Function que usa service_role key
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/approve-technician`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ technicianId: id }),
       });
 
-      if (emailError) {
-        console.error('Erro ao confirmar email:', emailError);
-        throw new Error('Erro ao confirmar email do técnico.');
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao aprovar técnico.');
       }
 
-      // 2. Atualizar status do perfil para 'ativo'
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .update({ status: 'ativo' })
-        .eq('id', id);
-
-      if (profileError) {
-        console.error('Erro ao atualizar perfil:', profileError);
-        throw profileError;
-      }
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-technicians'] });
@@ -72,18 +80,31 @@ export default function PendingTechnicians() {
   // Mutation para recusar técnico
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
-      // Primeiro, deletar o perfil
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .delete()
-        .eq('id', id);
+      // Obter o token do admin logado
+      const { data: { session } } = await supabaseAdmin.auth.getSession();
 
-      if (profileError) throw profileError;
+      if (!session?.access_token) {
+        throw new Error('Sessão de administrador não encontrada.');
+      }
 
-      // Depois, deletar o usuário do Auth
-      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
+      // Chamar Edge Function que usa service_role key
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/reject-technician`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ technicianId: id }),
+      });
 
-      if (authError) throw authError;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao recusar técnico.');
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-technicians'] });
