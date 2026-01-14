@@ -36,6 +36,11 @@ export function useAdminQuestionnaireSearch(filters: AdminSearchFilters) {
         query = query.eq('sexo', filters.sexo);
       }
 
+      // Filtro Status
+      if (filters.status !== 'todos') {
+        query = query.eq('status', filters.status);
+      }
+
       // Filtro Data do Exame (range)
       if (filters.dataExameInicio) {
         query = query.gte('data_exame', filters.dataExameInicio);
@@ -57,6 +62,7 @@ export function useAdminQuestionnaireSearch(filters: AdminSearchFilters) {
       filters.nome ||
       filters.tipoExame !== 'todos' ||
       filters.sexo !== 'todos' ||
+      filters.status !== 'todos' ||
       filters.dataExameInicio ||
       filters.dataExameFim
     ),

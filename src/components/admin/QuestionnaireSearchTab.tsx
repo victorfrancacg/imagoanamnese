@@ -14,6 +14,7 @@ export function QuestionnaireSearchTab() {
     nome: '',
     tipoExame: 'todos',
     sexo: 'todos',
+    status: 'todos',
     dataExameInicio: '',
     dataExameFim: '',
   });
@@ -33,6 +34,7 @@ export function QuestionnaireSearchTab() {
       nome: '',
       tipoExame: 'todos',
       sexo: 'todos',
+      status: 'todos',
       dataExameInicio: '',
       dataExameFim: '',
     };

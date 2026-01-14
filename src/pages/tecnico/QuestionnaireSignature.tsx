@@ -3,7 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowLeft, CheckCircle, Loader2, AlertTriangle, Radio } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
@@ -77,6 +78,8 @@ export default function QuestionnaireSignature() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assinaturaTecnico, setAssinaturaTecnico] = useState<string>('');
+  const [showTelecomandoDialog, setShowTelecomandoDialog] = useState(false);
+  const [telecomandoChoice, setTelecomandoChoice] = useState<boolean | null>(null);
 
   // Buscar dados do questionário
   const { data: questionario, isLoading, error } = useQuery({
@@ -94,15 +97,44 @@ export default function QuestionnaireSignature() {
     enabled: !!id,
   });
 
+  // Verifica se precisa mostrar dialog de telecomando
+  const needsTelecomandoQuestion = () => {
+    if (!questionario) return false;
+    const tipoExame = questionario.tipo_exame;
+    const statusAtual = questionario.status;
+    // Só pergunta sobre telecomando para RM/TC no status aguardando_assistente
+    return (tipoExame === 'ressonancia' || tipoExame === 'tomografia')
+           && statusAtual === 'aguardando_assistente';
+  };
+
   // Mutation para finalizar
   const finalizarMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (isTelecomando?: boolean) => {
       if (!assinaturaTecnico) {
         throw new Error('Assinatura é obrigatória');
       }
 
       if (!questionario) {
         throw new Error('Questionário não encontrado');
+      }
+
+      const tipoExame = questionario.tipo_exame;
+      const statusAtual = questionario.status;
+
+      // Determinar próximo status
+      let novoStatus: string;
+
+      if ((tipoExame === 'ressonancia' || tipoExame === 'tomografia')
+          && statusAtual === 'aguardando_assistente') {
+        // RM/TC vindo do assistente: depende da resposta do telecomando
+        if (isTelecomando === true) {
+          novoStatus = 'finalizado';
+        } else {
+          novoStatus = 'aguardando_operador';
+        }
+      } else {
+        // Mamografia/Densitometria ou qualquer exame vindo do operador: finaliza
+        novoStatus = 'finalizado';
       }
 
       // Converter dados do banco para formato QuestionnaireData
@@ -114,25 +146,43 @@ export default function QuestionnaireSignature() {
       // Fazer upload do PDF final
       const finalPdfUrl = await uploadFinalPDF(pdfBlob, id!);
 
-      // Atualizar questionário com assinatura, status e URL do PDF final
+      // Preparar dados para atualização
+      const updateData: Record<string, unknown> = {
+        assinatura_tecnico: assinaturaTecnico,
+        status: novoStatus,
+      };
+
+      // Adicionar data_finalizacao e final_pdf_url apenas se finalizado
+      if (novoStatus === 'finalizado') {
+        updateData.data_finalizacao = new Date().toISOString();
+        updateData.final_pdf_url = finalPdfUrl;
+      }
+
+      // Atualizar questionário
       const { error } = await supabase
         .from('questionarios')
-        .update({
-          assinatura_tecnico: assinaturaTecnico,
-          status: 'finalizado',
-          data_finalizacao: new Date().toISOString(),
-          final_pdf_url: finalPdfUrl,
-        })
+        .update(updateData)
         .eq('id', id!);
 
       if (error) throw error;
+
+      return novoStatus;
     },
-    onSuccess: () => {
+    onSuccess: (novoStatus) => {
       queryClient.invalidateQueries({ queryKey: ['questionario', id] });
-      toast({
-        title: 'Questionário finalizado!',
-        description: 'O documento foi assinado e arquivado com sucesso.',
-      });
+
+      if (novoStatus === 'finalizado') {
+        toast({
+          title: 'Questionário finalizado!',
+          description: 'O documento foi assinado e arquivado com sucesso.',
+        });
+      } else {
+        toast({
+          title: 'Enviado para Operador',
+          description: 'O questionário foi enviado para revisão do operador.',
+        });
+      }
+
       navigate('/tecnico/questionarios');
     },
     onError: (error) => {
@@ -145,7 +195,19 @@ export default function QuestionnaireSignature() {
   });
 
   const handleSubmit = () => {
+    // Se precisa da pergunta de telecomando, mostra o dialog
+    if (needsTelecomandoQuestion()) {
+      setShowTelecomandoDialog(true);
+      return;
+    }
+    // Caso contrário, finaliza diretamente
     finalizarMutation.mutate();
+  };
+
+  const handleTelecomandoChoice = (isTelecomando: boolean) => {
+    setTelecomandoChoice(isTelecomando);
+    setShowTelecomandoDialog(false);
+    finalizarMutation.mutate(isTelecomando);
   };
 
   if (isLoading) {
@@ -241,6 +303,44 @@ export default function QuestionnaireSignature() {
           {finalizarMutation.isPending ? 'Finalizando...' : 'Assinar e Finalizar'}
         </Button>
       </div>
+
+      {/* Dialog de Telecomando */}
+      <Dialog open={showTelecomandoDialog} onOpenChange={setShowTelecomandoDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Radio className="h-5 w-5" />
+              Exame com Telecomando?
+            </DialogTitle>
+            <DialogDescription>
+              Este exame de {questionario?.tipo_exame === 'ressonancia' ? 'Ressonância Magnética' : 'Tomografia Computadorizada'} será realizado com telecomando?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 py-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start h-auto py-4"
+              onClick={() => handleTelecomandoChoice(false)}
+              disabled={finalizarMutation.isPending}
+            >
+              <div className="text-left">
+                <p className="font-medium">Não, enviar para Operador</p>
+                <p className="text-sm text-muted-foreground">O questionário será enviado para revisão do operador</p>
+              </div>
+            </Button>
+            <Button
+              className="w-full justify-start h-auto py-4"
+              onClick={() => handleTelecomandoChoice(true)}
+              disabled={finalizarMutation.isPending}
+            >
+              <div className="text-left">
+                <p className="font-medium">Sim, finalizar agora</p>
+                <p className="text-sm text-muted-foreground">O questionário será finalizado sem passar pelo operador</p>
+              </div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

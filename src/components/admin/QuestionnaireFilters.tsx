@@ -35,6 +35,7 @@ export function QuestionnaireFilters({
     filters.nome ||
     filters.tipoExame !== 'todos' ||
     filters.sexo !== 'todos' ||
+    filters.status !== 'todos' ||
     filters.dataExameInicio ||
     filters.dataExameFim
   );
@@ -113,6 +114,28 @@ export function QuestionnaireFilters({
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="masculino">Masculino</SelectItem>
                 <SelectItem value="feminino">Feminino</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro Status */}
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={filters.status}
+              onValueChange={(value: AdminSearchFilters['status']) =>
+                onFiltersChange({ ...filters, status: value })
+              }
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="aguardando_assistente">Aguardando Assistente</SelectItem>
+                <SelectItem value="aguardando_operador">Aguardando Operador</SelectItem>
+                <SelectItem value="finalizado">Finalizado</SelectItem>
+                <SelectItem value="cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -124,7 +124,7 @@ export default function QuestionnaireReview() {
           </Button>
         </Link>
         <Link to={`/tecnico/questionario/${id}/assinatura`}>
-          <Button disabled>
+          <Button>
             Próximo: Assinar Documento
           </Button>
         </Link>

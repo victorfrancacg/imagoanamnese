@@ -13,7 +13,7 @@ import { QuestionnaireAnswers } from '@/components/tecnico/QuestionnaireAnswers'
 import { EditQuestionnaireDialog } from '@/components/tecnico/EditQuestionnaireDialog';
 
 type Questionario = Tables<'questionarios'>;
-type StatusQuestionario = 'aguardando_revisao' | 'finalizado' | 'cancelado';
+type StatusQuestionario = 'aguardando_assistente' | 'aguardando_operador' | 'finalizado' | 'cancelado';
 
 export default function QuestionnaireDetail() {
   const { id } = useParams();
@@ -61,8 +61,9 @@ export default function QuestionnaireDetail() {
   }, [questionario, navigate, toast]);
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<StatusQuestionario, { variant: 'default' | 'secondary' | 'destructive', label: string }> = {
-      aguardando_revisao: { variant: 'default', label: 'Aguardando Revisão' },
+    const statusMap: Record<StatusQuestionario, { variant: 'default' | 'secondary' | 'destructive' | 'outline', label: string }> = {
+      aguardando_assistente: { variant: 'default', label: 'Aguardando Assistente' },
+      aguardando_operador: { variant: 'outline', label: 'Aguardando Operador' },
       finalizado: { variant: 'secondary', label: 'Finalizado' },
       cancelado: { variant: 'destructive', label: 'Cancelado' },
     };
@@ -210,7 +211,7 @@ export default function QuestionnaireDetail() {
       {/* Actions */}
       <div className="flex gap-2 justify-end">
         <Link to={`/tecnico/questionario/${id}/revisao`}>
-          <Button disabled>
+          <Button>
             Próximo: Revisar e Assinar
           </Button>
         </Link>

@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 
-type StatusQuestionario = 'aguardando_revisao' | 'finalizado' | 'cancelado';
+type StatusQuestionario = 'aguardando_assistente' | 'aguardando_operador' | 'finalizado' | 'cancelado';
 
 export function getTipoExameBadge(tipo: string | null) {
   if (!tipo) return <Badge variant="outline">Não especificado</Badge>;
@@ -31,7 +31,8 @@ export function getStatusBadge(status: string) {
     variant: 'default' | 'secondary' | 'destructive' | 'outline';
     label: string
   }> = {
-    aguardando_revisao: { variant: 'outline', label: 'Aguardando Revisão' },
+    aguardando_assistente: { variant: 'default', label: 'Aguardando Assistente' },
+    aguardando_operador: { variant: 'outline', label: 'Aguardando Operador' },
     finalizado: { variant: 'secondary', label: 'Finalizado' },
     cancelado: { variant: 'destructive', label: 'Cancelado' },
   };

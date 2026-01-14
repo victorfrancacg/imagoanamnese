@@ -1,9 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
-import { QuestionnaireData } from "@/types/questionnaire";
+import { QuestionnaireData, TipoExame } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
 import { generateQuestionnairePDF } from "@/lib/generatePDF";
 import { cleanCpf, cleanTelefone } from "@/lib/utils";
 import { extractSecurityAnswers, extractClinicalAnswers } from "@/lib/questionnaireTransform";
+
+// Determina o status inicial baseado no tipo de exame
+function getStatusInicial(tipoExame: TipoExame | null): string {
+  // RM e TC precisam passar pelo assistente primeiro
+  if (tipoExame === 'ressonancia' || tipoExame === 'tomografia') {
+    return 'aguardando_assistente';
+  }
+  // Mamografia e Densitometria vão direto para o operador
+  return 'aguardando_operador';
+}
 
 const N8N_WEBHOOK_URL = "https://n8n.imagoradiologia.cloud/webhook-test/fa6f0ca1-b005-4648-9d1d-e01b9186c622";
 
@@ -166,6 +176,7 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
         tipo_exame: data.tipoExame || null,
         data_exame: data.dataExame || null,
         assinatura_data: data.assinaturaData || null,
+        status: getStatusInicial(data.tipoExame || null),
         respostas_completas: {
           versao: '1.0',
           tipoExame: data.tipoExame || '',

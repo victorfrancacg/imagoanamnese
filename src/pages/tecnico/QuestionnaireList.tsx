@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Search, FileText, Loader2, Eye, X, Lock } from 'lucide-react';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import { useToast } from '@/hooks/use-toast';
@@ -14,33 +16,41 @@ import { getTipoExameBadge, getStatusBadge } from '@/lib/badge-helpers';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Questionario = Tables<'questionarios'>;
-type StatusQuestionario = 'aguardando_revisao' | 'finalizado' | 'cancelado';
+type StatusQuestionario = 'aguardando_assistente' | 'aguardando_operador' | 'finalizado' | 'cancelado';
 
 export default function QuestionnaireList() {
   const [searchCpf, setSearchCpf] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusQuestionario | 'todos'>('todos');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Query para buscar questionários
   const { data: questionarios, isLoading, error } = useQuery({
-    queryKey: ['questionarios', searchTerm],
+    queryKey: ['questionarios', searchTerm, statusFilter],
     queryFn: async () => {
       if (!searchTerm) return [];
 
-      console.log('[QuestionnaireList] Starting search for:', searchTerm);
+      console.log('[QuestionnaireList] Starting search for:', searchTerm, 'status:', statusFilter);
       const cpfLimpo = cleanCpf(searchTerm);
       console.log('[QuestionnaireList] Cleaned CPF:', cpfLimpo);
 
       const queryStartTime = Date.now();
       console.log('[QuestionnaireList] Executing Supabase query...');
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('questionarios')
         .select('*')
         .ilike('cpf', `%${cpfLimpo}%`)
         .order('created_at', { ascending: false })
         .limit(50);
+
+      // Aplicar filtro de status se não for "todos"
+      if (statusFilter !== 'todos') {
+        query = query.eq('status', statusFilter);
+      }
+
+      const { data, error } = await query;
 
       console.log('[QuestionnaireList] Query completed in:', Date.now() - queryStartTime, 'ms');
       console.log('[QuestionnaireList] Results:', { count: data?.length, error });
@@ -106,7 +116,8 @@ export default function QuestionnaireList() {
 
   const getButtonTooltip = (status: string): string => {
     const tooltips: Record<StatusQuestionario, string> = {
-      aguardando_revisao: 'Clique para revisar',
+      aguardando_assistente: 'Clique para revisar (Assistente)',
+      aguardando_operador: 'Clique para revisar (Operador)',
       finalizado: 'Este questionário já foi finalizado',
       cancelado: 'Este questionário foi cancelado',
     };
@@ -142,6 +153,23 @@ export default function QuestionnaireList() {
                 onChange={(e) => setSearchCpf(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
+            </div>
+            <div className="w-56">
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => setStatusFilter(value as StatusQuestionario | 'todos')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os status</SelectItem>
+                  <SelectItem value="aguardando_assistente">Aguardando Assistente</SelectItem>
+                  <SelectItem value="aguardando_operador">Aguardando Operador</SelectItem>
+                  <SelectItem value="finalizado">Finalizado</SelectItem>
+                  <SelectItem value="cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button onClick={handleSearch} disabled={isLoading}>
               {isLoading ? (
