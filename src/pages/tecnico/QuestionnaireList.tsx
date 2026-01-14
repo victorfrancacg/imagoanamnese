@@ -20,20 +20,20 @@ type StatusQuestionario = 'aguardando_assistente' | 'aguardando_operador' | 'fin
 
 export default function QuestionnaireList() {
   const [searchCpf, setSearchCpf] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchNome, setSearchNome] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusQuestionario | 'todos'>('todos');
+  const [shouldSearch, setShouldSearch] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Verifica se há algum critério de busca ativo
+  const hasSearchCriteria = searchCpf.trim() || searchNome.trim() || statusFilter !== 'todos';
+
   // Query para buscar questionários
   const { data: questionarios, isLoading, error } = useQuery({
-    queryKey: ['questionarios', searchTerm, statusFilter],
+    queryKey: ['questionarios', searchCpf, searchNome, statusFilter, shouldSearch],
     queryFn: async () => {
-      if (!searchTerm) return [];
-
-      console.log('[QuestionnaireList] Starting search for:', searchTerm, 'status:', statusFilter);
-      const cpfLimpo = cleanCpf(searchTerm);
-      console.log('[QuestionnaireList] Cleaned CPF:', cpfLimpo);
+      console.log('[QuestionnaireList] Starting search - CPF:', searchCpf, 'Nome:', searchNome, 'Status:', statusFilter);
 
       const queryStartTime = Date.now();
       console.log('[QuestionnaireList] Executing Supabase query...');
@@ -41,12 +41,25 @@ export default function QuestionnaireList() {
       let query = supabase
         .from('questionarios')
         .select('*')
-        .ilike('cpf', `%${cpfLimpo}%`)
         .order('created_at', { ascending: false })
         .limit(50);
 
+      // Aplicar filtro de CPF se preenchido
+      if (searchCpf.trim()) {
+        const cpfLimpo = cleanCpf(searchCpf);
+        console.log('[QuestionnaireList] Filtering by CPF:', cpfLimpo);
+        query = query.ilike('cpf', `%${cpfLimpo}%`);
+      }
+
+      // Aplicar filtro de nome se preenchido
+      if (searchNome.trim()) {
+        console.log('[QuestionnaireList] Filtering by Nome:', searchNome);
+        query = query.ilike('nome', `%${searchNome.trim()}%`);
+      }
+
       // Aplicar filtro de status se não for "todos"
       if (statusFilter !== 'todos') {
+        console.log('[QuestionnaireList] Filtering by Status:', statusFilter);
         query = query.eq('status', statusFilter);
       }
 
@@ -58,24 +71,26 @@ export default function QuestionnaireList() {
       if (error) throw error;
       return data as Questionario[];
     },
-    enabled: !!searchTerm,
+    enabled: shouldSearch && hasSearchCriteria,
   });
 
   const handleSearch = () => {
-    if (!searchCpf.trim()) {
+    if (!hasSearchCriteria) {
       toast({
-        title: 'Campo vazio',
-        description: 'Por favor, digite um CPF para buscar.',
+        title: 'Nenhum critério de busca',
+        description: 'Por favor, preencha ao menos um campo (CPF, nome ou status).',
         variant: 'destructive',
       });
       return;
     }
-    setSearchTerm(searchCpf);
+    setShouldSearch(true);
   };
 
   const handleClearSearch = () => {
     setSearchCpf('');
-    setSearchTerm('');
+    setSearchNome('');
+    setStatusFilter('todos');
+    setShouldSearch(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -139,22 +154,41 @@ export default function QuestionnaireList() {
         <CardHeader>
           <CardTitle>Buscar Questionários</CardTitle>
           <CardDescription>
-            Digite o CPF do paciente (completo ou parcial)
+            Pesquise por CPF, nome do paciente ou filtre por status
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Digite o CPF (ex: 12345678900 ou 123.456.789-00)"
-                className="pl-10"
-                value={searchCpf}
-                onChange={(e) => setSearchCpf(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="searchCpf">CPF do Paciente</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="searchCpf"
+                  placeholder="Ex: 12345678900"
+                  className="pl-10"
+                  value={searchCpf}
+                  onChange={(e) => setSearchCpf(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
             </div>
-            <div className="w-56">
+            <div className="space-y-2">
+              <Label htmlFor="searchNome">Nome do Paciente</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="searchNome"
+                  placeholder="Ex: João Silva"
+                  className="pl-10"
+                  value={searchNome}
+                  onChange={(e) => setSearchNome(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
               <Select
                 value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value as StatusQuestionario | 'todos')}
@@ -171,6 +205,8 @@ export default function QuestionnaireList() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div className="flex gap-2 pt-2">
             <Button onClick={handleSearch} disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -179,7 +215,7 @@ export default function QuestionnaireList() {
               )}
               Buscar
             </Button>
-            {searchTerm && (
+            {shouldSearch && (
               <Button onClick={handleClearSearch} variant="outline">
                 <X className="mr-2 h-4 w-4" />
                 Limpar
@@ -220,23 +256,23 @@ export default function QuestionnaireList() {
           )}
 
           {/* Empty State - No search yet */}
-          {!searchTerm && !isLoading && (
+          {!shouldSearch && !isLoading && (
             <div className="text-center py-12 text-muted-foreground">
               <Search className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Nenhuma busca realizada</p>
               <p className="text-sm">
-                Digite um CPF no campo acima e clique em "Buscar" para encontrar questionários.
+                Preencha ao menos um dos campos acima (CPF, nome ou status) e clique em "Buscar".
               </p>
             </div>
           )}
 
           {/* Empty State - No results */}
-          {searchTerm && !isLoading && questionarios?.length === 0 && (
+          {shouldSearch && !isLoading && questionarios?.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Nenhum questionário encontrado</p>
               <p className="text-sm">
-                Não foram encontrados questionários para o CPF "{searchCpf}".
+                Não foram encontrados questionários com os critérios informados.
               </p>
             </div>
           )}

@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/integrations/supabase/adminClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QuestionnaireSearchTab } from '@/components/admin/QuestionnaireSearchTab';
-import { FileText, Clock, CheckCircle } from 'lucide-react';
+import { FileText, Clock, UserCheck, CheckCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
@@ -16,10 +16,11 @@ export default function Dashboard() {
       if (error) throw error;
 
       const total = data.length;
-      const aguardandoRevisao = data.filter(q => q.status === 'aguardando_revisao').length;
+      const aguardandoAssistente = data.filter(q => q.status === 'aguardando_assistente').length;
+      const aguardandoOperador = data.filter(q => q.status === 'aguardando_operador').length;
       const finalizados = data.filter(q => q.status === 'finalizado').length;
 
-      return { total, aguardandoRevisao, finalizados };
+      return { total, aguardandoAssistente, aguardandoOperador, finalizados };
     },
   });
 
@@ -32,11 +33,18 @@ export default function Dashboard() {
       color: 'text-blue-600',
     },
     {
-      title: 'Aguardando Revisão',
-      value: stats?.aguardandoRevisao ?? 0,
+      title: 'Aguardando Assistente',
+      value: stats?.aguardandoAssistente ?? 0,
       icon: Clock,
-      description: 'Pendentes de revisão',
+      description: 'Pendentes de revisão do assistente',
       color: 'text-orange-600',
+    },
+    {
+      title: 'Aguardando Operador',
+      value: stats?.aguardandoOperador ?? 0,
+      icon: UserCheck,
+      description: 'Pendentes de revisão do operador',
+      color: 'text-purple-600',
     },
     {
       title: 'Finalizados',
@@ -74,7 +82,7 @@ export default function Dashboard() {
         </TabsList>
 
         <TabsContent value="estatisticas" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {cards.map((card) => {
               const Icon = card.icon;
               return (

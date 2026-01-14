@@ -264,7 +264,9 @@ export default function QuestionnaireSignature() {
           <SignatureCanvas
             value={assinaturaTecnico}
             onChange={setAssinaturaTecnico}
-            label="Assinatura do Técnico Responsável"
+            label={questionario.status === 'aguardando_operador'
+              ? 'Assinatura do Operador Responsável'
+              : 'Assinatura do Assistente Responsável'}
             height="h-48"
           />
         </CardContent>

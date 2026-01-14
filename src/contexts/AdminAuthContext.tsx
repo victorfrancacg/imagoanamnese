@@ -96,6 +96,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           await loadProfile(session.user.id);
+          if (!mounted) return;
         }
       } catch (error) {
         console.error('[ADMIN] Error initializing auth:', error);
@@ -129,6 +130,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           await loadProfile(session.user.id);
+          if (!mounted) return;
         } else {
           setProfile(null);
         }
