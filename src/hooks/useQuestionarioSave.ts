@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData, TipoExame } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
-import { generateQuestionnairePDF } from "@/lib/generatePDF";
+import { generateQuestionnairePDF, generateMamografiaPDF, generateDensitometriaPDF } from "@/lib/generatePDF";
 import { cleanCpf, cleanTelefone } from "@/lib/utils";
 import { extractSecurityAnswers, extractClinicalAnswers } from "@/lib/questionnaireTransform";
 
@@ -215,8 +215,15 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       return { success: false };
     }
 
-    // 2. Gerar PDF
-    const pdfBlob = generateQuestionnairePDF(data);
+    // 2. Gerar PDF (usa PDF específico por tipo de exame)
+    let pdfBlob: Blob;
+    if (data.tipoExame === 'mamografia') {
+      pdfBlob = generateMamografiaPDF(data, { paciente: data.assinaturaData });
+    } else if (data.tipoExame === 'densitometria') {
+      pdfBlob = generateDensitometriaPDF(data, { paciente: data.assinaturaData });
+    } else {
+      pdfBlob = generateQuestionnairePDF(data);
+    }
 
     // 3. Fazer upload do PDF para o storage
     const pdfUrl = await uploadPDF(pdfBlob, result.id);

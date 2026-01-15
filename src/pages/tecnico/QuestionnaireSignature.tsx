@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { SignatureCanvas } from '@/components/tecnico/SignatureCanvas';
-import { generateFinalQuestionnairePDF } from '@/lib/generatePDF';
+import { generateFinalQuestionnairePDF, generateFinalMamografiaPDF, generateFinalDensitometriaPDF } from '@/lib/generatePDF';
 import { QuestionnaireData } from '@/types/questionnaire';
 
 type Questionario = Tables<'questionarios'>;
@@ -140,8 +140,21 @@ export default function QuestionnaireSignature() {
       // Converter dados do banco para formato QuestionnaireData
       const questionnaireData = convertToQuestionnaireData(questionario);
 
-      // Gerar PDF final com assinatura do técnico
-      const pdfBlob = generateFinalQuestionnairePDF(questionnaireData, assinaturaTecnico);
+      // Gerar PDF final com assinatura (usa PDF específico por tipo de exame)
+      let pdfBlob: Blob;
+      if (tipoExame === 'mamografia') {
+        pdfBlob = generateFinalMamografiaPDF(questionnaireData, {
+          paciente: questionnaireData.assinaturaData,
+          operador: assinaturaTecnico,
+        });
+      } else if (tipoExame === 'densitometria') {
+        pdfBlob = generateFinalDensitometriaPDF(questionnaireData, {
+          paciente: questionnaireData.assinaturaData,
+          operador: assinaturaTecnico,
+        });
+      } else {
+        pdfBlob = generateFinalQuestionnairePDF(questionnaireData, assinaturaTecnico);
+      }
 
       // Fazer upload do PDF final
       const finalPdfUrl = await uploadFinalPDF(pdfBlob, id!);
