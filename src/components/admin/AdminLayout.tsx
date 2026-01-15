@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import imagoLogo from '@/assets/imago-logo.png';
 import { Button } from '@/components/ui/button';
 import { LogOut, LayoutDashboard, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -35,7 +36,7 @@ export function AdminLayout() {
             <div className="flex items-center gap-8">
               <Link to="/admin" className="flex items-center gap-2">
                 <img
-                  src="/src/assets/imago-logo.png"
+                  src={imagoLogo}
                   alt="IMAGO Radiologia"
                   className="h-8"
                 />

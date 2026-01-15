@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import imagoLogo from '@/assets/imago-logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -126,7 +127,7 @@ export default function Register() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-4 text-center">
           <img
-            src="/src/assets/imago-logo.png"
+            src={imagoLogo}
             alt="IMAGO Radiologia"
             className="h-12 mx-auto"
           />
