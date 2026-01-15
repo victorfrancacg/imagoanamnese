@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import { useToast } from '@/hooks/use-toast';
 import { QuestionnaireData } from '@/types/questionnaire';
 import { cleanCpf, cleanTelefone } from '@/lib/utils';
@@ -75,9 +75,9 @@ export function useQuestionarioUpdate() {
       if (error) throw error;
       return result;
     },
-    onSuccess: (data, variables) => {
-      // Invalidar queries para forçar re-fetch dos dados atualizados
-      queryClient.invalidateQueries({ queryKey: ['questionario', variables.id] });
+    onSuccess: async (data, variables) => {
+      // Forçar refetch imediato das queries para atualizar a UI
+      await queryClient.refetchQueries({ queryKey: ['questionario', variables.id] });
       queryClient.invalidateQueries({ queryKey: ['questionarios'] });
 
       toast({

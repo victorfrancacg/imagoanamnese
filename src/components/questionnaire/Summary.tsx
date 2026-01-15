@@ -44,8 +44,8 @@ function SummarySection({ title, icon: Icon, children }: { title: string; icon: 
 function SummaryItem({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex flex-col xs:flex-row xs:flex-wrap xs:justify-between gap-0.5 xs:gap-2 py-1.5 sm:py-2 border-b border-border/50 last:border-0">
-      <span className="text-xs sm:text-sm text-muted-foreground">{label}</span>
-      <span className={`text-sm sm:text-base font-medium ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
+      <span className="text-xs sm:text-sm text-muted-foreground flex-shrink-0">{label}</span>
+      <span className={`text-sm sm:text-base font-medium break-words overflow-wrap-anywhere max-w-full ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
     </div>
   );
 }
@@ -304,29 +304,140 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
 
         <SummarySection title="Questões Clínicas" icon={Stethoscope}>
           <SummaryItem label="Motivo do Exame" value={data.motivoExame || '-'} />
-          <SummaryItem label="Sintomas" value={sintomasLabel} />
-          {data.sexo === 'feminino' && (
+
+          {/* Questões clínicas genéricas (não densitometria) */}
+          {!isDensitometria && (
             <>
-              <SummaryItem 
-                label="Diagnóstico de câncer de mama" 
-                value={formatBoolean(data.cancerMama)} 
-                highlight={data.cancerMama === true}
-              />
-              <SummaryItem label="Amamentação" value={formatBoolean(data.amamentando)} />
+              <SummaryItem label="Sintomas" value={sintomasLabel} />
+              {data.sexo === 'feminino' && (
+                <>
+                  <SummaryItem
+                    label="Diagnóstico de câncer de mama"
+                    value={formatBoolean(data.cancerMama)}
+                    highlight={data.cancerMama === true}
+                  />
+                  <SummaryItem label="Amamentação" value={formatBoolean(data.amamentando)} />
+                </>
+              )}
+              {data.sexo === 'masculino' && (
+                <>
+                  <SummaryItem
+                    label="Problemas na próstata"
+                    value={formatBoolean(data.problemaProstata)}
+                    highlight={data.problemaProstata === true}
+                  />
+                  <SummaryItem
+                    label="Dificuldades urinárias"
+                    value={formatBoolean(data.dificuldadeUrinaria)}
+                    highlight={data.dificuldadeUrinaria === true}
+                  />
+                </>
+              )}
             </>
           )}
-          {data.sexo === 'masculino' && (
+
+          {/* Questões clínicas específicas de densitometria */}
+          {isDensitometria && (
             <>
-              <SummaryItem 
-                label="Problemas na próstata" 
-                value={formatBoolean(data.problemaProstata)} 
-                highlight={data.problemaProstata === true}
+              <SummaryItem
+                label="Tem osteoporose"
+                value={formatBoolean(data.temOsteoporose)}
+                highlight={data.temOsteoporose === true}
               />
-              <SummaryItem 
-                label="Dificuldades urinárias" 
-                value={formatBoolean(data.dificuldadeUrinaria)} 
-                highlight={data.dificuldadeUrinaria === true}
+              <SummaryItem
+                label="Doença da tireoide"
+                value={formatBoolean(data.doencaTireoide)}
+                highlight={data.doencaTireoide === true}
               />
+              {data.doencaTireoide && data.doencaTireoideDetalhes && (
+                <SummaryItem label="Detalhes (tireoide)" value={data.doencaTireoideDetalhes} />
+              )}
+              <SummaryItem
+                label="Doença intestinal (Crohn, celíaca)"
+                value={formatBoolean(data.doencaIntestinal)}
+                highlight={data.doencaIntestinal === true}
+              />
+              {data.doencaIntestinal && data.doencaIntestinalDetalhes && (
+                <SummaryItem label="Detalhes (intestinal)" value={data.doencaIntestinalDetalhes} />
+              )}
+              <SummaryItem
+                label="Hiperparatireoidismo"
+                value={formatBoolean(data.temHiperparatiroidismo)}
+                highlight={data.temHiperparatiroidismo === true}
+              />
+              <SummaryItem
+                label="Doença de Paget"
+                value={formatBoolean(data.temDoencaPaget)}
+                highlight={data.temDoencaPaget === true}
+              />
+              <SummaryItem
+                label="Má absorção de cálcio"
+                value={formatBoolean(data.maAbsorcaoCalcio)}
+                highlight={data.maAbsorcaoCalcio === true}
+              />
+              <SummaryItem
+                label="Osteomalacia"
+                value={formatBoolean(data.temOsteomalacia)}
+                highlight={data.temOsteomalacia === true}
+              />
+              <SummaryItem
+                label="Síndrome de Cushing"
+                value={formatBoolean(data.temSindromeCushing)}
+                highlight={data.temSindromeCushing === true}
+              />
+              <SummaryItem
+                label="Deficiência de vitamina D"
+                value={formatBoolean(data.deficienciaVitaminaD)}
+                highlight={data.deficienciaVitaminaD === true}
+              />
+              <SummaryItem
+                label="Disfunção renal crônica"
+                value={formatBoolean(data.disfuncaoRenalCronica)}
+                highlight={data.disfuncaoRenalCronica === true}
+              />
+              <SummaryItem
+                label="Usa medicação regular"
+                value={formatBoolean(data.usaMedicacaoRegular)}
+              />
+              {data.usaMedicacaoRegular && data.usaMedicacaoRegularDetalhes && (
+                <SummaryItem label="Detalhes (medicação)" value={data.usaMedicacaoRegularDetalhes} />
+              )}
+
+              {/* Questões femininas específicas de densitometria */}
+              {isFeminino && (
+                <>
+                  <SummaryItem
+                    label="Ciclos menstruais irregulares"
+                    value={formatBoolean(data.ciclosIrregulares)}
+                    highlight={data.ciclosIrregulares === true}
+                  />
+                  <SummaryItem
+                    label="Retirou ovários"
+                    value={formatBoolean(data.retirouOvarios)}
+                    highlight={data.retirouOvarios === true}
+                  />
+                  <SummaryItem
+                    label="Teve câncer de mama"
+                    value={formatBoolean(data.teveCancerMamaDensi)}
+                    highlight={data.teveCancerMamaDensi === true}
+                  />
+                  <SummaryItem
+                    label="Passou pela menopausa"
+                    value={formatBoolean(data.passouMenopausa)}
+                  />
+                  {data.passouMenopausa && data.passouMenopausaDetalhes && (
+                    <SummaryItem label="Detalhes (menopausa)" value={data.passouMenopausaDetalhes} />
+                  )}
+                  <SummaryItem
+                    label="Fez histerectomia"
+                    value={formatBoolean(data.fezHisterectomia)}
+                    highlight={data.fezHisterectomia === true}
+                  />
+                  {data.fezHisterectomia && data.fezHisterectomiaDetalhes && (
+                    <SummaryItem label="Detalhes (histerectomia)" value={data.fezHisterectomiaDetalhes} />
+                  )}
+                </>
+              )}
             </>
           )}
         </SummarySection>

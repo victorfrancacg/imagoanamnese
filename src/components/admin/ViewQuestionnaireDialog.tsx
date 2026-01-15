@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { QuestionnaireAnswers } from '@/components/tecnico/QuestionnaireAnswers';
 import { formatCpf, formatDate } from '@/lib/utils';
 import { getStatusBadge } from '@/lib/badge-helpers';
+import { FileText } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Questionario = Tables<'questionarios'>;
@@ -42,11 +43,24 @@ export function ViewQuestionnaireDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>Questionário - {questionario.nome}</DialogTitle>
-          <DialogDescription>
-            Visualização somente leitura dos dados do questionário
-          </DialogDescription>
+        <DialogHeader className="flex flex-row items-start justify-between pr-8">
+          <div>
+            <DialogTitle>Questionário - {questionario.nome}</DialogTitle>
+            <DialogDescription>
+              Visualização somente leitura dos dados do questionário
+            </DialogDescription>
+          </div>
+          {questionario.final_pdf_url && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 flex-shrink-0"
+              onClick={() => window.open(questionario.final_pdf_url!, '_blank')}
+            >
+              <FileText className="h-4 w-4" />
+              Visualizar PDF
+            </Button>
+          )}
         </DialogHeader>
 
         <ScrollArea className="h-[60vh] pr-4">
