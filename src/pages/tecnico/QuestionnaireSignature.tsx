@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, CheckCircle, Loader2, AlertTriangle, Radio } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Loader2, AlertTriangle, Radio, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
@@ -80,6 +80,7 @@ export default function QuestionnaireSignature() {
   const [assinaturaTecnico, setAssinaturaTecnico] = useState<string>('');
   const [showTelecomandoDialog, setShowTelecomandoDialog] = useState(false);
   const [telecomandoChoice, setTelecomandoChoice] = useState<boolean | null>(null);
+  const [finalizationResult, setFinalizationResult] = useState<{ status: string; pdfUrl: string | null } | null>(null);
 
   // Buscar dados do questionário
   const { data: questionario, isLoading, error } = useQuery({
@@ -179,24 +180,22 @@ export default function QuestionnaireSignature() {
 
       if (error) throw error;
 
-      return novoStatus;
+      return { status: novoStatus, pdfUrl: finalPdfUrl };
     },
-    onSuccess: (novoStatus) => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['questionario', id] });
 
-      if (novoStatus === 'finalizado') {
-        toast({
-          title: 'Questionário finalizado!',
-          description: 'O documento foi assinado e arquivado com sucesso.',
-        });
+      if (result.status === 'finalizado') {
+        // Mostrar tela de sucesso com botão de download
+        setFinalizationResult(result);
       } else {
+        // Enviado para operador - navegar diretamente
         toast({
           title: 'Enviado para Operador',
           description: 'O questionário foi enviado para revisão do operador.',
         });
+        navigate('/tecnico/questionarios');
       }
-
-      navigate('/tecnico/questionarios');
     },
     onError: (error) => {
       toast({
@@ -242,6 +241,43 @@ export default function QuestionnaireSignature() {
               <Link to="/tecnico/questionarios">
                 <Button>Voltar para Lista</Button>
               </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Tela de sucesso após finalização
+  if (finalizationResult) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-12">
+              <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-6" />
+              <h2 className="text-2xl font-bold mb-2">Revisão Finalizada!</h2>
+              <p className="text-muted-foreground mb-8">
+                O questionário foi assinado e arquivado com sucesso.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {finalizationResult.pdfUrl && (
+                  <Button
+                    onClick={() => window.open(finalizationResult.pdfUrl!, '_blank')}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Baixar PDF
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/tecnico/questionarios')}
+                >
+                  Voltar para Lista
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

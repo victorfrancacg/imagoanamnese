@@ -286,12 +286,27 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
               />
             </>
           )}
+          {/* Campos de Segurança Mamografia */}
+          {isMamografia && isFeminino && (
+            <InfoRow
+              label="Está grávida ou suspeita"
+              value={formatBoolean(data.gravida)}
+              highlight={data.gravida === true}
+            />
+          )}
           {/* Campos de Segurança Densitometria */}
           {isDensitometria && (
             <>
-              <InfoRow 
-                label="Exame contraste/bário recente" 
-                value={formatBoolean(data.exameContrasteRecente)} 
+              {isFeminino && (
+                <InfoRow
+                  label="Está grávida ou suspeita"
+                  value={formatBoolean(data.gravida)}
+                  highlight={data.gravida === true}
+                />
+              )}
+              <InfoRow
+                label="Exame contraste/bário recente"
+                value={formatBoolean(data.exameContrasteRecente)}
                 highlight={data.exameContrasteRecente === true}
               />
               <InfoRow 
