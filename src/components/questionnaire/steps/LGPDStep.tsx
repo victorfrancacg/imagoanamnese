@@ -31,19 +31,17 @@ export function LGPDStep({ data, updateData, onNext, onBack }: LGPDStepProps) {
         </div>
 
         {/* Checkbox de aceite */}
-        <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
-          onClick={() => updateData({ aceitaCompartilhamento: !data.aceitaCompartilhamento })}
-        >
+        <label className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
           <Checkbox
             id="lgpd-aceite"
             checked={data.aceitaCompartilhamento === true}
             onCheckedChange={(checked) => updateData({ aceitaCompartilhamento: checked === true })}
             className="mt-0.5"
           />
-          <Label htmlFor="lgpd-aceite" className="cursor-pointer text-sm leading-relaxed font-medium">
+          <span className="text-sm leading-relaxed font-medium">
             Li e aceito o Termo de Consentimento para Tratamento de Dados – IMAGO
-          </Label>
-        </div>
+          </span>
+        </label>
 
         {!data.aceitaCompartilhamento && data.aceitaCompartilhamento !== null && (
           <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">

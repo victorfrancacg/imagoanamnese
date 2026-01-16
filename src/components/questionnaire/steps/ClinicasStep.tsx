@@ -171,20 +171,19 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
             </p>
             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
               {regioesDisponiveis.map((regiao) => (
-                <div 
+                <label
                   key={regiao.id}
                   className="flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => handleRegiaoChange(regiao.id, !(data.regioesExame || []).includes(regiao.id))}
                 >
                   <Checkbox
                     id={`regiao-${regiao.id}`}
                     checked={(data.regioesExame || []).includes(regiao.id)}
                     onCheckedChange={(checked) => handleRegiaoChange(regiao.id, checked as boolean)}
                   />
-                  <Label htmlFor={`regiao-${regiao.id}`} className="cursor-pointer font-normal text-sm sm:text-base">
+                  <span className="font-normal text-sm sm:text-base">
                     {regiao.label}
-                  </Label>
-                </div>
+                  </span>
+                </label>
               ))}
             </div>
           </div>
@@ -215,14 +214,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoExameAnterior: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-anterior-sim" />
-                  <Label htmlFor="mamo-anterior-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-anterior-nao" />
-                  <Label htmlFor="mamo-anterior-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoExameAnterior && (
                 <Input
@@ -257,14 +256,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoMenopausa: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-menopausa-sim" />
-                  <Label htmlFor="mamo-menopausa-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-menopausa-nao" />
-                  <Label htmlFor="mamo-menopausa-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoMenopausa && (
                 <Input
@@ -284,14 +283,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoUsaHormonios: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-hormonios-sim" />
-                  <Label htmlFor="mamo-hormonios-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-hormonios-nao" />
-                  <Label htmlFor="mamo-hormonios-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -304,14 +303,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoTemFilhos: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-filhos-sim" />
-                  <Label htmlFor="mamo-filhos-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-filhos-nao" />
-                  <Label htmlFor="mamo-filhos-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoTemFilhos && (
                 <Input
@@ -333,14 +332,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoProblemaMamas: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-problema-sim" />
-                  <Label htmlFor="mamo-problema-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-problema-nao" />
-                  <Label htmlFor="mamo-problema-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoProblemaMamas && (
                 <Textarea
@@ -361,14 +360,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoCirurgiaMamas: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-cirurgia-sim" />
-                  <Label htmlFor="mamo-cirurgia-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-cirurgia-nao" />
-                  <Label htmlFor="mamo-cirurgia-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoCirurgiaMamas && (
                 <Textarea
@@ -389,14 +388,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoUltrassonografia: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-ultra-sim" />
-                  <Label htmlFor="mamo-ultra-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-ultra-nao" />
-                  <Label htmlFor="mamo-ultra-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoUltrassonografia && (
                 <Input
@@ -418,14 +417,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoHistoricoFamiliar: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-historico-sim" />
-                  <Label htmlFor="mamo-historico-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-historico-nao" />
-                  <Label htmlFor="mamo-historico-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoHistoricoFamiliar && (
                 <Textarea
@@ -446,14 +445,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ mamoRadioterapia: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="mamo-radio-sim" />
-                  <Label htmlFor="mamo-radio-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="mamo-radio-nao" />
-                  <Label htmlFor="mamo-radio-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.mamoRadioterapia && (
                 <Input
@@ -479,14 +478,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
               onValueChange={(value) => updateData({ traumaRegiao: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="trauma-sim" />
-                <Label htmlFor="trauma-sim" className="cursor-pointer">Sim</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="trauma-nao" />
-                <Label htmlFor="trauma-nao" className="cursor-pointer">Não</Label>
-              </div>
+                <span>Não</span>
+              </label>
             </RadioGroup>
           </div>
         )}
@@ -501,14 +500,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
               onValueChange={(value) => updateData({ cirurgiaCorpo: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="cirurgia-corpo-sim" />
-                <Label htmlFor="cirurgia-corpo-sim" className="cursor-pointer">Sim</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="cirurgia-corpo-nao" />
-                <Label htmlFor="cirurgia-corpo-nao" className="cursor-pointer">Não</Label>
-              </div>
+                <span>Não</span>
+              </label>
             </RadioGroup>
             {data.cirurgiaCorpo && (
               <Textarea
@@ -531,14 +530,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
               onValueChange={(value) => updateData({ historicoCancer: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="historico-cancer-sim" />
-                <Label htmlFor="historico-cancer-sim" className="cursor-pointer">Sim</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="historico-cancer-nao" />
-                <Label htmlFor="historico-cancer-nao" className="cursor-pointer">Não</Label>
-              </div>
+                <span>Não</span>
+              </label>
             </RadioGroup>
             {data.historicoCancer && (
               <Textarea
@@ -561,14 +560,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
               onValueChange={(value) => updateData({ examesRelacionados: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="exames-relacionados-sim" />
-                <Label htmlFor="exames-relacionados-sim" className="cursor-pointer">Sim</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="exames-relacionados-nao" />
-                <Label htmlFor="exames-relacionados-nao" className="cursor-pointer">Não</Label>
-              </div>
+                <span>Não</span>
+              </label>
             </RadioGroup>
             {data.examesRelacionados && (
               <Textarea
@@ -591,14 +590,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ temOsteoporose: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="osteoporose-sim" />
-                  <Label htmlFor="osteoporose-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="osteoporose-nao" />
-                  <Label htmlFor="osteoporose-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -609,14 +608,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ doencaTireoide: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="tireoide-sim" />
-                  <Label htmlFor="tireoide-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="tireoide-nao" />
-                  <Label htmlFor="tireoide-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.doencaTireoide && (
                 <Textarea
@@ -635,14 +634,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ doencaIntestinal: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="intestinal-sim" />
-                  <Label htmlFor="intestinal-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="intestinal-nao" />
-                  <Label htmlFor="intestinal-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.doencaIntestinal && (
                 <Textarea
@@ -661,14 +660,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ temHiperparatiroidismo: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="hiperpara-sim" />
-                  <Label htmlFor="hiperpara-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="hiperpara-nao" />
-                  <Label htmlFor="hiperpara-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -679,14 +678,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ temDoencaPaget: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="paget-sim" />
-                  <Label htmlFor="paget-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="paget-nao" />
-                  <Label htmlFor="paget-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -697,14 +696,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ maAbsorcaoCalcio: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="calcio-sim" />
-                  <Label htmlFor="calcio-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="calcio-nao" />
-                  <Label htmlFor="calcio-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -715,14 +714,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ temOsteomalacia: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="osteomalacia-sim" />
-                  <Label htmlFor="osteomalacia-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="osteomalacia-nao" />
-                  <Label htmlFor="osteomalacia-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -733,14 +732,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ temSindromeCushing: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="cushing-sim" />
-                  <Label htmlFor="cushing-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="cushing-nao" />
-                  <Label htmlFor="cushing-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -751,14 +750,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ deficienciaVitaminaD: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="vitaminad-sim" />
-                  <Label htmlFor="vitaminad-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="vitaminad-nao" />
-                  <Label htmlFor="vitaminad-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -769,14 +768,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ disfuncaoRenalCronica: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="disfuncao-renal-sim" />
-                  <Label htmlFor="disfuncao-renal-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="disfuncao-renal-nao" />
-                  <Label htmlFor="disfuncao-renal-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
 
@@ -787,14 +786,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ usaMedicacaoRegular: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="medicacao-sim" />
-                  <Label htmlFor="medicacao-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="medicacao-nao" />
-                  <Label htmlFor="medicacao-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
               {data.usaMedicacaoRegular && (
                 <Textarea
@@ -818,14 +817,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     onValueChange={(value) => updateData({ passouMenopausa: value === 'sim' })}
                     className="flex gap-4"
                   >
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="sim" id="menopausa-sim" />
-                      <Label htmlFor="menopausa-sim" className="cursor-pointer">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                      <span>Sim</span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="nao" id="menopausa-nao" />
-                      <Label htmlFor="menopausa-nao" className="cursor-pointer">Não</Label>
-                    </div>
+                      <span>Não</span>
+                    </label>
                   </RadioGroup>
                   {data.passouMenopausa && (
                     <Textarea
@@ -846,14 +845,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     onValueChange={(value) => updateData({ ciclosIrregulares: value === 'sim' })}
                     className="flex gap-4"
                   >
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="sim" id="ciclos-sim" />
-                      <Label htmlFor="ciclos-sim" className="cursor-pointer">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                      <span>Sim</span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="nao" id="ciclos-nao" />
-                      <Label htmlFor="ciclos-nao" className="cursor-pointer">Não</Label>
-                    </div>
+                      <span>Não</span>
+                    </label>
                   </RadioGroup>
                 </div>
 
@@ -864,14 +863,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     onValueChange={(value) => updateData({ teveCancerMamaDensi: value === 'sim' })}
                     className="flex gap-4"
                   >
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="sim" id="cancer-mama-densi-sim" />
-                      <Label htmlFor="cancer-mama-densi-sim" className="cursor-pointer">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                      <span>Sim</span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="nao" id="cancer-mama-densi-nao" />
-                      <Label htmlFor="cancer-mama-densi-nao" className="cursor-pointer">Não</Label>
-                    </div>
+                      <span>Não</span>
+                    </label>
                   </RadioGroup>
                 </div>
 
@@ -884,14 +883,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     onValueChange={(value) => updateData({ fezHisterectomia: value === 'sim' })}
                     className="flex gap-4"
                   >
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="sim" id="histerectomia-sim" />
-                      <Label htmlFor="histerectomia-sim" className="cursor-pointer">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                      <span>Sim</span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="nao" id="histerectomia-nao" />
-                      <Label htmlFor="histerectomia-nao" className="cursor-pointer">Não</Label>
-                    </div>
+                      <span>Não</span>
+                    </label>
                   </RadioGroup>
                   {data.fezHisterectomia && (
                     <Textarea
@@ -910,14 +909,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                     onValueChange={(value) => updateData({ retirouOvarios: value === 'sim' })}
                     className="flex gap-4"
                   >
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="sim" id="ovarios-sim" />
-                      <Label htmlFor="ovarios-sim" className="cursor-pointer">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                      <span>Sim</span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                       <RadioGroupItem value="nao" id="ovarios-nao" />
-                      <Label htmlFor="ovarios-nao" className="cursor-pointer">Não</Label>
-                    </div>
+                      <span>Não</span>
+                    </label>
                   </RadioGroup>
                 </div>
               </div>
@@ -937,14 +936,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                 onValueChange={(value) => updateData({ amamentando: value === 'sim' })}
                 className="flex gap-4"
               >
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="sim" id="amamentando-sim" />
-                  <Label htmlFor="amamentando-sim" className="cursor-pointer">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <span>Sim</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                   <RadioGroupItem value="nao" id="amamentando-nao" />
-                  <Label htmlFor="amamentando-nao" className="cursor-pointer">Não</Label>
-                </div>
+                  <span>Não</span>
+                </label>
               </RadioGroup>
             </div>
           </div>
@@ -963,14 +962,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                   onValueChange={(value) => updateData({ problemaProstata: value === 'sim' })}
                   className="flex gap-4"
                 >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                     <RadioGroupItem value="sim" id="prostata-sim" />
-                    <Label htmlFor="prostata-sim" className="cursor-pointer">Sim</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <span>Sim</span>
+                  </label>
+                  <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                     <RadioGroupItem value="nao" id="prostata-nao" />
-                    <Label htmlFor="prostata-nao" className="cursor-pointer">Não</Label>
-                  </div>
+                    <span>Não</span>
+                  </label>
                 </RadioGroup>
               </div>
             )}
@@ -985,14 +984,14 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
                   onValueChange={(value) => updateData({ dificuldadeUrinaria: value === 'sim' })}
                   className="flex gap-4"
                 >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                     <RadioGroupItem value="sim" id="urinaria-sim" />
-                    <Label htmlFor="urinaria-sim" className="cursor-pointer">Sim</Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                    <span>Sim</span>
+                  </label>
+                  <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                     <RadioGroupItem value="nao" id="urinaria-nao" />
-                    <Label htmlFor="urinaria-nao" className="cursor-pointer">Não</Label>
-                  </div>
+                    <span>Não</span>
+                  </label>
                 </RadioGroup>
               </div>
             )}

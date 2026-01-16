@@ -40,14 +40,14 @@ function YesNoQuestion({
         onValueChange={(v) => onChange(v === 'sim')}
         className="flex gap-2 sm:gap-4"
       >
-        <div className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
           <RadioGroupItem value="sim" id={`${id}-sim`} />
-          <Label htmlFor={`${id}-sim`} className="cursor-pointer text-sm sm:text-base">Sim</Label>
-        </div>
-        <div className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+          <span className="text-sm sm:text-base">Sim</span>
+        </label>
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
           <RadioGroupItem value="nao" id={`${id}-nao`} />
-          <Label htmlFor={`${id}-nao`} className="cursor-pointer text-sm sm:text-base">Não</Label>
-        </div>
+          <span className="text-sm sm:text-base">Não</span>
+        </label>
       </RadioGroup>
       {children}
     </div>

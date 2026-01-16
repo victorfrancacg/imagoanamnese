@@ -146,18 +146,18 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
               className="flex flex-col gap-2 sm:gap-3"
             >
-              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="autorizo" id="tc-autorizo" className="mt-1" />
-                <Label htmlFor="tc-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
+                <span className="text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso e autorizo sua injeção.
-                </Label>
-              </div>
-              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                </span>
+              </label>
+              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="nao_autorizo" id="tc-nao-autorizo" className="mt-1" />
-                <Label htmlFor="tc-nao-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
+                <span className="text-xs sm:text-sm leading-relaxed">
                   Após o exposto, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso, entretanto NÃO autorizo sua injeção.
-                </Label>
-              </div>
+                </span>
+              </label>
             </RadioGroup>
           </div>
         </div>
@@ -183,18 +183,18 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
               className="flex flex-col gap-2 sm:gap-3"
             >
-              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="autorizo" id="rm-autorizo" className="mt-1" />
-                <Label htmlFor="rm-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
+                <span className="text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionados a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e AUTORIZO SUA INJEÇÃO.
-                </Label>
-              </div>
-              <div className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                </span>
+              </label>
+              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="nao_autorizo" id="rm-nao-autorizo" className="mt-1" />
-                <Label htmlFor="rm-nao-autorizo" className="cursor-pointer text-xs sm:text-sm leading-relaxed">
+                <span className="text-xs sm:text-sm leading-relaxed">
                   Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionado a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e NÃO AUTORIZO SUA INJEÇÃO.
-                </Label>
-              </div>
+                </span>
+              </label>
             </RadioGroup>
           </div>
         </div>
@@ -222,14 +222,14 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="densi-sim" />
-                <Label htmlFor="densi-sim" className="cursor-pointer">Sim, estou ciente e concordo</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim, estou ciente e concordo</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="densi-nao" />
-                <Label htmlFor="densi-nao" className="cursor-pointer">Não concordo</Label>
-              </div>
+                <span>Não concordo</span>
+              </label>
             </RadioGroup>
           </div>
         </div>
@@ -257,14 +257,14 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
               className="flex gap-4"
             >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="mamo-sim" />
-                <Label htmlFor="mamo-sim" className="cursor-pointer">Sim, estou ciente e concordo</Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                <span>Sim, estou ciente e concordo</span>
+              </label>
+              <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="mamo-nao" />
-                <Label htmlFor="mamo-nao" className="cursor-pointer">Não concordo</Label>
-              </div>
+                <span>Não concordo</span>
+              </label>
             </RadioGroup>
           </div>
         </div>
@@ -292,14 +292,14 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
             onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
             className="flex gap-4"
           >
-            <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+            <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
               <RadioGroupItem value="sim" id="riscos-sim" />
-              <Label htmlFor="riscos-sim" className="cursor-pointer">Sim, estou ciente e concordo</Label>
-            </div>
-            <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <span>Sim, estou ciente e concordo</span>
+            </label>
+            <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
               <RadioGroupItem value="nao" id="riscos-nao" />
-              <Label htmlFor="riscos-nao" className="cursor-pointer">Não concordo</Label>
-            </div>
+              <span>Não concordo</span>
+            </label>
           </RadioGroup>
         </div>
       </div>
