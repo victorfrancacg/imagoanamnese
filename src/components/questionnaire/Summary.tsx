@@ -305,19 +305,63 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
         <SummarySection title="Questões Clínicas" icon={Stethoscope}>
           <SummaryItem label="Motivo do Exame" value={data.motivoExame || '-'} />
 
-          {/* Questões clínicas genéricas (não densitometria) */}
-          {!isDensitometria && (
+          {/* Questões clínicas específicas de Mamografia */}
+          {data.tipoExame === 'mamografia' && (
             <>
-              <SummaryItem label="Sintomas" value={sintomasLabel} />
-              {data.sexo === 'feminino' && (
-                <>
-                  <SummaryItem
-                    label="Diagnóstico de câncer de mama"
-                    value={formatBoolean(data.cancerMama)}
-                    highlight={data.cancerMama === true}
-                  />
-                  <SummaryItem label="Amamentação" value={formatBoolean(data.amamentando)} />
-                </>
+              <SummaryItem label="Exame anterior" value={formatBoolean(data.mamoExameAnterior)} />
+              {data.mamoExameAnterior && data.mamoExameAnteriorDetalhes && (
+                <SummaryItem label="Quando realizou" value={data.mamoExameAnteriorDetalhes} />
+              )}
+              <SummaryItem label="Última menstruação" value={data.mamoUltimaMenstruacao || '-'} />
+              <SummaryItem label="Na menopausa" value={formatBoolean(data.mamoMenopausa)} />
+              {data.mamoMenopausa && data.mamoMenopausaDetalhes && (
+                <SummaryItem label="Idade menopausa" value={data.mamoMenopausaDetalhes} />
+              )}
+              <SummaryItem label="Usa hormônios" value={formatBoolean(data.mamoUsaHormonios)} />
+              <SummaryItem label="Tem filhos" value={formatBoolean(data.mamoTemFilhos)} />
+              {data.mamoTemFilhos && data.mamoTemFilhosDetalhes && (
+                <SummaryItem label="Amamentação" value={data.mamoTemFilhosDetalhes} />
+              )}
+              <SummaryItem
+                label="Problema nas mamas"
+                value={formatBoolean(data.mamoProblemaMamas)}
+                highlight={data.mamoProblemaMamas === true}
+              />
+              {data.mamoProblemaMamas && data.mamoProblemaMamasDetalhes && (
+                <SummaryItem label="Detalhes problema" value={data.mamoProblemaMamasDetalhes} />
+              )}
+              <SummaryItem label="Cirurgia nas mamas" value={formatBoolean(data.mamoCirurgiaMamas)} />
+              {data.mamoCirurgiaMamas && data.mamoCirurgiaMamasDetalhes && (
+                <SummaryItem label="Detalhes cirurgia" value={data.mamoCirurgiaMamasDetalhes} />
+              )}
+              <SummaryItem label="Ultrassonografia mama" value={formatBoolean(data.mamoUltrassonografia)} />
+              {data.mamoUltrassonografia && data.mamoUltrassonografiaDetalhes && (
+                <SummaryItem label="Quando realizou" value={data.mamoUltrassonografiaDetalhes} />
+              )}
+              <SummaryItem
+                label="Histórico familiar câncer mama/ovário"
+                value={formatBoolean(data.mamoHistoricoFamiliar)}
+                highlight={data.mamoHistoricoFamiliar === true}
+              />
+              {data.mamoHistoricoFamiliar && data.mamoHistoricoFamiliarDetalhes && (
+                <SummaryItem label="Quais parentes" value={data.mamoHistoricoFamiliarDetalhes} />
+              )}
+              <SummaryItem
+                label="Radioterapia mama"
+                value={formatBoolean(data.mamoRadioterapia)}
+                highlight={data.mamoRadioterapia === true}
+              />
+              {data.mamoRadioterapia && data.mamoRadioterapiaDetalhes && (
+                <SummaryItem label="Ano radioterapia" value={data.mamoRadioterapiaDetalhes} />
+              )}
+            </>
+          )}
+
+          {/* Questões clínicas para Tomografia e Ressonância */}
+          {(isTomografia || isRessonancia) && (
+            <>
+              {data.sexo === 'feminino' && isTomografia && (
+                <SummaryItem label="Amamentação" value={formatBoolean(data.amamentando)} />
               )}
               {data.sexo === 'masculino' && (
                 <>
@@ -331,6 +375,31 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
                     value={formatBoolean(data.dificuldadeUrinaria)}
                     highlight={data.dificuldadeUrinaria === true}
                   />
+                </>
+              )}
+              <SummaryItem
+                label="Trauma na região"
+                value={formatBoolean(data.traumaRegiao)}
+                highlight={data.traumaRegiao === true}
+              />
+              <SummaryItem label="Cirurgia no corpo" value={formatBoolean(data.cirurgiaCorpo)} />
+              {data.cirurgiaCorpo && data.cirurgiaCorpoDetalhes && (
+                <SummaryItem label="Detalhes cirurgia" value={data.cirurgiaCorpoDetalhes} />
+              )}
+              <SummaryItem
+                label="Histórico de câncer"
+                value={formatBoolean(data.historicoCancer)}
+                highlight={data.historicoCancer === true}
+              />
+              {data.historicoCancer && data.historicoCancerDetalhes && (
+                <SummaryItem label="Detalhes câncer" value={data.historicoCancerDetalhes} />
+              )}
+              {isRessonancia && (
+                <>
+                  <SummaryItem label="Exames relacionados" value={formatBoolean(data.examesRelacionados)} />
+                  {data.examesRelacionados && data.examesRelacionadosDetalhes && (
+                    <SummaryItem label="Detalhes exames" value={data.examesRelacionadosDetalhes} />
+                  )}
                 </>
               )}
             </>
