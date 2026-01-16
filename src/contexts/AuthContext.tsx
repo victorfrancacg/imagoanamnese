@@ -125,12 +125,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       try {
+        // Para eventos de refresh de token, apenas atualizar a sessão
+        // Não recarregar o perfil se já temos um perfil válido para o mesmo usuário
+        if (_event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed, updating session only');
+          setSession(session);
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          await loadProfile(session.user.id);
-          if (!mounted) return;
+          // Só recarregar perfil se mudou o usuário ou não temos perfil
+          const currentProfile = profile;
+          if (!currentProfile || currentProfile.id !== session.user.id) {
+            await loadProfile(session.user.id);
+            if (!mounted) return;
+          }
         } else {
           setProfile(null);
         }

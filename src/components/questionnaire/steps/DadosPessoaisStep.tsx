@@ -4,8 +4,13 @@ import { NavigationButtons } from "../NavigationButtons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
 import { QuestionnaireData, Sex } from "@/types/questionnaire";
 import { formatCpf as formatCpfUtil } from "@/lib/utils";
+import { ptBR } from "date-fns/locale";
 
 interface DadosPessoaisStepProps {
   data: QuestionnaireData;
@@ -77,6 +82,8 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
     return data.dataExame || '';
   });
 
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   // Para mamografia, sexo é sempre feminino
   const isMamografia = data.tipoExame === 'mamografia';
   
@@ -126,7 +133,7 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
   const handleDataExameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatDateInput(e.target.value);
     setDataExameInput(formatted);
-    
+
     // Se a data estiver completa e válida, converte para formato de armazenamento
     const numbers = formatted.replace(/\D/g, '');
     if (numbers.length === 8) {
@@ -137,6 +144,26 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
     } else {
       updateData({ dataExame: formatted });
     }
+  };
+
+  const handleCalendarSelect = (date: Date | undefined) => {
+    if (date) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      setDataExameInput(`${day}/${month}/${year}`);
+      updateData({ dataExame: `${year}-${month}-${day}` });
+      setCalendarOpen(false);
+    }
+  };
+
+  // Converte o valor do input para Date (para sincronizar com o calendário)
+  const getSelectedDate = (): Date | undefined => {
+    if (data.dataExame && data.dataExame.includes('-')) {
+      const [year, month, day] = data.dataExame.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return undefined;
   };
 
   return (
@@ -263,15 +290,42 @@ export function DadosPessoaisStep({ data, updateData, onNext, onBack }: DadosPes
           <Label htmlFor="dataExame" className="text-sm sm:text-base font-medium">
             Data do Exame
           </Label>
-          <Input
-            id="dataExame"
-            type="text"
-            placeholder="dd/mm/aaaa"
-            value={dataExameInput}
-            onChange={handleDataExameChange}
-            className="h-10 sm:h-12 text-sm sm:text-base"
-            maxLength={10}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="dataExame"
+              type="text"
+              placeholder="dd/mm/aaaa"
+              value={dataExameInput}
+              onChange={handleDataExameChange}
+              onFocus={() => {
+                if (!dataExameInput) {
+                  setCalendarOpen(true);
+                }
+              }}
+              className="h-10 sm:h-12 text-sm sm:text-base flex-1"
+              maxLength={10}
+            />
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 sm:h-12 px-3"
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={getSelectedDate()}
+                  onSelect={handleCalendarSelect}
+                  locale={ptBR}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, CheckCircle, Loader2, AlertTriangle, Radio, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { SignatureCanvas } from '@/components/tecnico/SignatureCanvas';
@@ -76,6 +77,7 @@ export default function QuestionnaireSignature() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [assinaturaTecnico, setAssinaturaTecnico] = useState<string>('');
   const [showTelecomandoDialog, setShowTelecomandoDialog] = useState(false);
@@ -147,11 +149,13 @@ export default function QuestionnaireSignature() {
         pdfBlob = generateFinalMamografiaPDF(questionnaireData, {
           paciente: questionnaireData.assinaturaData,
           operador: assinaturaTecnico,
+          nomeOperador: profile?.nome,
         });
       } else if (tipoExame === 'densitometria') {
         pdfBlob = generateFinalDensitometriaPDF(questionnaireData, {
           paciente: questionnaireData.assinaturaData,
           operador: assinaturaTecnico,
+          nomeOperador: profile?.nome,
         });
       } else {
         pdfBlob = generateFinalQuestionnairePDF(questionnaireData, assinaturaTecnico);

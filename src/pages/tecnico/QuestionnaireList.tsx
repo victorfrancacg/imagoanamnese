@@ -22,56 +22,69 @@ export default function QuestionnaireList() {
   const [searchCpf, setSearchCpf] = useState('');
   const [searchNome, setSearchNome] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusQuestionario | 'todos'>('todos');
-  const [shouldSearch, setShouldSearch] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Verifica se há algum critério de busca ativo
   const hasSearchCriteria = searchCpf.trim() || searchNome.trim() || statusFilter !== 'todos';
 
-  // Query para buscar questionários
-  const { data: questionarios, isLoading, error } = useQuery({
-    queryKey: ['questionarios', searchCpf, searchNome, statusFilter, shouldSearch],
-    queryFn: async () => {
+  // Query para buscar questionários (disparo manual via refetch)
+  const { data: questionarios, isFetching, error, refetch } = useQuery({
+    queryKey: ['questionarios', searchCpf, searchNome, statusFilter],
+    queryFn: async ({ signal }) => {
       console.log('[QuestionnaireList] Starting search - CPF:', searchCpf, 'Nome:', searchNome, 'Status:', statusFilter);
 
       const queryStartTime = Date.now();
       console.log('[QuestionnaireList] Executing Supabase query...');
 
-      let query = supabase
-        .from('questionarios')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
+      // Timeout de 30 segundos
+      const timeoutId = setTimeout(() => {
+        console.log('[QuestionnaireList] Query timeout reached (30s)');
+      }, 30000);
 
-      // Aplicar filtro de CPF se preenchido
-      if (searchCpf.trim()) {
-        const cpfLimpo = cleanCpf(searchCpf);
-        console.log('[QuestionnaireList] Filtering by CPF:', cpfLimpo);
-        query = query.ilike('cpf', `%${cpfLimpo}%`);
+      try {
+        let query = supabase
+          .from('questionarios')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50)
+          .abortSignal(signal); // Permite cancelar a query se o componente desmontar
+
+        // Aplicar filtro de CPF se preenchido
+        if (searchCpf.trim()) {
+          const cpfLimpo = cleanCpf(searchCpf);
+          console.log('[QuestionnaireList] Filtering by CPF:', cpfLimpo);
+          query = query.ilike('cpf', `%${cpfLimpo}%`);
+        }
+
+        // Aplicar filtro de nome se preenchido
+        if (searchNome.trim()) {
+          console.log('[QuestionnaireList] Filtering by Nome:', searchNome);
+          query = query.ilike('nome', `%${searchNome.trim()}%`);
+        }
+
+        // Aplicar filtro de status se não for "todos"
+        if (statusFilter !== 'todos') {
+          console.log('[QuestionnaireList] Filtering by Status:', statusFilter);
+          query = query.eq('status', statusFilter);
+        }
+
+        const { data, error } = await query;
+
+        console.log('[QuestionnaireList] Query completed in:', Date.now() - queryStartTime, 'ms');
+        console.log('[QuestionnaireList] Results:', { count: data?.length, error });
+
+        if (error) throw error;
+        return data as Questionario[];
+      } finally {
+        clearTimeout(timeoutId);
       }
-
-      // Aplicar filtro de nome se preenchido
-      if (searchNome.trim()) {
-        console.log('[QuestionnaireList] Filtering by Nome:', searchNome);
-        query = query.ilike('nome', `%${searchNome.trim()}%`);
-      }
-
-      // Aplicar filtro de status se não for "todos"
-      if (statusFilter !== 'todos') {
-        console.log('[QuestionnaireList] Filtering by Status:', statusFilter);
-        query = query.eq('status', statusFilter);
-      }
-
-      const { data, error } = await query;
-
-      console.log('[QuestionnaireList] Query completed in:', Date.now() - queryStartTime, 'ms');
-      console.log('[QuestionnaireList] Results:', { count: data?.length, error });
-
-      if (error) throw error;
-      return data as Questionario[];
     },
-    enabled: shouldSearch && hasSearchCriteria,
+    enabled: false, // Não roda automaticamente, apenas via refetch()
+    staleTime: 15000, // Cache de 15 segundos
+    retry: 1, // Tentar novamente 1 vez em caso de falha
+    retryDelay: 1000, // Esperar 1 segundo antes de tentar novamente
   });
 
   const handleSearch = () => {
@@ -83,14 +96,15 @@ export default function QuestionnaireList() {
       });
       return;
     }
-    setShouldSearch(true);
+    setHasSearched(true);
+    refetch();
   };
 
   const handleClearSearch = () => {
     setSearchCpf('');
     setSearchNome('');
     setStatusFilter('todos');
-    setShouldSearch(false);
+    setHasSearched(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -207,15 +221,15 @@ export default function QuestionnaireList() {
             </div>
           </div>
           <div className="flex gap-2 pt-2">
-            <Button onClick={handleSearch} disabled={isLoading}>
-              {isLoading ? (
+            <Button onClick={handleSearch} disabled={isFetching}>
+              {isFetching ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Search className="mr-2 h-4 w-4" />
               )}
               Buscar
             </Button>
-            {shouldSearch && (
+            {hasSearched && (
               <Button onClick={handleClearSearch} variant="outline">
                 <X className="mr-2 h-4 w-4" />
                 Limpar
@@ -237,7 +251,7 @@ export default function QuestionnaireList() {
         </CardHeader>
         <CardContent>
           {/* Loading State */}
-          {isLoading && (
+          {isFetching && (
             <div className="text-center py-12">
               <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary mb-4" />
               <p className="text-lg font-medium">Buscando questionários...</p>
@@ -245,7 +259,7 @@ export default function QuestionnaireList() {
           )}
 
           {/* Error State */}
-          {error && (
+          {error && !isFetching && (
             <div className="text-center py-12 text-destructive">
               <FileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Erro ao buscar questionários</p>
@@ -256,7 +270,7 @@ export default function QuestionnaireList() {
           )}
 
           {/* Empty State - No search yet */}
-          {!shouldSearch && !isLoading && (
+          {!hasSearched && !isFetching && (
             <div className="text-center py-12 text-muted-foreground">
               <Search className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Nenhuma busca realizada</p>
@@ -267,7 +281,7 @@ export default function QuestionnaireList() {
           )}
 
           {/* Empty State - No results */}
-          {shouldSearch && !isLoading && questionarios?.length === 0 && (
+          {hasSearched && !isFetching && questionarios?.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Nenhum questionário encontrado</p>
@@ -278,7 +292,7 @@ export default function QuestionnaireList() {
           )}
 
           {/* Results Table */}
-          {questionarios && questionarios.length > 0 && !isLoading && (
+          {questionarios && questionarios.length > 0 && !isFetching && (
             <div className="rounded-md border">
               <Table>
                 <TableHeader>

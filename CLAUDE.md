@@ -91,3 +91,16 @@ O sistema usa **dois clientes Supabase separados** com sessões independentes:
 
 ### Storage
 - `questionarios-pdfs` - PDFs gerados dos questionários
+
+## Pendências Técnicas
+
+### useAdminQuestionnaireSearch.ts (Risco Médio)
+**Status:** Monitorar
+
+O hook `src/hooks/useAdminQuestionnaireSearch.ts` usa um padrão de query que pode causar problemas de loading infinito em certas condições (similar ao bug corrigido em `QuestionnaireList.tsx`).
+
+**Problema potencial:** O `queryKey` inclui o objeto `filters` inteiro e o `enabled` depende dos valores dos filtros. Se houver re-renderizações que alterem o objeto inadvertidamente, pode causar comportamento inconsistente.
+
+**Solução recomendada:** Refatorar para usar `enabled: false` com disparo manual via `refetch()`, seguindo o padrão implementado em `QuestionnaireList.tsx`.
+
+**Referência:** Correção aplicada em `src/pages/tecnico/QuestionnaireList.tsx` e `src/contexts/AuthContext.tsx` (janeiro/2026).

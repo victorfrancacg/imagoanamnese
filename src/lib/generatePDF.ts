@@ -56,6 +56,8 @@ interface Assinaturas {
   responsavel?: string;
   assistente?: string;
   operador?: string;
+  nomeAssistente?: string;
+  nomeOperador?: string;
 }
 
 // Contexto de renderização passado para as funções de campos
@@ -680,7 +682,7 @@ function buildExamePDF(
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.textLight);
   doc.text(`Nome: ${data.nome || '_______________________'}`, leftX, yPos);
-  doc.text("Nome: _______________________", rightX, yPos);
+  doc.text(`Nome: ${assinaturas?.nomeAssistente || '_______________________'}`, rightX, yPos);
 
   yPos += 8;
 
@@ -717,7 +719,7 @@ function buildExamePDF(
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.textLight);
   doc.text("Nome: _______________________", leftX, yPos);
-  doc.text("Nome: _______________________", rightX, yPos);
+  doc.text(`Nome: ${assinaturas?.nomeOperador || '_______________________'}`, rightX, yPos);
 
   yPos += 8;
 
