@@ -58,6 +58,8 @@ interface Assinaturas {
   operador?: string;
   nomeAssistente?: string;
   nomeOperador?: string;
+  registroAssistente?: string;
+  registroOperador?: string;
 }
 
 // Contexto de renderização passado para as funções de campos
@@ -684,7 +686,16 @@ function buildExamePDF(
   doc.text(`Nome: ${data.nome || '_______________________'}`, leftX, yPos);
   doc.text(`Nome: ${assinaturas?.nomeAssistente || '_______________________'}`, rightX, yPos);
 
-  yPos += 8;
+  yPos += 4;
+
+  // Registro profissional do assistente
+  doc.setFontSize(6);
+  doc.text("", leftX, yPos); // Paciente não tem registro
+  if (assinaturas?.registroAssistente) {
+    doc.text(assinaturas.registroAssistente, rightX, yPos);
+  }
+
+  yPos += 6;
 
   // Linha 2: Responsável | Operador
   doc.setFontSize(8);
@@ -721,7 +732,16 @@ function buildExamePDF(
   doc.text("Nome: _______________________", leftX, yPos);
   doc.text(`Nome: ${assinaturas?.nomeOperador || '_______________________'}`, rightX, yPos);
 
-  yPos += 8;
+  yPos += 4;
+
+  // Registro profissional do operador
+  doc.setFontSize(6);
+  doc.text("", leftX, yPos); // Responsável não tem registro
+  if (assinaturas?.registroOperador) {
+    doc.text(assinaturas.registroOperador, rightX, yPos);
+  }
+
+  yPos += 6;
 
   // Data e local
   doc.setFontSize(9);

@@ -5,9 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
+
+type Profissao = 'biomedico' | 'tecnico_radiologia' | 'tecnico_enfermagem' | 'assistente_sala';
+
+// Lista de UFs brasileiras
+const UFS = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
+  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
+  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+];
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -16,12 +32,50 @@ export default function Register() {
     email: '',
     password: '',
     confirmPassword: '',
-    professionalId: '',
+    profissao: '' as Profissao | '',
+    crbmRegiao: '',
+    crbmNumero: '',
+    crtrRegiao: '',
+    crtrNumero: '',
+    corenUf: '',
+    corenNumero: '',
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Formata o registro profissional baseado na profissão selecionada
+  const formatarRegistroProfissional = (): string | null => {
+    switch (formData.profissao) {
+      case 'biomedico':
+        return `CRBM-${formData.crbmRegiao} nº ${formData.crbmNumero}`;
+      case 'tecnico_radiologia':
+        return `CRTR-${formData.crtrRegiao} nº ${formData.crtrNumero}`;
+      case 'tecnico_enfermagem':
+        return `COREN-${formData.corenUf} ${formData.corenNumero}`;
+      case 'assistente_sala':
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  // Verifica se os campos de registro estão preenchidos (quando aplicável)
+  const isRegistroValido = (): boolean => {
+    switch (formData.profissao) {
+      case 'biomedico':
+        return !!formData.crbmRegiao && !!formData.crbmNumero;
+      case 'tecnico_radiologia':
+        return !!formData.crtrRegiao && !!formData.crtrNumero;
+      case 'tecnico_enfermagem':
+        return !!formData.corenUf && !!formData.corenNumero;
+      case 'assistente_sala':
+        return true;
+      default:
+        return false;
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -36,6 +90,14 @@ export default function Register() {
 
     try {
       // Validações
+      if (!formData.profissao) {
+        throw new Error('Selecione uma profissão');
+      }
+
+      if (!isRegistroValido()) {
+        throw new Error('Preencha os campos do registro profissional');
+      }
+
       if (formData.password !== formData.confirmPassword) {
         throw new Error('As senhas não coincidem');
       }
@@ -43,6 +105,9 @@ export default function Register() {
       if (formData.password.length < 6) {
         throw new Error('A senha deve ter pelo menos 6 caracteres');
       }
+
+      // Formatar o registro profissional
+      const registroProfissional = formatarRegistroProfissional();
 
       // 1. Criar usuário no Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -66,7 +131,7 @@ export default function Register() {
         user_id: authData.user.id,
         p_nome: formData.nome,
         p_cpf: formData.cpf,
-        p_professional_id: formData.professionalId,
+        p_professional_id: registroProfissional,
       });
 
       if (profileError) throw profileError;
@@ -168,19 +233,155 @@ export default function Register() {
               />
             </div>
 
+            {/* Select de Profissão */}
             <div className="space-y-2">
-              <Label htmlFor="professionalId">COREN/CRM</Label>
-              <Input
-                id="professionalId"
-                name="professionalId"
-                type="text"
-                placeholder="Número do registro profissional"
-                value={formData.professionalId}
-                onChange={handleChange}
-                required
+              <Label>Profissão</Label>
+              <Select
+                value={formData.profissao}
+                onValueChange={(value: Profissao) =>
+                  setFormData({ ...formData, profissao: value })
+                }
                 disabled={loading}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione sua profissão" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="biomedico">Biomédico</SelectItem>
+                  <SelectItem value="tecnico_radiologia">Técnico de Radiologia</SelectItem>
+                  <SelectItem value="tecnico_enfermagem">Técnico de Enfermagem</SelectItem>
+                  <SelectItem value="assistente_sala">Assistente de Sala</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* Campos condicionais - CRBM (Biomédico) */}
+            {formData.profissao === 'biomedico' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Região CRBM</Label>
+                  <Select
+                    value={formData.crbmRegiao}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, crbmRegiao: value })
+                    }
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Região" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1ª Região</SelectItem>
+                      <SelectItem value="2">2ª Região</SelectItem>
+                      <SelectItem value="3">3ª Região</SelectItem>
+                      <SelectItem value="4">4ª Região</SelectItem>
+                      <SelectItem value="5">5ª Região</SelectItem>
+                      <SelectItem value="6">6ª Região</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="crbmNumero">Número</Label>
+                  <Input
+                    id="crbmNumero"
+                    type="text"
+                    placeholder="Ex: 1234"
+                    value={formData.crbmNumero}
+                    onChange={(e) =>
+                      setFormData({ ...formData, crbmNumero: e.target.value })
+                    }
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Campos condicionais - CRTR (Técnico de Radiologia) */}
+            {formData.profissao === 'tecnico_radiologia' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Região CRTR</Label>
+                  <Select
+                    value={formData.crtrRegiao}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, crtrRegiao: value })
+                    }
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Região" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 24 }, (_, i) => i + 1).map((num) => (
+                        <SelectItem key={num} value={String(num)}>
+                          {num}ª Região
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="crtrNumero">Número</Label>
+                  <Input
+                    id="crtrNumero"
+                    type="text"
+                    placeholder="Ex: 12345"
+                    value={formData.crtrNumero}
+                    onChange={(e) =>
+                      setFormData({ ...formData, crtrNumero: e.target.value })
+                    }
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Campos condicionais - COREN (Técnico de Enfermagem) */}
+            {formData.profissao === 'tecnico_enfermagem' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>UF</Label>
+                  <Select
+                    value={formData.corenUf}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, corenUf: value })
+                    }
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UFS.map((uf) => (
+                        <SelectItem key={uf} value={uf}>
+                          {uf}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="corenNumero">Número</Label>
+                  <Input
+                    id="corenNumero"
+                    type="text"
+                    placeholder="Ex: 123456"
+                    value={formData.corenNumero}
+                    onChange={(e) =>
+                      setFormData({ ...formData, corenNumero: e.target.value })
+                    }
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem para Assistente de Sala */}
+            {formData.profissao === 'assistente_sala' && (
+              <p className="text-sm text-muted-foreground">
+                Assistentes de sala não necessitam de registro profissional.
+              </p>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>

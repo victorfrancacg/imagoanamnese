@@ -123,60 +123,97 @@ export default function QuestionnaireSignature() {
 
       const tipoExame = questionario.tipo_exame;
       const statusAtual = questionario.status;
+      const isAssistente = statusAtual === 'aguardando_assistente';
+      const isOperador = statusAtual === 'aguardando_operador';
 
       // Determinar próximo status
       let novoStatus: string;
 
-      if ((tipoExame === 'ressonancia' || tipoExame === 'tomografia')
-          && statusAtual === 'aguardando_assistente') {
-        // RM/TC vindo do assistente: depende da resposta do telecomando
+      if (isAssistente) {
+        // Assistente assinando (RM/TC): depende do telecomando
         if (isTelecomando === true) {
           novoStatus = 'finalizado';
         } else {
           novoStatus = 'aguardando_operador';
         }
       } else {
-        // Mamografia/Densitometria ou qualquer exame vindo do operador: finaliza
+        // Operador assinando: sempre finaliza
         novoStatus = 'finalizado';
       }
 
-      // Converter dados do banco para formato QuestionnaireData
-      const questionnaireData = convertToQuestionnaireData(questionario);
-
-      // Gerar PDF final com assinatura (usa PDF específico por tipo de exame)
-      let pdfBlob: Blob;
-      if (tipoExame === 'mamografia') {
-        pdfBlob = generateFinalMamografiaPDF(questionnaireData, {
-          paciente: questionnaireData.assinaturaData,
-          operador: assinaturaTecnico,
-          nomeOperador: profile?.nome,
-        });
-      } else if (tipoExame === 'densitometria') {
-        pdfBlob = generateFinalDensitometriaPDF(questionnaireData, {
-          paciente: questionnaireData.assinaturaData,
-          operador: assinaturaTecnico,
-          nomeOperador: profile?.nome,
-        });
-      } else {
-        pdfBlob = generateFinalQuestionnairePDF(questionnaireData, assinaturaTecnico);
-      }
-
-      // Fazer upload do PDF final
-      const finalPdfUrl = await uploadFinalPDF(pdfBlob, id!);
-
-      // Preparar dados para atualização
+      // Preparar dados para atualização no banco
       const updateData: Record<string, unknown> = {
-        assinatura_tecnico: assinaturaTecnico,
         status: novoStatus,
       };
 
-      // Adicionar data_finalizacao e final_pdf_url apenas se finalizado
+      // Salvar assinatura no campo correto
+      if (isAssistente) {
+        updateData.assinatura_assistente = assinaturaTecnico;
+        updateData.nome_assistente = profile?.nome;
+        updateData.registro_assistente = profile?.professional_id || null;
+      } else {
+        updateData.assinatura_operador = assinaturaTecnico;
+        updateData.nome_operador = profile?.nome;
+        updateData.registro_operador = profile?.professional_id || null;
+      }
+
+      // Gerar PDF apenas quando finalizar
+      let finalPdfUrl: string | null = null;
+
       if (novoStatus === 'finalizado') {
+        const questionnaireData = convertToQuestionnaireData(questionario);
+
+        // Montar objeto de assinaturas para o PDF
+        const assinaturas: {
+          paciente?: string;
+          assistente?: string;
+          nomeAssistente?: string;
+          registroAssistente?: string;
+          operador?: string;
+          nomeOperador?: string;
+          registroOperador?: string;
+        } = {
+          paciente: questionnaireData.assinaturaData,
+        };
+
+        if (isAssistente) {
+          // Assistente finalizando com telecomando (só ele assina)
+          assinaturas.assistente = assinaturaTecnico;
+          assinaturas.nomeAssistente = profile?.nome;
+          assinaturas.registroAssistente = profile?.professional_id || undefined;
+        } else if (isOperador) {
+          // Operador finalizando
+          assinaturas.operador = assinaturaTecnico;
+          assinaturas.nomeOperador = profile?.nome;
+          assinaturas.registroOperador = profile?.professional_id || undefined;
+
+          // Para RM/TC, buscar dados do assistente que já assinou
+          if (tipoExame === 'ressonancia' || tipoExame === 'tomografia') {
+            assinaturas.assistente = questionario.assinatura_assistente || undefined;
+            assinaturas.nomeAssistente = questionario.nome_assistente || undefined;
+            assinaturas.registroAssistente = questionario.registro_assistente || undefined;
+          }
+        }
+
+        // Gerar PDF específico por tipo de exame
+        let pdfBlob: Blob;
+        if (tipoExame === 'mamografia') {
+          pdfBlob = generateFinalMamografiaPDF(questionnaireData, assinaturas);
+        } else if (tipoExame === 'densitometria') {
+          pdfBlob = generateFinalDensitometriaPDF(questionnaireData, assinaturas);
+        } else {
+          // RM/TC - usar função genérica por enquanto (TODO: criar funções específicas)
+          pdfBlob = generateFinalMamografiaPDF(questionnaireData, assinaturas);
+        }
+
+        // Fazer upload do PDF final
+        finalPdfUrl = await uploadFinalPDF(pdfBlob, id!);
+
         updateData.data_finalizacao = new Date().toISOString();
         updateData.final_pdf_url = finalPdfUrl;
       }
 
-      // Atualizar questionário
+      // Atualizar questionário no banco
       const { error } = await supabase
         .from('questionarios')
         .update(updateData)

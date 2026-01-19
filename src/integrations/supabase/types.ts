@@ -45,7 +45,12 @@ export type Database = {
       questionarios: {
         Row: {
           assinatura_data: string | null
-          assinatura_tecnico: string | null
+                    assinatura_assistente: string | null
+          nome_assistente: string | null
+          registro_assistente: string | null
+          assinatura_operador: string | null
+          nome_operador: string | null
+          registro_operador: string | null
           cpf: string | null
           created_at: string
           data_exame: string | null
@@ -64,7 +69,12 @@ export type Database = {
         }
         Insert: {
           assinatura_data?: string | null
-          assinatura_tecnico?: string | null
+                    assinatura_assistente?: string | null
+          nome_assistente?: string | null
+          registro_assistente?: string | null
+          assinatura_operador?: string | null
+          nome_operador?: string | null
+          registro_operador?: string | null
           cpf?: string | null
           created_at?: string
           data_exame?: string | null
@@ -83,7 +93,12 @@ export type Database = {
         }
         Update: {
           assinatura_data?: string | null
-          assinatura_tecnico?: string | null
+                    assinatura_assistente?: string | null
+          nome_assistente?: string | null
+          registro_assistente?: string | null
+          assinatura_operador?: string | null
+          nome_operador?: string | null
+          registro_operador?: string | null
           cpf?: string | null
           created_at?: string
           data_exame?: string | null
