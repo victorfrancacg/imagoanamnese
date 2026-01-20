@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabaseTecnico as supabase } from '@/integrations/supabase/tecnicoClient';
 import type { Tables } from '@/integrations/supabase/types';
 import { SignatureCanvas } from '@/components/tecnico/SignatureCanvas';
-import { generateFinalQuestionnairePDF, generateFinalMamografiaPDF, generateFinalDensitometriaPDF } from '@/lib/generatePDF';
+import { generateFinalQuestionnairePDF, generateFinalMamografiaPDF, generateFinalDensitometriaPDF, generateFinalRessonanciaPDF } from '@/lib/pdf';
 import { QuestionnaireData } from '@/types/questionnaire';
 
 type Questionario = Tables<'questionarios'>;
@@ -201,9 +201,11 @@ export default function QuestionnaireSignature() {
           pdfBlob = generateFinalMamografiaPDF(questionnaireData, assinaturas);
         } else if (tipoExame === 'densitometria') {
           pdfBlob = generateFinalDensitometriaPDF(questionnaireData, assinaturas);
+        } else if (tipoExame === 'ressonancia') {
+          pdfBlob = generateFinalRessonanciaPDF(questionnaireData, assinaturas);
         } else {
-          // RM/TC - usar função genérica por enquanto (TODO: criar funções específicas)
-          pdfBlob = generateFinalMamografiaPDF(questionnaireData, assinaturas);
+          // TC - usar função genérica por enquanto (TODO: criar função específica)
+          pdfBlob = generateFinalRessonanciaPDF(questionnaireData, assinaturas);
         }
 
         // Fazer upload do PDF final

@@ -205,14 +205,54 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
       return (
         <div className="space-y-4">
           <div className="p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento – Densitometria Óssea</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              Declaro que fui informado(a) sobre o exame de densitometria óssea (DXA), que utiliza raios X em baixíssima dose para avaliação da densidade mineral óssea, auxiliando no diagnóstico e acompanhamento de osteopenia, osteoporose e risco de fraturas.
-
-              Compreendo que se trata de um exame não invasivo, rápido e indolor, com mínima exposição à radiação. Informei previamente à equipe sobre gravidez ou suspeita, uso recente de contrastes radiológicos, presença de próteses metálicas ou cirurgias que possam interferir no resultado.
-            </p>
+            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento Informado – Exame de Densitometria Óssea (DXA)</h4>
+            <div className="max-h-64 overflow-y-auto pr-2 text-sm text-muted-foreground leading-relaxed space-y-3">
+              <div>
+                <p className="font-semibold text-foreground">1. DO EXAME DE DENSITOMETRIA ÓSSEA</p>
+                <p>A Densitometria Óssea, também denominada Absorciometria por Dupla Energia de Raios X (DXA), é um exame de diagnóstico por imagem utilizado para a avaliação da densidade mineral óssea, auxiliando no diagnóstico, acompanhamento e estratificação do risco de osteopenia, osteoporose e fraturas. O exame é amplamente reconhecido como método padrão para avaliação da saúde óssea, sendo indicado conforme critérios clínicos e diretrizes médicas vigentes.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">2. DO FUNCIONAMENTO DO APARELHO</p>
+                <p>O exame é realizado em equipamento específico que utiliza raios X em doses extremamente baixas, significativamente inferiores às utilizadas em exames radiográficos convencionais. Durante o procedimento, o paciente permanece deitado sobre uma mesa plana, enquanto o braço do aparelho realiza varreduras sobre as regiões anatômicas de interesse, sem contato físico direto.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">3. REGIÕES AVALIADAS</p>
+                <p>As regiões mais comumente avaliadas na densitometria óssea incluem:</p>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  <li>Coluna lombar;</li>
+                  <li>Quadril (fêmur proximal);</li>
+                  <li>Antebraço, em situações específicas;</li>
+                  <li>Corpo inteiro, quando indicado para avaliação de composição corporal.</li>
+                </ul>
+                <p className="mt-1">A escolha das regiões avaliadas depende da indicação clínica, das condições do paciente e de critérios técnicos.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">4. DO TEMPO DE REALIZAÇÃO</p>
+                <p>O exame apresenta duração média de 10 a 20 minutos, podendo variar conforme o número de regiões analisadas e a colaboração do paciente durante o procedimento.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">5. DOS RISCOS E SEGURANÇA</p>
+                <p>A densitometria óssea é considerada um exame seguro, não invasivo e indolor. A exposição à radiação é mínima, não oferecendo risco significativo quando realizada dentro das indicações clínicas adequadas. Por utilizar raios X, ainda que em baixíssima dose, o exame deve ser realizado com cautela em gestantes, sendo necessária comunicação prévia à equipe para avaliação individualizada.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">6. DE FATORES QUE PODEM INTERFERIR NO RESULTADO</p>
+                <p>Algumas condições podem interferir na qualidade ou interpretação dos resultados do exame, tais como:</p>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  <li>Presença de próteses metálicas ou implantes na região avaliada;</li>
+                  <li>Cirurgias prévias;</li>
+                  <li>Fraturas recentes;</li>
+                  <li>Alterações degenerativas importantes da coluna;</li>
+                  <li>Uso recente de contrastes radiológicos (iodados ou à base de bário), devendo-se respeitar intervalo adequado antes da realização do exame.</li>
+                </ul>
+                <p className="mt-1">Essas informações devem ser comunicadas previamente para correta análise técnica.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">7. DO USO DAS IMAGENS E DADOS</p>
+                <p>As imagens e dados obtidos por meio do exame, bem como os dados pessoais colhidos durante o preenchimento do questionário, destinam-se exclusivamente à finalidade diagnóstica e de acompanhamento clínico, respeitando-se o sigilo profissional, as normas éticas aplicáveis e a legislação vigente, em especial a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 – LGPD).</p>
+              </div>
+            </div>
           </div>
-          
+
           <div className="space-y-3">
             <Label className="text-base font-medium">
               Você declara estar ciente e concorda em realizar o exame?
@@ -309,7 +349,7 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
   return (
     <QuestionCard
       title="Termo de Consentimento"
-      subtitle="Por favor, leia atentamente e concorde com os termos abaixo"
+      subtitle="Por favor, leia atentamente os termos abaixo"
     >
       <div className="space-y-6 sm:space-y-8">
         {/* Termo específico por tipo de exame */}

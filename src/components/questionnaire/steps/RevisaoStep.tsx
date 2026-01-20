@@ -168,18 +168,22 @@ export function RevisaoStep({ data, onNext, onBack, onEditStep }: RevisaoStepPro
           {/* Questões de Segurança - Ressonância Magnética */}
           {tipoExame === 'ressonancia' && (
             <>
-              <InfoRow 
-                label="Está grávida ou suspeita" 
-                value={formatBoolean(data.rmGravida)} 
-                highlight={data.rmGravida === true}
-              />
-              <InfoRow 
-                label="Está amamentando" 
-                value={formatBoolean(data.rmAmamentando)} 
-              />
-              <InfoRow 
-                label="Implante medicamentoso" 
-                value={formatBoolean(data.rmImplanteMedicamentoso)} 
+              {data.sexo === 'feminino' && (
+                <>
+                  <InfoRow
+                    label="Está grávida ou suspeita"
+                    value={formatBoolean(data.rmGravida)}
+                    highlight={data.rmGravida === true}
+                  />
+                  <InfoRow
+                    label="Está amamentando"
+                    value={formatBoolean(data.rmAmamentando)}
+                  />
+                </>
+              )}
+              <InfoRow
+                label="Implante medicamentoso"
+                value={formatBoolean(data.rmImplanteMedicamentoso)}
                 highlight={data.rmImplanteMedicamentoso === true}
               />
               <InfoRow 
