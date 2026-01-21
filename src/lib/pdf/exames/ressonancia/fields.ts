@@ -1,5 +1,19 @@
 import { RenderContext } from "../../core/types";
 
+// Mapeamento de regiões do exame para texto legível
+const REGIOES_LABELS: Record<string, string> = {
+  cabeca: 'Cabeça',
+  pescoco: 'Pescoço',
+  tronco: 'Tronco',
+  membros_superiores: 'Membros Superiores',
+  membros_inferiores: 'Membros Inferiores',
+};
+
+function formatRegioes(regioes: string[] | null | undefined): string {
+  if (!regioes || regioes.length === 0) return '-';
+  return regioes.map(r => REGIOES_LABELS[r] || r.replace(/_/g, ' ')).join(', ');
+}
+
 export function renderRessonanciaSecurityFields(ctx: RenderContext): number {
   const { data, addThreeColumnRow, formatBoolean } = ctx;
   let y = ctx.yPos;
@@ -103,12 +117,9 @@ export function renderRessonanciaClinicalFields(ctx: RenderContext): number {
   const { data, leftX, contentWidth, addCompactDataRow, addMotivoField, addFieldPair, formatBoolean } = ctx;
   let y = ctx.yPos;
 
-  // Regiões do exame (full width)
-  const regioesText = data.regioesExame && data.regioesExame.length > 0
-    ? data.regioesExame.join(', ')
-    : '-';
-  addCompactDataRow("Regiões do exame", regioesText, leftX, y, contentWidth);
-  y += 8;
+  // Regiões do exame (full width, usando addMotivoField para não cortar texto)
+  const regioesText = formatRegioes(data.regioesExame);
+  y = addMotivoField("Regiões do exame", regioesText, leftX, y, contentWidth);
 
   // Motivo do Exame (full width)
   y = addMotivoField("Motivo do Exame", data.motivoExame || '-', leftX, y, contentWidth);

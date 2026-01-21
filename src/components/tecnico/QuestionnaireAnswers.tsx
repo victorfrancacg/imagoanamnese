@@ -28,9 +28,9 @@ const DetailItem = ({ label, value }: { label: string; value: string | null | un
   if (!value) return null;
 
   return (
-    <div className="pl-4 py-2 border-b bg-muted/30">
+    <div className="pl-4 py-2 border-b bg-muted/30 overflow-hidden">
       <span className="text-xs text-muted-foreground">{label}:</span>
-      <p className="text-sm mt-1">{value}</p>
+      <p className="text-sm mt-1 break-words whitespace-pre-wrap" style={{ wordBreak: 'break-word' }}>{value}</p>
     </div>
   );
 };

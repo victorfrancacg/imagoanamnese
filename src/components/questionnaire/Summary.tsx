@@ -89,7 +89,7 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
           Questionário Preenchido com Sucesso!
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground px-2">
-          Você preencheu com sucesso o questionário de anamnese para o exame de {getExamTypeLabel(data.tipoExame)}.
+          Você preencheu com sucesso o questionário para o exame de {getExamTypeLabel(data.tipoExame)}.
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { QuestionnaireData, TipoExame } from "@/types/questionnaire";
 import { toast } from "@/hooks/use-toast";
-import { generateQuestionnairePDF, generateMamografiaPDF, generateDensitometriaPDF, generateRessonanciaPDF } from "@/lib/pdf";
+import { generateMamografiaPDF, generateDensitometriaPDF, generateRessonanciaPDF, generateTomografiaPDF } from "@/lib/pdf";
 import { cleanCpf, cleanTelefone } from "@/lib/utils";
 import { extractSecurityAnswers, extractClinicalAnswers } from "@/lib/questionnaireTransform";
 
@@ -223,9 +223,11 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
       pdfBlob = generateDensitometriaPDF(data, { paciente: data.assinaturaData });
     } else if (data.tipoExame === 'ressonancia') {
       pdfBlob = generateRessonanciaPDF(data, { paciente: data.assinaturaData });
+    } else if (data.tipoExame === 'tomografia') {
+      pdfBlob = generateTomografiaPDF(data, { paciente: data.assinaturaData });
     } else {
-      // TC - usar função genérica por enquanto (TODO: criar função específica)
-      pdfBlob = generateRessonanciaPDF(data, { paciente: data.assinaturaData });
+      // Fallback para tipos não reconhecidos
+      pdfBlob = generateTomografiaPDF(data, { paciente: data.assinaturaData });
     }
 
     // 3. Fazer upload do PDF para o storage

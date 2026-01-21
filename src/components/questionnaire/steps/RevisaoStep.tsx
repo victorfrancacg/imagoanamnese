@@ -69,9 +69,14 @@ function SectionCard({
 
 function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-2 py-0.5 sm:py-1">
-      <span className="text-muted-foreground text-xs sm:text-sm">{label}</span>
-      <span className={`font-medium text-xs sm:text-sm text-right ${highlight ? 'text-warning' : 'text-foreground'}`}>{value}</span>
+    <div className="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-2 py-0.5 sm:py-1 min-w-0">
+      <span className="text-muted-foreground text-xs sm:text-sm flex-shrink-0">{label}</span>
+      <span
+        className={`font-medium text-xs sm:text-sm xs:text-right break-words whitespace-pre-wrap min-w-0 ${highlight ? 'text-warning' : 'text-foreground'}`}
+        style={{ wordBreak: 'break-word' }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
