@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +11,20 @@ import { formatCpf, formatDate } from '@/lib/utils';
 
 type Questionario = Tables<'questionarios'>;
 
+// Chave para sessionStorage (deve ser igual à usada em MamografiaDesenho)
+const getStorageKey = (questionarioId: string) => `desenho_mamas_${questionarioId}`;
+
 export default function QuestionnaireReview() {
   const { id } = useParams();
+  const [desenhoMamas, setDesenhoMamas] = useState<string | null>(null);
+
+  // Buscar desenho do sessionStorage
+  useEffect(() => {
+    if (id) {
+      const savedDrawing = sessionStorage.getItem(getStorageKey(id));
+      setDesenhoMamas(savedDrawing);
+    }
+  }, [id]);
 
   // Buscar dados do questionário
   const { data: questionario, isLoading, error } = useQuery({
@@ -116,13 +129,43 @@ export default function QuestionnaireReview() {
         </CardContent>
       </Card>
 
+      {/* Desenho das Mamas - Apenas para Mamografia */}
+      {questionario.tipo_exame === 'mamografia' && desenhoMamas && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Marcações Anatômicas</CardTitle>
+            <CardDescription>
+              Desenho com marcações feitas pelo técnico
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center">
+              <img
+                src={desenhoMamas}
+                alt="Marcações anatômicas das mamas"
+                className="max-w-full h-auto border rounded-lg"
+                style={{ maxHeight: '400px' }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Actions */}
       <div className="flex gap-2 justify-between">
-        <Link to={`/tecnico/questionario/${id}`}>
-          <Button variant="outline">
-            Voltar para Edição
-          </Button>
-        </Link>
+        {questionario.tipo_exame === 'mamografia' ? (
+          <Link to={`/tecnico/questionario/${id}/desenho-mamas`}>
+            <Button variant="outline">
+              Voltar para Marcações
+            </Button>
+          </Link>
+        ) : (
+          <Link to={`/tecnico/questionario/${id}`}>
+            <Button variant="outline">
+              Voltar para Edição
+            </Button>
+          </Link>
+        )}
         <Link to={`/tecnico/questionario/${id}/assinatura`}>
           <Button>
             Próximo: Assinar Documento

@@ -210,11 +210,19 @@ export default function QuestionnaireDetail() {
 
       {/* Actions */}
       <div className="flex gap-2 justify-end">
-        <Link to={`/tecnico/questionario/${id}/revisao`}>
-          <Button>
-            Próximo: Revisar e Assinar
-          </Button>
-        </Link>
+        {questionario.tipo_exame === 'mamografia' ? (
+          <Link to={`/tecnico/questionario/${id}/desenho-mamas`}>
+            <Button>
+              Próximo: Marcações Anatômicas
+            </Button>
+          </Link>
+        ) : (
+          <Link to={`/tecnico/questionario/${id}/revisao`}>
+            <Button>
+              Próximo: Revisar e Assinar
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Edit Dialog */}

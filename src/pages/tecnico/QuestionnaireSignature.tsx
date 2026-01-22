@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,9 @@ import { generateFinalMamografiaPDF, generateFinalDensitometriaPDF, generateFina
 import { QuestionnaireData } from '@/types/questionnaire';
 
 type Questionario = Tables<'questionarios'>;
+
+// Chave para sessionStorage (deve ser igual à usada em MamografiaDesenho)
+const getStorageKey = (questionarioId: string) => `desenho_mamas_${questionarioId}`;
 
 // Função para converter dados do banco para QuestionnaireData
 function convertToQuestionnaireData(questionario: Questionario): QuestionnaireData {
@@ -83,6 +86,15 @@ export default function QuestionnaireSignature() {
   const [showTelecomandoDialog, setShowTelecomandoDialog] = useState(false);
   const [telecomandoChoice, setTelecomandoChoice] = useState<boolean | null>(null);
   const [finalizationResult, setFinalizationResult] = useState<{ status: string; pdfUrl: string | null } | null>(null);
+  const [desenhoMamas, setDesenhoMamas] = useState<string | null>(null);
+
+  // Buscar desenho do sessionStorage (para mamografia)
+  useEffect(() => {
+    if (id) {
+      const savedDrawing = sessionStorage.getItem(getStorageKey(id));
+      setDesenhoMamas(savedDrawing);
+    }
+  }, [id]);
 
   // Buscar dados do questionário
   const { data: questionario, isLoading, error } = useQuery({
@@ -198,6 +210,10 @@ export default function QuestionnaireSignature() {
         // Gerar PDF específico por tipo de exame
         let pdfBlob: Blob;
         if (tipoExame === 'mamografia') {
+          // Adicionar desenho das mamas às assinaturas se existir (do sessionStorage)
+          if (desenhoMamas) {
+            assinaturas.desenhoMamas = desenhoMamas;
+          }
           pdfBlob = generateFinalMamografiaPDF(questionnaireData, assinaturas);
         } else if (tipoExame === 'densitometria') {
           pdfBlob = generateFinalDensitometriaPDF(questionnaireData, assinaturas);
@@ -229,6 +245,11 @@ export default function QuestionnaireSignature() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['questionario', id] });
+
+      // Limpar desenho do sessionStorage após finalização
+      if (id) {
+        sessionStorage.removeItem(getStorageKey(id));
+      }
 
       if (result.status === 'finalizado') {
         // Mostrar tela de sucesso com botão de download

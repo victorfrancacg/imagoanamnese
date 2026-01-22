@@ -37,6 +37,8 @@ export interface Assinaturas {
   nomeOperador?: string;
   registroAssistente?: string;
   registroOperador?: string;
+  // Desenho de marcações anatômicas (mamografia)
+  desenhoMamas?: string;
 }
 
 // Contexto de renderização passado para as funções de campos

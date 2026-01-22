@@ -246,6 +246,29 @@ export function buildExamePDF(
   yPos = addSection(layout, "QUESTÕES CLÍNICAS", yPos);
   yPos = config.renderClinicalFields(createRenderContext(yPos));
 
+  // MARCAÇÕES ANATÔMICAS (apenas para mamografia)
+  if (config.tipoExame === 'mamografia' && assinaturas?.desenhoMamas) {
+    yPos = addSection(layout, "MARCAÇÕES ANATÔMICAS", yPos);
+
+    // Calcular espaço disponível na página (antes do footer)
+    const espacoDisponivel = pageHeight - yPos - 20; // 20 para margem inferior + footer
+
+    // Dimensões da imagem - proporcional ao espaço disponível
+    const imgWidth = Math.min(80, contentWidth * 0.45); // Máximo 80mm ou 45% da largura
+    const imgHeight = Math.min(espacoDisponivel - 5, imgWidth * 0.75); // Proporção ~4:3
+
+    // Centralizar a imagem
+    const imgX = margin + (contentWidth - imgWidth) / 2;
+
+    try {
+      const imgFormat = assinaturas.desenhoMamas.includes('image/png') ? 'PNG' : 'JPEG';
+      doc.addImage(assinaturas.desenhoMamas, imgFormat, imgX, yPos, imgWidth, imgHeight);
+      yPos += imgHeight + 5;
+    } catch {
+      // Erro ao adicionar imagem - pula esta seção
+    }
+  }
+
   addFooter(layout, 1, 3);
 
   // ========== PÁGINA 2 - TERMO DE CONSENTIMENTO ==========

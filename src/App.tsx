@@ -16,6 +16,7 @@ import QuestionnaireList from "./pages/tecnico/QuestionnaireList";
 import QuestionnaireDetail from "./pages/tecnico/QuestionnaireDetail";
 import QuestionnaireReview from "./pages/tecnico/QuestionnaireReview";
 import QuestionnaireSignature from "./pages/tecnico/QuestionnaireSignature";
+import MamografiaDesenho from "./pages/tecnico/MamografiaDesenho";
 
 // Admin module imports
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
@@ -53,6 +54,7 @@ const App = () => (
             <Route index element={<Navigate to="/tecnico/questionarios" replace />} />
             <Route path="questionarios" element={<QuestionnaireList />} />
             <Route path="questionario/:id" element={<QuestionnaireDetail />} />
+            <Route path="questionario/:id/desenho-mamas" element={<MamografiaDesenho />} />
             <Route path="questionario/:id/revisao" element={<QuestionnaireReview />} />
             <Route path="questionario/:id/assinatura" element={<QuestionnaireSignature />} />
           </Route>
