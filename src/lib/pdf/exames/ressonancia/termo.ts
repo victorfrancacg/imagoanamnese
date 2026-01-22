@@ -1,6 +1,7 @@
 import { TermoConsentimento } from "../../core/types";
 
-export const TERMO_RESSONANCIA: TermoConsentimento = {
+// Termo 1: Termo Geral de RM
+export const TERMO_RESSONANCIA_GERAL: TermoConsentimento = {
   titulo: "TERMO DE CONSENTIMENTO INFORMADO – EXAME DE RESSONÂNCIA MAGNÉTICA (RM)",
   secoes: [
     {
@@ -39,11 +40,26 @@ export const TERMO_RESSONANCIA: TermoConsentimento = {
       textoAdicional: "A omissão de informações sobre implantes ou objetos metálicos pode acarretar risco grave à integridade física do paciente."
     },
     {
-      titulo: "6. DA RESSONÂNCIA MAGNÉTICA COM USO DE CONTRASTE",
+      titulo: "6. DE GESTAÇÃO E OUTRAS CONDIÇÕES ESPECIAIS",
+      texto: "Embora não haja evidência conclusiva de risco, a realização de RM em gestantes, especialmente no primeiro trimestre, será avaliada individualmente, considerando a indicação clínica e os benefícios diagnósticos. O uso de contraste em gestantes é restrito a situações excepcionais, quando estritamente necessário."
+    },
+    {
+      titulo: "7. DO USO DAS IMAGENS E DADOS",
+      texto: "As imagens e informações obtidas durante o exame, bem como os dados pessoais colhidos durante o preenchimento do questionário, destinam-se exclusivamente à finalidade diagnóstica, respeitando-se o sigilo profissional, as normas éticas e a legislação vigente, incluindo a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 – LGPD)."
+    }
+  ]
+};
+
+// Termo 2: Termo de Contraste à base de Gadolínio
+export const TERMO_RESSONANCIA_CONTRASTE: TermoConsentimento = {
+  titulo: "TERMO DE CONSENTIMENTO – USO DE CONTRASTE (GADOLÍNIO)",
+  secoes: [
+    {
+      titulo: "1. DA RESSONÂNCIA MAGNÉTICA COM USO DE CONTRASTE",
       texto: "Em determinadas situações clínicas, pode ser necessária a administração de meio de contraste à base de gadolínio, por via intravenosa, com a finalidade de melhorar a visualização e caracterização de estruturas anatômicas ou patológicas."
     },
     {
-      titulo: "6.1. Riscos do Contraste",
+      titulo: "1.1. Riscos do Contraste",
       texto: "O contraste utilizado em RM é considerado seguro para a maioria dos pacientes. Entretanto, podem ocorrer, de forma rara, reações adversas, tais como:",
       bullets: [
         "Náuseas, tontura ou sensação de calor;",
@@ -52,16 +68,11 @@ export const TERMO_RESSONANCIA: TermoConsentimento = {
       ]
     },
     {
-      titulo: "6.2. Função Renal",
+      titulo: "1.2. Função Renal",
       texto: "Pacientes com doença renal grave devem ser avaliados previamente, pois, em casos específicos, o uso de contraste pode estar associado a complicações raras. A avaliação da função renal poderá ser solicitada antes da administração do contraste."
-    },
-    {
-      titulo: "7. DE GESTAÇÃO E OUTRAS CONDIÇÕES ESPECIAIS",
-      texto: "Embora não haja evidência conclusiva de risco, a realização de RM em gestantes, especialmente no primeiro trimestre, será avaliada individualmente, considerando a indicação clínica e os benefícios diagnósticos. O uso de contraste em gestantes é restrito a situações excepcionais, quando estritamente necessário."
-    },
-    {
-      titulo: "8. DO USO DAS IMAGENS E DADOS",
-      texto: "As imagens e informações obtidas durante o exame, bem como os dados pessoais colhidos durante o preenchimento do questionário, destinam-se exclusivamente à finalidade diagnóstica, respeitando-se o sigilo profissional, as normas éticas e a legislação vigente, incluindo a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 – LGPD)."
     }
   ]
 };
+
+// Mantém export do termo antigo para compatibilidade (usa o geral)
+export const TERMO_RESSONANCIA = TERMO_RESSONANCIA_GERAL;

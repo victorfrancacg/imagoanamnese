@@ -1,6 +1,7 @@
 import { TermoConsentimento } from "../../core/types";
 
-export const TERMO_TOMOGRAFIA: TermoConsentimento = {
+// Termo 1: Termo Geral de TC (com ou sem contraste)
+export const TERMO_TOMOGRAFIA_GERAL: TermoConsentimento = {
   titulo: "TERMO DE CONSENTIMENTO INFORMADO – EXAME DE TOMOGRAFIA COMPUTADORIZADA (TC)",
   secoes: [
     {
@@ -30,40 +31,7 @@ export const TERMO_TOMOGRAFIA: TermoConsentimento = {
       textoAdicional: "Os benefícios diagnósticos do exame, quando corretamente indicado, superam os riscos potenciais associados."
     },
     {
-      titulo: "6. DA TOMOGRAFIA COMPUTADORIZADA COM USO DE CONTRASTE",
-      texto: "Em determinadas situações clínicas, pode ser necessária a administração de meio de contraste iodado, por via intravenosa, oral ou retal, com o objetivo de melhorar a visualização de estruturas anatômicas e vasculares."
-    },
-    {
-      titulo: "6.1. Reações ao Contraste",
-      texto: "O contraste iodado é amplamente utilizado e, na maioria dos casos, bem tolerado. Entretanto, podem ocorrer, de forma infrequente, reações adversas, incluindo:",
-      bullets: [
-        "Sensação de calor ou gosto metálico;",
-        "Náuseas ou vômitos;",
-        "Reações alérgicas leves (coceira, urticária);",
-        "Reações alérgicas moderadas ou graves, raras, que podem exigir atendimento médico imediato."
-      ],
-      textoAdicional: "A equipe está preparada para reconhecimento e manejo de eventuais intercorrências."
-    },
-    {
-      titulo: "6.2. Função Renal",
-      texto: "O contraste iodado é eliminado pelos rins. Pacientes com insuficiência renal, diabetes mellitus, desidratação, insuficiência cardíaca ou idade avançada podem apresentar maior risco de comprometimento da função renal. Quando indicado, poderão ser solicitados exames laboratoriais prévios para avaliação da função renal antes da administração do contraste."
-    },
-    {
-      titulo: "6.3. Uso de Metformina",
-      texto: "Pacientes em uso de metformina devem informar previamente essa condição. Em situações específicas, especialmente na presença de alteração da função renal, poderá ser recomendada a suspensão temporária da medicação, conforme protocolos médicos, para redução do risco de complicações metabólicas raras."
-    },
-    {
-      titulo: "7. DE CONTRAINDICAÇÕES E CONDIÇÕES ESPECIAIS",
-      texto: "A TC com contraste pode exigir avaliação individualizada em pacientes com:",
-      bullets: [
-        "Histórico de reação prévia a contraste iodado;",
-        "Doença renal conhecida;",
-        "Gestação ou suspeita de gravidez;",
-        "Condições clínicas graves que limitem a colaboração durante o exame."
-      ]
-    },
-    {
-      titulo: "8. DO USO DAS IMAGENS E DADOS",
+      titulo: "6. DO USO DAS IMAGENS E DADOS",
       texto: "As imagens, laudos e demais informações obtidas por meio do exame de Tomografia Computadorizada, bem como os dados pessoais obtidos por meio do preenchimento do questionário, constituem dados sensíveis, sendo utilizados exclusivamente para fins diagnósticos, assistenciais, de acompanhamento clínico e, quando aplicável, auditorias médicas e regulatórias. O tratamento, armazenamento, transmissão e eventual compartilhamento dessas informações ocorrem em conformidade com:",
       bullets: [
         "O sigilo profissional;",
@@ -75,3 +43,46 @@ export const TERMO_TOMOGRAFIA: TermoConsentimento = {
     }
   ]
 };
+
+// Termo 2: Termo de Contraste Iodado
+export const TERMO_TOMOGRAFIA_CONTRASTE: TermoConsentimento = {
+  titulo: "TERMO DE CONSENTIMENTO – USO DE CONTRASTE IODADO",
+  secoes: [
+    {
+      titulo: "1. DA TOMOGRAFIA COMPUTADORIZADA COM USO DE CONTRASTE",
+      texto: "Em determinadas situações clínicas, pode ser necessária a administração de meio de contraste iodado, por via intravenosa, oral ou retal, com o objetivo de melhorar a visualização de estruturas anatômicas e vasculares."
+    },
+    {
+      titulo: "1.1. Reações ao Contraste",
+      texto: "O contraste iodado é amplamente utilizado e, na maioria dos casos, bem tolerado. Entretanto, podem ocorrer, de forma infrequente, reações adversas, incluindo:",
+      bullets: [
+        "Sensação de calor ou gosto metálico;",
+        "Náuseas ou vômitos;",
+        "Reações alérgicas leves (coceira, urticária);",
+        "Reações alérgicas moderadas ou graves, raras, que podem exigir atendimento médico imediato."
+      ],
+      textoAdicional: "A equipe está preparada para reconhecimento e manejo de eventuais intercorrências."
+    },
+    {
+      titulo: "1.2. Função Renal",
+      texto: "O contraste iodado é eliminado pelos rins. Pacientes com insuficiência renal, diabetes mellitus, desidratação, insuficiência cardíaca ou idade avançada podem apresentar maior risco de comprometimento da função renal. Quando indicado, poderão ser solicitados exames laboratoriais prévios para avaliação da função renal antes da administração do contraste."
+    },
+    {
+      titulo: "1.3. Uso de Metformina",
+      texto: "Pacientes em uso de metformina devem informar previamente essa condição. Em situações específicas, especialmente na presença de alteração da função renal, poderá ser recomendada a suspensão temporária da medicação, conforme protocolos médicos, para redução do risco de complicações metabólicas raras."
+    },
+    {
+      titulo: "2. DE CONTRAINDICAÇÕES E CONDIÇÕES ESPECIAIS",
+      texto: "A TC com contraste pode exigir avaliação individualizada em pacientes com:",
+      bullets: [
+        "Histórico de reação prévia a contraste iodado;",
+        "Doença renal conhecida;",
+        "Gestação ou suspeita de gravidez;",
+        "Condições clínicas graves que limitem a colaboração durante o exame."
+      ]
+    }
+  ]
+};
+
+// Mantém export do termo antigo para compatibilidade (usa o geral)
+export const TERMO_TOMOGRAFIA = TERMO_TOMOGRAFIA_GERAL;

@@ -123,6 +123,8 @@ export interface QuestionnaireData {
 
   // Termo de Consentimento
   aceitaRiscos: boolean | null;
+  tcAceitaContraste: boolean | null; // Termo específico de contraste para TC
+  rmAceitaContraste: boolean | null; // Termo específico de contraste para RM
   aceitaCompartilhamento: boolean | null;
   assinaturaData: string;
 }
@@ -233,6 +235,8 @@ export const initialData: QuestionnaireData = {
   problemaProstata: null,
   dificuldadeUrinaria: null,
   aceitaRiscos: null,
+  tcAceitaContraste: null,
+  rmAceitaContraste: null,
   aceitaCompartilhamento: null,
   assinaturaData: '',
 };

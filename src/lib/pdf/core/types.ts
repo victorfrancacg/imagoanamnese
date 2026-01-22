@@ -88,6 +88,7 @@ export interface ExameConfig {
   tipoExame: string;
   badgeLabel: string;
   termo: TermoConsentimento;
+  termos?: TermoConsentimento[]; // Para exames com múltiplos termos (ex: TC)
   renderSecurityFields: (ctx: RenderContext) => number;
   renderClinicalFields: (ctx: RenderContext) => number;
 }

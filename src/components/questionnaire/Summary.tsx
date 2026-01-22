@@ -513,6 +513,20 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
 
         <SummarySection title="Termo de Consentimento" icon={FileCheck}>
           <SummaryItem label="Aceita riscos do exame" value={formatBoolean(data.aceitaRiscos)} />
+          {isTomografia && (
+            <SummaryItem
+              label="Autoriza uso de contraste iodado"
+              value={formatBoolean(data.tcAceitaContraste)}
+              highlight={data.tcAceitaContraste === false}
+            />
+          )}
+          {isRessonancia && (
+            <SummaryItem
+              label="Autoriza uso de contraste (gadolínio)"
+              value={formatBoolean(data.rmAceitaContraste)}
+              highlight={data.rmAceitaContraste === false}
+            />
+          )}
           <SummaryItem label="Autoriza compartilhamento de dados" value={formatBoolean(data.aceitaCompartilhamento)} />
           {data.assinaturaData && (
             <div className="pt-3">

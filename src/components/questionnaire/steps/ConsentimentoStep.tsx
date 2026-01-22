@@ -20,9 +20,12 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
 
-  const canProceed = 
-    data.aceitaRiscos !== null && 
-    hasSignature;
+  // Para TC e RM, precisa aceitar/recusar ambos os termos (geral e contraste)
+  const canProceed = data.tipoExame === 'tomografia'
+    ? data.aceitaRiscos !== null && data.tcAceitaContraste !== null && hasSignature
+    : data.tipoExame === 'ressonancia'
+    ? data.aceitaRiscos !== null && data.rmAceitaContraste !== null && hasSignature
+    : data.aceitaRiscos !== null && hasSignature;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -129,36 +132,139 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
   const renderTermoConsentimento = () => {
     if (data.tipoExame === 'tomografia') {
       return (
-        <div className="space-y-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento - Tomografia Computadorizada</h4>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              A Tomografia Computadorizada (TC) é um método de exame por imagem que envolve o uso de radiação ionizante (raios x) para produzir imagens de interesse médico da parte do corpo que se quer estudar. Para completar seu exame, uma injeção intravenosa de agente de contraste iodado pode ser necessária para o implemento das imagens geradas, com melhoria da capacidade diagnóstica do método. O procedimento é simples, com poucos efeitos colaterais potenciais e pouco frequentes (em torno de 0,6% dos exames), em sua maioria correspondendo a reações alérgicas leves, como urticária, coceira, sensação de calor, náusea e cefaleia. Em raros casos, reações alérgicas moderadas e graves podem ocorrer num curto espaço de tempo após a infusão do fármaco, devendo ser prontamente tratadas para evitar desfechos negativos.
-            </p>
+        <div className="space-y-6">
+          {/* TERMO 1: Termo Geral de TC */}
+          <div className="space-y-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+              <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento Informado – Exame de Tomografia Computadorizada (TC)</h4>
+              <div className="max-h-64 overflow-y-auto pr-2 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+                <div>
+                  <p className="font-semibold text-foreground">1. DO EXAME DE TOMOGRAFIA COMPUTADORIZADA</p>
+                  <p>A Tomografia Computadorizada (TC) é um exame de diagnóstico por imagem que utiliza raios X associados a sistemas computacionais avançados para obtenção de imagens detalhadas do corpo humano em cortes seccionais, permitindo avaliação precisa de órgãos, ossos, vasos sanguíneos e tecidos. A TC é amplamente utilizada para fins diagnósticos, acompanhamento clínico, avaliação de urgências e planejamento terapêutico, conforme indicação médica.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">2. DO FUNCIONAMENTO DO APARELHO</p>
+                  <p>O exame é realizado em equipamento específico composto por um gantry (estrutura circular) que abriga o tubo de raios X e os detectores. Durante o exame, o paciente permanece deitado sobre uma mesa móvel que se desloca através do equipamento enquanto os raios X giram ao redor do corpo, gerando imagens de alta resolução. O procedimento exige imobilidade durante a aquisição das imagens, sendo que movimentos podem comprometer a qualidade diagnóstica.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">3. DO TEMPO DE REALIZAÇÃO</p>
+                  <p>O tempo total do exame é variável conforme a região estudada, o protocolo técnico e a necessidade de uso de contraste, geralmente entre 5 e 30 minutos, sendo a aquisição das imagens, em muitos casos, realizada em poucos segundos.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">4. DA RADIAÇÃO E SEGURANÇA</p>
+                  <p>A Tomografia Computadorizada utiliza radiação ionizante (raios X). As doses empregadas são cuidadosamente ajustadas conforme protocolos técnicos, idade, biotipo do paciente e finalidade clínica, respeitando os princípios de justificação, otimização e limitação da dose, conforme normas nacionais e internacionais de radioproteção. Apesar dos avanços tecnológicos, a TC deve ser realizada apenas quando clinicamente indicada, especialmente em gestantes ou em caso de suspeita de gravidez, situação que deve ser comunicada previamente à equipe.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">5. DOS RISCOS E DESCONFORTOS GERAIS</p>
+                  <p>A TC é considerada um exame seguro, porém pode estar associada a:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Exposição à radiação ionizante;</li>
+                    <li>Desconforto leve relacionado à posição ou à necessidade de imobilidade;</li>
+                    <li>Ansiedade em ambientes hospitalares.</li>
+                  </ul>
+                  <p className="mt-1">Os benefícios diagnósticos do exame, quando corretamente indicado, superam os riscos potenciais associados.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">6. DO USO DAS IMAGENS E DADOS</p>
+                  <p>As imagens, laudos e demais informações obtidas por meio do exame de Tomografia Computadorizada, bem como os dados pessoais obtidos por meio do preenchimento do questionário, constituem dados sensíveis, sendo utilizados exclusivamente para fins diagnósticos, assistenciais, de acompanhamento clínico e, quando aplicável, auditorias médicas e regulatórias.</p>
+                  <p className="mt-1">O tratamento, armazenamento, transmissão e eventual compartilhamento dessas informações ocorrem em conformidade com:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>O sigilo profissional;</li>
+                    <li>As normas éticas aplicáveis à prática médica e diagnóstica;</li>
+                    <li>A Lei Geral de Proteção de Dados – LGPD (Lei nº 13.709/2018);</li>
+                    <li>Demais legislações e regulamentações vigentes.</li>
+                  </ul>
+                  <p className="mt-1">O acesso aos dados é restrito a profissionais devidamente autorizados, sendo adotadas medidas técnicas e administrativas para garantir a confidencialidade, integridade e segurança das informações, inclusive em sistemas informatizados e meios digitais.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3">
+              <Label className="text-sm sm:text-base font-medium">
+                Você declara estar ciente e concorda em realizar o exame?
+              </Label>
+              <RadioGroup
+                value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="tc-geral-sim" />
+                  <span className="text-xs sm:text-sm">Sim, estou ciente e concordo</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="tc-geral-nao" />
+                  <span className="text-xs sm:text-sm">Não concordo</span>
+                </label>
+              </RadioGroup>
+            </div>
           </div>
-          
-          <div className="space-y-2 sm:space-y-3">
-            <Label className="text-sm sm:text-base font-medium">
-              Selecione uma opção abaixo:
-            </Label>
-            <RadioGroup
-              value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'autorizo' : 'nao_autorizo'}
-              onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
-              className="flex flex-col gap-2 sm:gap-3"
-            >
-              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="autorizo" id="tc-autorizo" className="mt-1" />
-                <span className="text-xs sm:text-sm leading-relaxed">
-                  Após o exposto e não havendo mais dúvidas, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso e autorizo sua injeção.
-                </span>
-              </label>
-              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="nao_autorizo" id="tc-nao-autorizo" className="mt-1" />
-                <span className="text-xs sm:text-sm leading-relaxed">
-                  Após o exposto, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado endovenoso, entretanto NÃO autorizo sua injeção.
-                </span>
-              </label>
-            </RadioGroup>
+
+          {/* TERMO 2: Termo de Contraste Iodado */}
+          <div className="space-y-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+              <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento – Uso de Contraste Iodado</h4>
+              <div className="max-h-64 overflow-y-auto pr-2 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+                <div>
+                  <p className="font-semibold text-foreground">1. DA TOMOGRAFIA COMPUTADORIZADA COM USO DE CONTRASTE</p>
+                  <p>Em determinadas situações clínicas, pode ser necessária a administração de meio de contraste iodado, por via intravenosa, oral ou retal, com o objetivo de melhorar a visualização de estruturas anatômicas e vasculares.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">1.1. Reações ao Contraste</p>
+                  <p>O contraste iodado é amplamente utilizado e, na maioria dos casos, bem tolerado. Entretanto, podem ocorrer, de forma infrequente, reações adversas, incluindo:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Sensação de calor ou gosto metálico;</li>
+                    <li>Náuseas ou vômitos;</li>
+                    <li>Reações alérgicas leves (coceira, urticária);</li>
+                    <li>Reações alérgicas moderadas ou graves, raras, que podem exigir atendimento médico imediato.</li>
+                  </ul>
+                  <p className="mt-1">A equipe está preparada para reconhecimento e manejo de eventuais intercorrências.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">1.2. Função Renal</p>
+                  <p>O contraste iodado é eliminado pelos rins. Pacientes com insuficiência renal, diabetes mellitus, desidratação, insuficiência cardíaca ou idade avançada podem apresentar maior risco de comprometimento da função renal.</p>
+                  <p className="mt-1">Quando indicado, poderão ser solicitados exames laboratoriais prévios para avaliação da função renal antes da administração do contraste.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">1.3. Uso de Metformina</p>
+                  <p>Pacientes em uso de metformina devem informar previamente essa condição. Em situações específicas, especialmente na presença de alteração da função renal, poderá ser recomendada a suspensão temporária da medicação, conforme protocolos médicos, para redução do risco de complicações metabólicas raras.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">2. DE CONTRAINDICAÇÕES E CONDIÇÕES ESPECIAIS</p>
+                  <p>A TC com contraste pode exigir avaliação individualizada em pacientes com:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Histórico de reação prévia a contraste iodado;</li>
+                    <li>Doença renal conhecida;</li>
+                    <li>Gestação ou suspeita de gravidez;</li>
+                    <li>Condições clínicas graves que limitem a colaboração durante o exame.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3">
+              <Label className="text-sm sm:text-base font-medium">
+                Você autoriza a administração de contraste iodado, se necessário?
+              </Label>
+              <RadioGroup
+                value={data.tcAceitaContraste === null ? '' : data.tcAceitaContraste ? 'autorizo' : 'nao_autorizo'}
+                onValueChange={(value) => updateData({ tcAceitaContraste: value === 'autorizo' })}
+                className="flex flex-col gap-2 sm:gap-3"
+              >
+                <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                  <RadioGroupItem value="autorizo" id="tc-contraste-autorizo" className="mt-1" />
+                  <span className="text-xs sm:text-sm leading-relaxed">
+                    Após o exposto e não havendo mais dúvidas, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado e <strong>autorizo</strong> sua administração.
+                  </span>
+                </label>
+                <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                  <RadioGroupItem value="nao_autorizo" id="tc-contraste-nao-autorizo" className="mt-1" />
+                  <span className="text-xs sm:text-sm leading-relaxed">
+                    Após o exposto, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste iodado, entretanto <strong>NÃO autorizo</strong> sua administração.
+                  </span>
+                </label>
+              </RadioGroup>
+            </div>
           </div>
         </div>
       );
@@ -166,36 +272,127 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
 
     if (data.tipoExame === 'ressonancia') {
       return (
-        <div className="space-y-4">
-        <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento - Ressonância Magnética</h4>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              A Ressonância magnética (RM) é um método de diagnóstico por imagem que envolve o uso de ondas de radiofrequência e um forte campo eletromagnético para produzir imagens de interesse médico da parte do corpo que se quer estudar, funcionando como um potente imã que atua de forma contínua, mesmo quando não está em realização de exames. Objetos metálicos, alguns clipes e próteses cirúrgicos, dispositivos médicos implantáveis, pigmentos cutâneos de base metálica e adornos podem gerar acidentes potencialmente graves, não devendo o paciente ou o acompanhante ter acesso à sala de exames quando se enquadrar nestas situações, salvo após ciência da equipe e liberação pela mesma e preenchimento do questionário de segurança. Para completar seu exame, uma injeção intravenosa de agente de contraste à base de gadolínio pode ser necessária para o implemento das imagens geradas, com melhoria da capacidade diagnóstica do método. O procedimento é simples, com poucos efeitos colaterais potenciais e pouco frequentes (em torno de 0,2% dos exames), em sua maioria correspondendo a reações alérgicas leves, como urticária, coceira, sensação de calor, náusea e cefaleia. Em raros casos, reações alérgicas moderadas e graves podem ocorrer num curto espaço de tempo após a infusão do fármaco, devendo ser prontamente tratadas para evitar desfechos negativos. Em casos ainda mais raros descritos na literatura médica, a fibrose sistêmica nefrogênica pode ocorrer em alguns pacientes com insuficiência renal grave, sendo nestes casos imperativo a avaliação pelo médico responsável antes de proceder o uso do meio de contraste endovenoso. Em caso de dúvidas, procure o responsável pelo setor.
-            </p>
+        <div className="space-y-6">
+          {/* TERMO 1: Termo Geral de RM */}
+          <div className="space-y-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+              <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento Informado – Exame de Ressonância Magnética (RM)</h4>
+              <div className="max-h-64 overflow-y-auto pr-2 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+                <div>
+                  <p className="font-semibold text-foreground">1. DO EXAME DE RESSONÂNCIA MAGNÉTICA</p>
+                  <p>A Ressonância Magnética (RM) é um exame de diagnóstico por imagem que utiliza campo magnético intenso e ondas de radiofrequência para obtenção de imagens detalhadas dos órgãos, tecidos e estruturas internas do corpo humano. O exame não utiliza radiação ionizante (raios X). A RM permite avaliação anatômica e funcional precisa, sendo amplamente empregada para diagnóstico, acompanhamento e planejamento terapêutico em diversas especialidades médicas.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">2. DO FUNCIONAMENTO DO APARELHO</p>
+                  <p>O exame é realizado em equipamento específico composto por um ímã de alta potência, no qual o paciente permanece deitado sobre uma mesa móvel que se desloca para o interior do aparelho. Durante a aquisição das imagens, o equipamento produz ruídos elevados e repetitivos, considerados normais ao funcionamento do sistema. É obrigatório que o paciente permaneça imóvel durante a realização do exame, pois movimentos podem comprometer a qualidade das imagens e a interpretação diagnóstica.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">3. DO TEMPO DE REALIZAÇÃO</p>
+                  <p>O tempo de exame pode variar conforme a região estudada, o protocolo técnico adotado e a necessidade ou não de uso de contraste, geralmente entre 20 e 60 minutos, podendo ser maior em situações específicas.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">4. DOS RISCOS GERAIS E DESCONFORTOS</p>
+                  <p>A Ressonância Magnética é considerada um exame seguro, porém pode estar associada a alguns riscos e desconfortos, incluindo, mas não se limitando a:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Sensação de confinamento (claustrofobia), especialmente em pacientes sensíveis a ambientes fechados;</li>
+                    <li>Ruído intenso, sendo fornecidos protetores auriculares quando necessário;</li>
+                    <li>Sensação de calor leve em determinadas regiões do corpo durante a aquisição das imagens;</li>
+                    <li>Ansiedade ou desconforto relacionados à permanência imóvel por período prolongado.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">5. DE OBJETOS METÁLICOS E DISPOSITIVOS IMPLANTÁVEIS</p>
+                  <p>Devido ao campo magnético intenso, é terminantemente proibida a entrada na sala de exame com objetos metálicos, tais como joias, relógios, cartões magnéticos, aparelhos eletrônicos, próteses removíveis, piercings e similares. A RM pode ser contraindicada ou exigir avaliação prévia em pacientes portadores de:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Marca-passo cardíaco;</li>
+                    <li>Desfibriladores implantáveis;</li>
+                    <li>Clipes metálicos intracranianos;</li>
+                    <li>Implantes cocleares;</li>
+                    <li>Próteses metálicas não compatíveis com RM;</li>
+                    <li>Fragmentos metálicos no corpo.</li>
+                  </ul>
+                  <p className="mt-1">A omissão de informações sobre implantes ou objetos metálicos pode acarretar risco grave à integridade física do paciente.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">6. DE GESTAÇÃO E OUTRAS CONDIÇÕES ESPECIAIS</p>
+                  <p>Embora não haja evidência conclusiva de risco, a realização de RM em gestantes, especialmente no primeiro trimestre, será avaliada individualmente, considerando a indicação clínica e os benefícios diagnósticos. O uso de contraste em gestantes é restrito a situações excepcionais, quando estritamente necessário.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">7. DO USO DAS IMAGENS E DADOS</p>
+                  <p>As imagens e informações obtidas durante o exame, bem como os dados pessoais colhidos durante o preenchimento do questionário, destinam-se exclusivamente à finalidade diagnóstica, respeitando-se o sigilo profissional, as normas éticas e a legislação vigente, incluindo a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 – LGPD).</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3">
+              <Label className="text-sm sm:text-base font-medium">
+                Você declara estar ciente e concorda em realizar o exame?
+              </Label>
+              <RadioGroup
+                value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'sim' : 'nao'}
+                onValueChange={(value) => updateData({ aceitaRiscos: value === 'sim' })}
+                className="flex gap-4"
+              >
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="sim" id="rm-geral-sim" />
+                  <span className="text-xs sm:text-sm">Sim, estou ciente e concordo</span>
+                </label>
+                <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+                  <RadioGroupItem value="nao" id="rm-geral-nao" />
+                  <span className="text-xs sm:text-sm">Não concordo</span>
+                </label>
+              </RadioGroup>
+            </div>
           </div>
-          
-          <div className="space-y-2 sm:space-y-3">
-            <Label className="text-sm sm:text-base font-medium">
-              Selecione uma opção abaixo:
-            </Label>
-            <RadioGroup
-              value={data.aceitaRiscos === null ? '' : data.aceitaRiscos ? 'autorizo' : 'nao_autorizo'}
-              onValueChange={(value) => updateData({ aceitaRiscos: value === 'autorizo' })}
-              className="flex flex-col gap-2 sm:gap-3"
-            >
-              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="autorizo" id="rm-autorizo" className="mt-1" />
-                <span className="text-xs sm:text-sm leading-relaxed">
-                  Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionados a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e AUTORIZO SUA INJEÇÃO.
-                </span>
-              </label>
-              <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="nao_autorizo" id="rm-nao-autorizo" className="mt-1" />
-                <span className="text-xs sm:text-sm leading-relaxed">
-                  Após o exposto e não havendo mais dúvidas, DECLARO TER COMPREENDIDO OS RISCOS inerentes ao acesso à sala de ressonância magnética, especialmente relacionado a objetos metálicos e dispositivos implantáveis, bem como a necessidade e as possíveis complicações pelo uso do meio de contraste endovenoso à base de gadolínio e NÃO AUTORIZO SUA INJEÇÃO.
-                </span>
-              </label>
-            </RadioGroup>
+
+          {/* TERMO 2: Termo de Contraste (Gadolínio) */}
+          <div className="space-y-4">
+            <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+              <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento – Uso de Contraste (Gadolínio)</h4>
+              <div className="max-h-64 overflow-y-auto pr-2 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+                <div>
+                  <p className="font-semibold text-foreground">1. DA RESSONÂNCIA MAGNÉTICA COM USO DE CONTRASTE</p>
+                  <p>Em determinadas situações clínicas, pode ser necessária a administração de meio de contraste à base de gadolínio, por via intravenosa, com a finalidade de melhorar a visualização e caracterização de estruturas anatômicas ou patológicas.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">1.1. Riscos do Contraste</p>
+                  <p>O contraste utilizado em RM é considerado seguro para a maioria dos pacientes. Entretanto, podem ocorrer, de forma rara, reações adversas, tais como:</p>
+                  <ul className="list-disc list-inside ml-2 mt-1">
+                    <li>Náuseas, tontura ou sensação de calor;</li>
+                    <li>Reações alérgicas leves (coceira, vermelhidão);</li>
+                    <li>Reações alérgicas graves, extremamente raras, que requerem atendimento médico imediato.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">1.2. Função Renal</p>
+                  <p>Pacientes com doença renal grave devem ser avaliados previamente, pois, em casos específicos, o uso de contraste pode estar associado a complicações raras. A avaliação da função renal poderá ser solicitada antes da administração do contraste.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3">
+              <Label className="text-sm sm:text-base font-medium">
+                Você autoriza a administração de contraste (gadolínio), se necessário?
+              </Label>
+              <RadioGroup
+                value={data.rmAceitaContraste === null ? '' : data.rmAceitaContraste ? 'autorizo' : 'nao_autorizo'}
+                onValueChange={(value) => updateData({ rmAceitaContraste: value === 'autorizo' })}
+                className="flex flex-col gap-2 sm:gap-3"
+              >
+                <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                  <RadioGroupItem value="autorizo" id="rm-contraste-autorizo" className="mt-1" />
+                  <span className="text-xs sm:text-sm leading-relaxed">
+                    Após o exposto e não havendo mais dúvidas, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste à base de gadolínio e <strong>autorizo</strong> sua administração.
+                  </span>
+                </label>
+                <label className="flex items-start space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer">
+                  <RadioGroupItem value="nao_autorizo" id="rm-contraste-nao-autorizo" className="mt-1" />
+                  <span className="text-xs sm:text-sm leading-relaxed">
+                    Após o exposto, declaro ter compreendido a necessidade e as possíveis complicações pelo uso do meio de contraste à base de gadolínio, entretanto <strong>NÃO autorizo</strong> sua administração.
+                  </span>
+                </label>
+              </RadioGroup>
+            </div>
           </div>
         </div>
       );

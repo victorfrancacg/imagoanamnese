@@ -253,52 +253,64 @@ export function buildExamePDF(
   yPos = addHeader(layout, "TERMO DE CONSENTIMENTO", 15);
   yPos += 3;
 
-  // Título do termo
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...COLORS.text);
-  doc.text(config.termo.titulo, margin, yPos);
-  yPos += 6;
+  // Usar múltiplos termos se disponíveis, senão usa o termo único
+  const termosParaRenderizar = config.termos || [config.termo];
 
-  // Renderizar cada seção do termo (sem paginação - deve caber em 1 página)
-  for (const secao of config.termo.secoes) {
-    // Título da seção
-    doc.setFontSize(7);
+  for (let termoIndex = 0; termoIndex < termosParaRenderizar.length; termoIndex++) {
+    const termo = termosParaRenderizar[termoIndex];
+
+    // Espaçamento entre termos (exceto o primeiro)
+    if (termoIndex > 0) {
+      yPos += 4;
+    }
+
+    // Título do termo
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...COLORS.primary);
-    doc.text(secao.titulo, margin, yPos);
-    yPos += 4;
-
-    // Texto da seção
-    doc.setFontSize(6.5);
-    doc.setFont("helvetica", "normal");
     doc.setTextColor(...COLORS.text);
-    const textoLines = doc.splitTextToSize(secao.texto, contentWidth);
-    textoLines.forEach((line: string) => {
-      doc.text(line, margin, yPos);
+    doc.text(termo.titulo, margin, yPos);
+    yPos += 5;
+
+    // Renderizar cada seção do termo
+    for (const secao of termo.secoes) {
+      // Título da seção
+      doc.setFontSize(6.5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...COLORS.primary);
+      doc.text(secao.titulo, margin, yPos);
       yPos += 3.5;
-    });
 
-    // Bullets (se houver)
-    if (secao.bullets) {
-      yPos += 1;
-      for (const bullet of secao.bullets) {
-        doc.text(`  • ${bullet}`, margin, yPos);
-        yPos += 3.5;
-      }
-    }
-
-    // Texto adicional (se houver)
-    if (secao.textoAdicional) {
-      yPos += 1;
-      const textoAdicionalLines = doc.splitTextToSize(secao.textoAdicional, contentWidth);
-      textoAdicionalLines.forEach((line: string) => {
+      // Texto da seção
+      doc.setFontSize(6);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...COLORS.text);
+      const textoLines = doc.splitTextToSize(secao.texto, contentWidth);
+      textoLines.forEach((line: string) => {
         doc.text(line, margin, yPos);
-        yPos += 3.5;
+        yPos += 3;
       });
-    }
 
-    yPos += 2;
+      // Bullets (se houver)
+      if (secao.bullets) {
+        yPos += 0.5;
+        for (const bullet of secao.bullets) {
+          doc.text(`  • ${bullet}`, margin, yPos);
+          yPos += 3;
+        }
+      }
+
+      // Texto adicional (se houver)
+      if (secao.textoAdicional) {
+        yPos += 0.5;
+        const textoAdicionalLines = doc.splitTextToSize(secao.textoAdicional, contentWidth);
+        textoAdicionalLines.forEach((line: string) => {
+          doc.text(line, margin, yPos);
+          yPos += 3;
+        });
+      }
+
+      yPos += 1.5;
+    }
   }
 
   addFooter(layout, 2, 3);
@@ -352,8 +364,13 @@ export function buildExamePDF(
   yPos += 5;
 
   // Campos de aceite
+  const isTomografia = config.tipoExame === 'tomografia';
+  const isRessonancia = config.tipoExame === 'ressonancia';
+  const temCampoContraste = isTomografia || isRessonancia;
+  const aceiteBoxHeight = temCampoContraste ? 28 : 20;
+
   doc.setFillColor(...COLORS.background);
-  doc.roundedRect(margin, yPos - 4, contentWidth, 20, 2, 2, 'F');
+  doc.roundedRect(margin, yPos - 4, contentWidth, aceiteBoxHeight, 2, 2, 'F');
 
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
@@ -363,14 +380,35 @@ export function buildExamePDF(
   doc.setTextColor(data.aceitaRiscos ? 34 : 180, data.aceitaRiscos ? 139 : 50, data.aceitaRiscos ? 34 : 50);
   doc.text(formatBoolean(data.aceitaRiscos), pageWidth - margin - 5, yPos + 2, { align: "right" });
 
+  // Campo específico para TC: autorização de contraste iodado
+  if (isTomografia) {
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.textLight);
+    doc.text("Autoriza uso de contraste iodado:", margin + 5, yPos + 10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(data.tcAceitaContraste ? 34 : 180, data.tcAceitaContraste ? 139 : 50, data.tcAceitaContraste ? 34 : 50);
+    doc.text(formatBoolean(data.tcAceitaContraste), pageWidth - margin - 5, yPos + 10, { align: "right" });
+  }
+
+  // Campo específico para RM: autorização de contraste (gadolínio)
+  if (isRessonancia) {
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.textLight);
+    doc.text("Autoriza uso de contraste (gadolínio):", margin + 5, yPos + 10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(data.rmAceitaContraste ? 34 : 180, data.rmAceitaContraste ? 139 : 50, data.rmAceitaContraste ? 34 : 50);
+    doc.text(formatBoolean(data.rmAceitaContraste), pageWidth - margin - 5, yPos + 10, { align: "right" });
+  }
+
+  const lgpdYOffset = temCampoContraste ? 18 : 10;
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.textLight);
-  doc.text("Aceita Termo LGPD:", margin + 5, yPos + 10);
+  doc.text("Aceita Termo LGPD:", margin + 5, yPos + lgpdYOffset);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(data.aceitaCompartilhamento ? 34 : 180, data.aceitaCompartilhamento ? 139 : 50, data.aceitaCompartilhamento ? 34 : 50);
-  doc.text(formatBoolean(data.aceitaCompartilhamento), pageWidth - margin - 5, yPos + 10, { align: "right" });
+  doc.text(formatBoolean(data.aceitaCompartilhamento), pageWidth - margin - 5, yPos + lgpdYOffset, { align: "right" });
 
-  yPos += 28;
+  yPos += aceiteBoxHeight + 8;
 
   // ASSINATURAS (Grid 2x2)
   yPos = addSection(layout, "ASSINATURAS", yPos);
