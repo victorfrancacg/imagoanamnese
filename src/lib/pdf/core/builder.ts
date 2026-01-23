@@ -504,10 +504,19 @@ export function buildExamePDF(
   doc.text("OPERADOR", rightX, yPos);
   yPos += 4;
 
-  // Caixa Responsável (vazia por enquanto)
+  // Caixa Responsável
   doc.setDrawColor(...COLORS.border);
   doc.setFillColor(...COLORS.white);
   doc.roundedRect(leftX, yPos, signWidth, signHeight, 2, 2, 'FD');
+
+  if (assinaturas?.responsavel && assinaturas.responsavel.startsWith('data:image')) {
+    try {
+      const imgFormat = assinaturas.responsavel.includes('image/png') ? 'PNG' : 'JPEG';
+      doc.addImage(assinaturas.responsavel, imgFormat, leftX + 2, yPos + 2, signWidth - 4, signHeight - 8);
+    } catch {
+      // Erro ao adicionar imagem - caixa fica vazia
+    }
+  }
 
   // Caixa Operador
   doc.setFillColor(...COLORS.white);
@@ -528,7 +537,7 @@ export function buildExamePDF(
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.textLight);
-  doc.text("Nome: _______________________", leftX, yPos);
+  doc.text(`Nome: ${assinaturas?.nomeResponsavel || '_______________________'}`, leftX, yPos);
   doc.text(`Nome: ${assinaturas?.nomeOperador || '_______________________'}`, rightX, yPos);
 
   yPos += 4;

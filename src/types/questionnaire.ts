@@ -127,6 +127,11 @@ export interface QuestionnaireData {
   rmAceitaContraste: boolean | null; // Termo específico de contraste para RM
   aceitaCompartilhamento: boolean | null;
   assinaturaData: string;
+
+  // Preenchimento por responsável
+  preenchidoPor: 'paciente' | 'responsavel';
+  nomeResponsavel?: string;
+  assinaturaResponsavel?: string;
 }
 
 export const initialData: QuestionnaireData = {
@@ -239,4 +244,8 @@ export const initialData: QuestionnaireData = {
   rmAceitaContraste: null,
   aceitaCompartilhamento: null,
   assinaturaData: '',
+  // Preenchimento por responsável
+  preenchidoPor: 'paciente',
+  nomeResponsavel: '',
+  assinaturaResponsavel: '',
 };

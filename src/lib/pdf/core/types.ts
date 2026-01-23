@@ -31,6 +31,7 @@ export interface TermoConsentimento {
 export interface Assinaturas {
   paciente?: string;
   responsavel?: string;
+  nomeResponsavel?: string;
   assistente?: string;
   operador?: string;
   nomeAssistente?: string;

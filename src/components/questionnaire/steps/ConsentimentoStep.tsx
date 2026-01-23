@@ -4,6 +4,7 @@ import { NavigationButtons } from "../NavigationButtons";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { QuestionnaireData } from "@/types/questionnaire";
 import { Eraser } from "lucide-react";
 
@@ -16,21 +17,38 @@ interface ConsentimentoStepProps {
 }
 
 export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving = false }: ConsentimentoStepProps) {
+  // Canvas do paciente
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
 
+  // Canvas do responsável
+  const canvasResponsavelRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawingResponsavel, setIsDrawingResponsavel] = useState(false);
+  const [hasSignatureResponsavel, setHasSignatureResponsavel] = useState(false);
+
+  // Lógica de validação:
+  // - Se preenchido pelo paciente: assinatura do paciente obrigatória
+  // - Se preenchido pelo responsável: assinatura e nome do responsável obrigatórios, assinatura do paciente opcional
+  const preenchidoPorResponsavel = data.preenchidoPor === 'responsavel';
+  const nomeResponsavelPreenchido = (data.nomeResponsavel?.trim() || '').length > 0;
+
+  const assinaturaValida = preenchidoPorResponsavel
+    ? hasSignatureResponsavel && nomeResponsavelPreenchido
+    : hasSignature;
+
   // Para TC e RM, precisa aceitar/recusar ambos os termos (geral e contraste)
   const canProceed = data.tipoExame === 'tomografia'
-    ? data.aceitaRiscos !== null && data.tcAceitaContraste !== null && hasSignature
+    ? data.aceitaRiscos !== null && data.tcAceitaContraste !== null && assinaturaValida
     : data.tipoExame === 'ressonancia'
-    ? data.aceitaRiscos !== null && data.rmAceitaContraste !== null && hasSignature
-    : data.aceitaRiscos !== null && hasSignature;
+    ? data.aceitaRiscos !== null && data.rmAceitaContraste !== null && assinaturaValida
+    : data.aceitaRiscos !== null && assinaturaValida;
 
+  // Inicialização do canvas do paciente
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -39,7 +57,7 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
     canvas.width = rect.width * 2;
     canvas.height = rect.height * 2;
     ctx.scale(2, 2);
-    
+
     // Set drawing style
     ctx.strokeStyle = 'hsl(var(--foreground))';
     ctx.lineWidth = 2;
@@ -56,6 +74,37 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
       img.src = data.assinaturaData;
     }
   }, []);
+
+  // Inicialização do canvas do responsável
+  useEffect(() => {
+    const canvas = canvasResponsavelRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+
+    // Set drawing style
+    ctx.strokeStyle = 'hsl(var(--foreground))';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Restore signature if exists
+    if (data.assinaturaResponsavel) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
+        setHasSignatureResponsavel(true);
+      };
+      img.src = data.assinaturaResponsavel;
+    }
+  }, [data.preenchidoPor]);
 
   const getCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -126,6 +175,78 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
     ctx.clearRect(0, 0, rect.width, rect.height);
     setHasSignature(false);
     updateData({ assinaturaData: '' });
+  };
+
+  // Funções para o canvas do responsável
+  const getCoordinatesResponsavel = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasResponsavelRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+
+    if ('touches' in e) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const startDrawingResponsavel = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const canvas = canvasResponsavelRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx) return;
+
+    setIsDrawingResponsavel(true);
+    const { x, y } = getCoordinatesResponsavel(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const drawResponsavel = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    if (!isDrawingResponsavel) return;
+
+    const canvas = canvasResponsavelRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!ctx) return;
+
+    const { x, y } = getCoordinatesResponsavel(e);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    setHasSignatureResponsavel(true);
+  };
+
+  const stopDrawingResponsavel = () => {
+    if (isDrawingResponsavel) {
+      setIsDrawingResponsavel(false);
+      saveSignatureResponsavel();
+    }
+  };
+
+  const saveSignatureResponsavel = () => {
+    const canvas = canvasResponsavelRef.current;
+    if (!canvas) return;
+
+    const dataUrl = canvas.toDataURL('image/png');
+    updateData({ assinaturaResponsavel: dataUrl });
+  };
+
+  const clearSignatureResponsavel = () => {
+    const canvas = canvasResponsavelRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    setHasSignatureResponsavel(false);
+    updateData({ assinaturaResponsavel: '' });
   };
 
   // Termos específicos por tipo de exame
@@ -552,10 +673,93 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
         {/* Termo específico por tipo de exame */}
         {renderTermoConsentimento()}
 
-        {/* Assinatura Digital */}
+        {/* Pergunta: Quem está preenchendo */}
+        <div className="space-y-3 sm:space-y-4">
+          <Label className="text-sm sm:text-base font-medium">
+            O questionário foi preenchido pelo próprio paciente ou por um responsável?
+          </Label>
+          <RadioGroup
+            value={data.preenchidoPor}
+            onValueChange={(value) => updateData({ preenchidoPor: value as 'paciente' | 'responsavel' })}
+            className="flex gap-4"
+          >
+            <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <RadioGroupItem value="paciente" id="preenchido-paciente" />
+              <span className="text-xs sm:text-sm">Paciente</span>
+            </label>
+            <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+              <RadioGroupItem value="responsavel" id="preenchido-responsavel" />
+              <span className="text-xs sm:text-sm">Responsável</span>
+            </label>
+          </RadioGroup>
+        </div>
+
+        {/* Campos do Responsável (se aplicável) */}
+        {preenchidoPorResponsavel && (
+          <div className="space-y-4 p-4 rounded-lg border border-border bg-accent/20">
+            <h4 className="font-medium text-foreground text-sm sm:text-base">Dados do Responsável</h4>
+
+            {/* Nome do Responsável */}
+            <div className="space-y-2">
+              <Label htmlFor="nomeResponsavel" className="text-sm font-medium">
+                Nome completo do responsável <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="nomeResponsavel"
+                type="text"
+                placeholder="Digite o nome completo do responsável"
+                value={data.nomeResponsavel || ''}
+                onChange={(e) => updateData({ nomeResponsavel: e.target.value })}
+                className="w-full"
+              />
+            </div>
+
+            {/* Assinatura do Responsável */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">
+                  Assinatura do Responsável <span className="text-destructive">*</span>
+                </Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSignatureResponsavel}
+                  className="text-muted-foreground hover:text-foreground h-8 text-xs sm:text-sm"
+                >
+                  <Eraser className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  Limpar
+                </Button>
+              </div>
+
+              <div className="border-2 border-dashed border-border rounded-lg p-2 bg-background">
+                <canvas
+                  ref={canvasResponsavelRef}
+                  className="w-full h-32 cursor-crosshair touch-none"
+                  onMouseDown={startDrawingResponsavel}
+                  onMouseMove={drawResponsavel}
+                  onMouseUp={stopDrawingResponsavel}
+                  onMouseLeave={stopDrawingResponsavel}
+                  onTouchStart={startDrawingResponsavel}
+                  onTouchMove={drawResponsavel}
+                  onTouchEnd={stopDrawingResponsavel}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                O responsável deve assinar no campo acima
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Assinatura Digital do Paciente */}
         <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-sm sm:text-base font-medium">Assinatura Digital</Label>
+            <Label className="text-sm sm:text-base font-medium">
+              Assinatura Digital do Paciente
+              {!preenchidoPorResponsavel && <span className="text-destructive ml-1">*</span>}
+              {preenchidoPorResponsavel && <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>}
+            </Label>
             <Button
               type="button"
               variant="ghost"
@@ -567,7 +771,7 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               Limpar
             </Button>
           </div>
-          
+
           <div className="border-2 border-dashed border-border rounded-lg p-2 bg-background">
             <canvas
               ref={canvasRef}
@@ -582,7 +786,10 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
             />
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            Assine no campo acima usando o mouse ou o dedo (em dispositivos touch)
+            {preenchidoPorResponsavel
+              ? "Se possível, o paciente pode assinar no campo acima"
+              : "Assine no campo acima usando o mouse ou o dedo (em dispositivos touch)"
+            }
           </p>
         </div>
       </div>

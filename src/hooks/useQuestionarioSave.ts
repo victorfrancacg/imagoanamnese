@@ -216,18 +216,25 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
     }
 
     // 2. Gerar PDF (usa PDF específico por tipo de exame)
+    // Inclui dados do responsável se o questionário foi preenchido por um
+    const assinaturas = {
+      paciente: data.assinaturaData,
+      responsavel: data.preenchidoPor === 'responsavel' ? data.assinaturaResponsavel : undefined,
+      nomeResponsavel: data.preenchidoPor === 'responsavel' ? data.nomeResponsavel : undefined,
+    };
+
     let pdfBlob: Blob;
     if (data.tipoExame === 'mamografia') {
-      pdfBlob = generateMamografiaPDF(data, { paciente: data.assinaturaData });
+      pdfBlob = generateMamografiaPDF(data, assinaturas);
     } else if (data.tipoExame === 'densitometria') {
-      pdfBlob = generateDensitometriaPDF(data, { paciente: data.assinaturaData });
+      pdfBlob = generateDensitometriaPDF(data, assinaturas);
     } else if (data.tipoExame === 'ressonancia') {
-      pdfBlob = generateRessonanciaPDF(data, { paciente: data.assinaturaData });
+      pdfBlob = generateRessonanciaPDF(data, assinaturas);
     } else if (data.tipoExame === 'tomografia') {
-      pdfBlob = generateTomografiaPDF(data, { paciente: data.assinaturaData });
+      pdfBlob = generateTomografiaPDF(data, assinaturas);
     } else {
       // Fallback para tipos não reconhecidos
-      pdfBlob = generateTomografiaPDF(data, { paciente: data.assinaturaData });
+      pdfBlob = generateTomografiaPDF(data, assinaturas);
     }
 
     // 3. Fazer upload do PDF para o storage
