@@ -528,9 +528,26 @@ export function Summary({ data, onReset, savedId }: SummaryProps) {
             />
           )}
           <SummaryItem label="Autoriza compartilhamento de dados" value={formatBoolean(data.aceitaCompartilhamento)} />
+          <SummaryItem
+            label="Preenchido por"
+            value={data.preenchidoPor === 'responsavel' ? 'Responsável' : 'Paciente'}
+          />
+          {data.preenchidoPor === 'responsavel' && (
+            <>
+              <SummaryItem label="Nome do Responsável" value={data.nomeResponsavel || '-'} />
+              {data.assinaturaResponsavel && (
+                <div className="pt-3">
+                  <span className="text-muted-foreground text-sm">Assinatura do Responsável:</span>
+                  <div className="mt-2 p-2 bg-background rounded-lg border border-border">
+                    <img src={data.assinaturaResponsavel} alt="Assinatura do responsável" className="max-h-20" />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
           {data.assinaturaData && (
             <div className="pt-3">
-              <span className="text-muted-foreground text-sm">Assinatura:</span>
+              <span className="text-muted-foreground text-sm">Assinatura do Paciente:</span>
               <div className="mt-2 p-2 bg-background rounded-lg border border-border">
                 <img src={data.assinaturaData} alt="Assinatura do paciente" className="max-h-20" />
               </div>
