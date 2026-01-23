@@ -597,17 +597,64 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
     if (data.tipoExame === 'mamografia') {
       return (
         <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-accent/30 border border-border">
-            <h4 className="font-medium text-foreground mb-2">Termo de Consentimento – Mamografia</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-              Declaro que fui devidamente informado(a) sobre o exame de mamografia, que utiliza raios X em baixa dose para avaliação das mamas, com finalidade diagnóstica e/ou de rastreamento. Compreendo que o exame envolve a compressão das mamas, necessária para obtenção de imagens adequadas, podendo causar desconforto ou dor transitória.
-
-              Estou ciente de que, em pacientes com próteses mamárias, a mamografia pode apresentar limitações técnicas, exigir manobras adicionais, e, embora raro, existe risco mínimo de deslocamento ou dano à prótese. Declaro que informei corretamente à equipe sobre a presença de prótese, cirurgias prévias, gestação suspeita ou confirmada, e outras condições relevantes.
-            </p>
+          <div className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border">
+            <h4 className="font-medium text-foreground mb-1.5 sm:mb-2 text-sm sm:text-base">Termo de Consentimento Informado – Exame de Mamografia</h4>
+            <div className="max-h-64 overflow-y-auto pr-2 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+              <div>
+                <p className="font-semibold text-foreground">1. DO EXAME DE MAMOGRAFIA</p>
+                <p>A mamografia é um exame de diagnóstico por imagem que utiliza raios X em baixa dose para avaliação das mamas, sendo o principal método para rastreamento, detecção precoce e acompanhamento de doenças mamárias, incluindo o câncer de mama. O exame permite a identificação de alterações como nódulos, assimetrias, distorções arquiteturais e microcalcificações, muitas vezes antes do surgimento de sintomas clínicos.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">2. DO FUNCIONAMENTO DO APARELHO</p>
+                <p>O exame é realizado em equipamento específico denominado mamógrafo, projetado para obtenção de imagens detalhadas do tecido mamário com controle rigoroso da dose de radiação. Durante o procedimento, cada mama é posicionada individualmente no aparelho e submetida à compressão controlada, necessária para:</p>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  <li>Reduzir a espessura do tecido mamário;</li>
+                  <li>Melhorar a qualidade e nitidez das imagens;</li>
+                  <li>Diminuir a dose de radiação;</li>
+                  <li>Evitar sobreposição de estruturas.</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">3. DA COMPRESSÃO MAMÁRIA</p>
+                <p>A compressão das mamas é uma etapa essencial do exame. Pode causar desconforto ou dor transitória, variável conforme a sensibilidade individual, o período do ciclo menstrual e condições pré-existentes. O desconforto é temporário e cessa imediatamente após o término da compressão.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">4. DO TEMPO DE REALIZAÇÃO</p>
+                <p>O tempo médio do exame é de aproximadamente 10 a 20 minutos, podendo variar conforme a necessidade de incidências adicionais ou complementares.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">5. DOS RISCOS E SEGURANÇA</p>
+                <p>A mamografia é considerada um exame seguro, realizado com baixa dose de radiação, dentro dos limites estabelecidos por normas nacionais e internacionais de radioproteção. Apesar da baixa exposição, o exame deve ser realizado conforme indicação médica, especialmente em gestantes ou em caso de suspeita de gravidez, situação que deve ser comunicada previamente à equipe.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">6. DA MAMOGRAFIA EM PACIENTES COM PRÓTESES MAMÁRIAS</p>
+                <p>Em pacientes portadoras de próteses mamárias, a mamografia pode apresentar limitações técnicas, exigindo manobras específicas e incidências adicionais para melhor avaliação do tecido mamário residual. Embora raríssimo, existe risco mínimo de:</p>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  <li>Deslocamento da prótese;</li>
+                  <li>Dano ou ruptura da prótese durante a compressão.</li>
+                </ul>
+                <p className="mt-1">A correta informação sobre a presença de próteses, tipo de implante e histórico cirúrgico é fundamental para a segurança do exame e adequada condução técnica.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">7. DE FATORES QUE PODEM INTERFERIR NO EXAME</p>
+                <p>Algumas condições podem interferir na qualidade das imagens ou na interpretação diagnóstica, tais como:</p>
+                <ul className="list-disc list-inside ml-2 mt-1">
+                  <li>Cirurgias mamárias prévias;</li>
+                  <li>Presença de próteses, expansores ou materiais cirúrgicos;</li>
+                  <li>Processos inflamatórios;</li>
+                  <li>Alterações hormonais;</li>
+                  <li>Uso recente de desodorantes, cremes ou talcos na região das mamas e axilas, que devem ser evitados no dia do exame.</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">8. DO USO DAS IMAGENS E DADOS</p>
+                <p>As imagens e informações obtidas destinam-se exclusivamente à finalidade diagnóstica, respeitando-se o sigilo profissional, os princípios éticos e a legislação vigente, especialmente a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 – LGPD).</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="space-y-3">
-            <Label className="text-base font-medium">
+
+          <div className="space-y-2 sm:space-y-3">
+            <Label className="text-sm sm:text-base font-medium">
               Você declara estar ciente e concorda em realizar o exame?
             </Label>
             <RadioGroup
@@ -617,11 +664,11 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
             >
               <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="sim" id="mamo-sim" />
-                <span>Sim, estou ciente e concordo</span>
+                <span className="text-xs sm:text-sm">Sim, estou ciente e concordo</span>
               </label>
               <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
                 <RadioGroupItem value="nao" id="mamo-nao" />
-                <span>Não concordo</span>
+                <span className="text-xs sm:text-sm">Não concordo</span>
               </label>
             </RadioGroup>
           </div>
