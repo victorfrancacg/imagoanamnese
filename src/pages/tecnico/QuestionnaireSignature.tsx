@@ -38,6 +38,9 @@ function convertToQuestionnaireData(questionario: Questionario): QuestionnaireDa
     aceitaRiscos: respostas.consentimento.aceitaRiscos,
     aceitaCompartilhamento: respostas.consentimento.aceitaCompartilhamento,
     assinaturaData: questionario.assinatura_data || respostas.consentimento.assinaturaData,
+    preenchidoPor: respostas.consentimento.preenchidoPor || 'paciente',
+    nomeResponsavel: respostas.consentimento.nomeResponsavel,
+    assinaturaResponsavel: respostas.consentimento.assinaturaResponsavel,
 
     // Segurança
     ...respostas.seguranca,
@@ -48,32 +51,30 @@ function convertToQuestionnaireData(questionario: Questionario): QuestionnaireDa
 }
 
 // Função para fazer upload do PDF final
-async function uploadFinalPDF(pdfBlob: Blob, questionarioId: string): Promise<string | null> {
-  try {
-    const fileName = `questionario_final_${questionarioId}_${Date.now()}.pdf`;
+async function uploadFinalPDF(pdfBlob: Blob, questionarioId: string): Promise<string> {
+  const fileName = `questionario_final_${questionarioId}_${Date.now()}.pdf`;
 
-    const { data, error } = await supabase.storage
-      .from('questionarios-pdfs')
-      .upload(fileName, pdfBlob, {
-        contentType: 'application/pdf',
-        upsert: false
-      });
+  const { data, error } = await supabase.storage
+    .from('questionarios-pdfs')
+    .upload(fileName, pdfBlob, {
+      contentType: 'application/pdf',
+      upsert: false
+    });
 
-    if (error) {
-      console.error('Erro ao fazer upload do PDF final:', error);
-      return null;
-    }
-
-    // Obter URL pública do PDF
-    const { data: publicUrlData } = supabase.storage
-      .from('questionarios-pdfs')
-      .getPublicUrl(data.path);
-
-    return publicUrlData.publicUrl;
-  } catch (error) {
+  if (error) {
     console.error('Erro ao fazer upload do PDF final:', error);
-    return null;
+    if (error.message?.includes('JWT') || error.message?.includes('token')) {
+      throw new Error('Sessão expirada. Atualize a página e tente novamente.');
+    }
+    throw new Error('Erro ao salvar o PDF. Tente novamente.');
   }
+
+  // Obter URL pública do PDF
+  const { data: publicUrlData } = supabase.storage
+    .from('questionarios-pdfs')
+    .getPublicUrl(data.path);
+
+  return publicUrlData.publicUrl;
 }
 
 export default function QuestionnaireSignature() {
@@ -125,6 +126,8 @@ export default function QuestionnaireSignature() {
   // Mutation para finalizar
   const finalizarMutation = useMutation({
     mutationFn: async (isTelecomando?: boolean) => {
+      console.log('[Finalizar] Iniciando mutation...');
+
       if (!assinaturaTecnico) {
         throw new Error('Assinatura é obrigatória');
       }
@@ -178,6 +181,8 @@ export default function QuestionnaireSignature() {
         // Montar objeto de assinaturas para o PDF
         const assinaturas: {
           paciente?: string;
+          responsavel?: string;
+          nomeResponsavel?: string;
           assistente?: string;
           nomeAssistente?: string;
           registroAssistente?: string;
@@ -186,6 +191,8 @@ export default function QuestionnaireSignature() {
           registroOperador?: string;
         } = {
           paciente: questionnaireData.assinaturaData,
+          responsavel: questionnaireData.preenchidoPor === 'responsavel' ? questionnaireData.assinaturaResponsavel : undefined,
+          nomeResponsavel: questionnaireData.preenchidoPor === 'responsavel' ? questionnaireData.nomeResponsavel : undefined,
         };
 
         if (isAssistente) {
@@ -234,6 +241,7 @@ export default function QuestionnaireSignature() {
       }
 
       // Atualizar questionário no banco
+      console.log('[Finalizar] Atualizando banco...');
       const { error } = await supabase
         .from('questionarios')
         .update(updateData)
@@ -241,10 +249,15 @@ export default function QuestionnaireSignature() {
 
       if (error) throw error;
 
+      console.log('[Finalizar] Banco atualizado com sucesso!');
       return { status: novoStatus, pdfUrl: finalPdfUrl };
     },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['questionario', id] });
+    onSuccess: async (result) => {
+      console.log('[Finalizar] onSuccess chamado, resultado:', result.status);
+      // Aguardar invalidação e refetch antes de prosseguir
+      console.log('[Finalizar] Invalidando queries...');
+      await queryClient.invalidateQueries({ queryKey: ['questionario', id] });
+      console.log('[Finalizar] Queries invalidadas!');
 
       // Limpar desenho do sessionStorage após finalização
       if (id) {
@@ -264,6 +277,7 @@ export default function QuestionnaireSignature() {
       }
     },
     onError: (error) => {
+      console.error('[Finalizar] onError chamado:', error);
       toast({
         title: 'Erro ao finalizar',
         description: error instanceof Error ? error.message : 'Ocorreu um erro.',
@@ -283,6 +297,7 @@ export default function QuestionnaireSignature() {
   };
 
   const handleTelecomandoChoice = (isTelecomando: boolean) => {
+    console.log('[Finalizar] Escolha telecomando:', isTelecomando);
     setTelecomandoChoice(isTelecomando);
     setShowTelecomandoDialog(false);
     finalizarMutation.mutate(isTelecomando);

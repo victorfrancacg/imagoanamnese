@@ -196,6 +196,9 @@ export async function saveQuestionario(data: QuestionnaireData): Promise<{ succe
             aceitaRiscos: data.aceitaRiscos ?? false,
             aceitaCompartilhamento: data.aceitaCompartilhamento ?? false,
             assinaturaData: data.assinaturaData || undefined,
+            preenchidoPor: data.preenchidoPor || 'paciente',
+            nomeResponsavel: data.preenchidoPor === 'responsavel' ? data.nomeResponsavel : undefined,
+            assinaturaResponsavel: data.preenchidoPor === 'responsavel' ? data.assinaturaResponsavel : undefined,
           },
           metadata: {
             preenchidoEm: new Date().toISOString(),
