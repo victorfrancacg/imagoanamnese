@@ -94,13 +94,47 @@ O sistema usa **dois clientes Supabase separados** com sessões independentes:
 
 ## Pendências Técnicas
 
+### Bug Intermitente: Loading Infinito na Finalização (Risco Alto)
+**Status:** Não resolvido - Monitorar
+
+**Descrição:** Ao finalizar um questionário de RM/TC como assistente, o sistema pode entrar em loading infinito na primeira tentativa após login. Após refresh (F5), funciona normalmente.
+
+**Sintomas:**
+- Botão "Finalizar" fica em estado de loading indefinidamente
+- Console mostra múltiplos `Loading profile for user` sem completar
+- Evento `SIGNED_IN` dispara durante a mutation
+
+**Logs característicos:**
+```
+AuthContext.tsx: Auth state changed: SIGNED_IN
+AuthContext.tsx: Loading profile for user: [id]
+(sem "Profile loaded successfully" depois)
+```
+
+**Causa provável:** Race condition entre:
+1. Mutation chamando Supabase (upload/update)
+2. Supabase fazendo refresh de token
+3. AuthContext disparando `loadProfile` devido a evento de auth
+4. Closure desatualizada no `onAuthStateChange` (linha 141) - `profile` sempre é `null`
+
+**Arquivo afetado:** `src/pages/tecnico/QuestionnaireSignature.tsx`
+
+**Correções aplicadas (janeiro/2026):**
+1. `onSuccess` agora usa `async/await` no `invalidateQueries`
+2. `uploadFinalPDF` agora lança exceções em vez de retornar `null`
+3. Logs de debug adicionados com prefixo `[Finalizar]`
+
+**Correção pendente:** Refatorar `src/contexts/AuthContext.tsx` para usar `useRef` no lugar da closure desatualizada do `profile` (linha 141-142).
+
+**Como reproduzir:** Fazer login → navegar até questionário RM → assinar → clicar "Finalizar" (pode não ocorrer sempre).
+
+---
+
 ### useAdminQuestionnaireSearch.ts (Risco Médio)
 **Status:** Monitorar
 
-O hook `src/hooks/useAdminQuestionnaireSearch.ts` usa um padrão de query que pode causar problemas de loading infinito em certas condições (similar ao bug corrigido em `QuestionnaireList.tsx`).
+O hook `src/hooks/useAdminQuestionnaireSearch.ts` usa um padrão de query que pode causar problemas de loading infinito em certas condições.
 
-**Problema potencial:** O `queryKey` inclui o objeto `filters` inteiro e o `enabled` depende dos valores dos filtros. Se houver re-renderizações que alterem o objeto inadvertidamente, pode causar comportamento inconsistente.
+**Problema potencial:** O `queryKey` inclui o objeto `filters` inteiro e o `enabled` depende dos valores dos filtros.
 
-**Solução recomendada:** Refatorar para usar `enabled: false` com disparo manual via `refetch()`, seguindo o padrão implementado em `QuestionnaireList.tsx`.
-
-**Referência:** Correção aplicada em `src/pages/tecnico/QuestionnaireList.tsx` e `src/contexts/AuthContext.tsx` (janeiro/2026).
+**Solução recomendada:** Refatorar para usar `enabled: false` com disparo manual via `refetch()`.
