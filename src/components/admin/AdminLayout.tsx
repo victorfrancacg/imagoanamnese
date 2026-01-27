@@ -6,7 +6,7 @@ import { LogOut, LayoutDashboard, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function AdminLayout() {
-  const { user, signOut } = useAdminAuth();
+  const { profile, signOut } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,13 +34,13 @@ export function AdminLayout() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link to="/admin" className="flex items-center gap-2">
+              <Link to="/admin" className="flex items-center gap-4">
                 <img
                   src={imagoLogo}
                   alt="IMAGO Radiologia"
-                  className="h-8"
+                  className="h-10"
                 />
-                <span className="font-semibold text-lg">Portal Admin</span>
+                <span className="font-semibold text-lg">Portal do Administrador</span>
               </Link>
 
               <nav className="hidden md:flex items-center gap-4">
@@ -61,7 +61,7 @@ export function AdminLayout() {
 
             <div className="flex items-center gap-4">
               <div className="hidden sm:block text-sm text-muted-foreground">
-                {user?.email}
+                {profile?.nome}
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />

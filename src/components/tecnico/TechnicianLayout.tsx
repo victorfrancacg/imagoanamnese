@@ -6,7 +6,7 @@ import { LogOut, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function TechnicianLayout() {
-  const { user, signOut } = useAuth();
+  const { profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,11 +34,11 @@ export function TechnicianLayout() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <Link to="/tecnico/questionarios" className="flex items-center gap-2">
+              <Link to="/tecnico/questionarios" className="flex items-center gap-4">
                 <img
                   src={imagoLogo}
                   alt="IMAGO Radiologia"
-                  className="h-8"
+                  className="h-10"
                 />
                 <span className="font-semibold text-lg">Portal do Técnico</span>
               </Link>
@@ -55,7 +55,7 @@ export function TechnicianLayout() {
 
             <div className="flex items-center gap-4">
               <div className="hidden sm:block text-sm text-muted-foreground">
-                {user?.email}
+                {profile?.nome}
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
