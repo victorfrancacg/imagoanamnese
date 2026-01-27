@@ -151,7 +151,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
       title="Questões de Segurança"
       subtitle="Informações importantes para a realização do exame"
     >
-      <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-8 sm:space-y-10">
         
         {/* ========== RESSONÂNCIA MAGNÉTICA ========== */}
         {isRessonancia && (

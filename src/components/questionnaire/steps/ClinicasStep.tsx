@@ -38,25 +38,25 @@ function YesNoQuestion({
   };
 
   return (
-    <div className="space-y-3 animate-fade-in">
-      <Label className="text-base font-medium">{label}</Label>
+    <div className="space-y-2 sm:space-y-3 animate-fade-in">
+      <Label className="text-sm sm:text-base font-medium">{label}</Label>
       <RadioGroup
         value={getRadioValue()}
         onValueChange={handleChange}
         className="flex flex-wrap gap-2 sm:gap-4"
       >
-        <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
           <RadioGroupItem value="sim" id={`${id}-sim`} />
-          <span>Sim</span>
+          <span className="text-sm sm:text-base">Sim</span>
         </label>
-        <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
           <RadioGroupItem value="nao" id={`${id}-nao`} />
-          <span>Não</span>
+          <span className="text-sm sm:text-base">Não</span>
         </label>
         {showUnknownOption && (
-          <label className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
+          <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
             <RadioGroupItem value="nao_sei" id={`${id}-nao_sei`} />
-            <span>{unknownLabel}</span>
+            <span className="text-sm sm:text-base">{unknownLabel}</span>
           </label>
         )}
       </RadioGroup>
@@ -217,7 +217,7 @@ export function ClinicasStep({ data, updateData, onNext, onBack }: ClinicasStepP
       }`}
       subtitle="Informações sobre o motivo do exame"
     >
-      <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-8 sm:space-y-10">
         {/* Bloco de Regiões do Exame - Apenas para Tomografia e Ressonância */}
         {isTomografiaOuRessonancia && (
           <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 rounded-lg bg-accent/30 border border-border animate-fade-in">
