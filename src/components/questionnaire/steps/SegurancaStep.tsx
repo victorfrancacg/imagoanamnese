@@ -13,22 +13,38 @@ interface SegurancaStepProps {
   onBack: () => void;
 }
 
-// Componente reutilizável para perguntas Sim/Não
+// Componente reutilizável para perguntas Sim/Não/Não sei
 function YesNoQuestion({
   id,
   label,
   value,
   onChange,
   showWarning = false,
+  showUnknownOption = true,
+  unknownLabel = "Não sei",
   children,
 }: {
   id: string;
   label: string;
-  value: boolean | null;
-  onChange: (value: boolean) => void;
+  value: boolean | 'nao_sei' | null;
+  onChange: (value: boolean | 'nao_sei') => void;
   showWarning?: boolean;
+  showUnknownOption?: boolean;
+  unknownLabel?: string;
   children?: React.ReactNode;
 }) {
+  const getRadioValue = () => {
+    if (value === null) return '';
+    if (value === 'nao_sei') return 'nao_sei';
+    return value ? 'sim' : 'nao';
+  };
+
+  const handleChange = (v: string) => {
+    if (v === 'sim') onChange(true);
+    else if (v === 'nao') onChange(false);
+    else if (v === 'nao_sei') onChange('nao_sei');
+  };
+
   return (
     <div className="space-y-2 sm:space-y-3 animate-fade-in">
       <Label className="text-sm sm:text-base font-medium flex items-center gap-2">
@@ -36,18 +52,24 @@ function YesNoQuestion({
         <span>{label}</span>
       </Label>
       <RadioGroup
-        value={value === null ? '' : value ? 'sim' : 'nao'}
-        onValueChange={(v) => onChange(v === 'sim')}
-        className="flex gap-2 sm:gap-4"
+        value={getRadioValue()}
+        onValueChange={handleChange}
+        className="flex flex-wrap gap-2 sm:gap-4"
       >
-        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
           <RadioGroupItem value="sim" id={`${id}-sim`} />
           <span className="text-sm sm:text-base">Sim</span>
         </label>
-        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+        <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
           <RadioGroupItem value="nao" id={`${id}-nao`} />
           <span className="text-sm sm:text-base">Não</span>
         </label>
+        {showUnknownOption && (
+          <label className="flex items-center space-x-2 p-2.5 sm:p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1 min-w-[80px]">
+            <RadioGroupItem value="nao_sei" id={`${id}-nao_sei`} />
+            <span className="text-sm sm:text-base">{unknownLabel}</span>
+          </label>
+        )}
       </RadioGroup>
       {children}
     </div>
@@ -111,13 +133,13 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
       if (isFeminino && data.gravida === null) return false;
       if (data.exameContrasteRecente === null) return false;
       if (data.fraturouOsso === null) return false;
-      if (data.fraturouOsso && (data.fraturouOssoDetalhes?.trim() ?? '') === '') return false;
+      if (data.fraturouOsso === true && (data.fraturouOssoDetalhes?.trim() ?? '') === '') return false;
       if (data.perdeuAltura === null) return false;
       if (data.perdaOsseaRadiografia === null) return false;
       if (data.cifoseDorsal === null) return false;
       if (data.quedas12Meses === null) return false;
       if (data.parenteOsteoporose === null) return false;
-      if (data.parenteOsteoporose && (data.parenteOsteoporoseDetalhes?.trim() ?? '') === '') return false;
+      if (data.parenteOsteoporose === true && (data.parenteOsteoporoseDetalhes?.trim() ?? '') === '') return false;
       return true;
     }
     
@@ -236,6 +258,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               label="Já fez alguma cirurgia renal? (p. ex. retirada de rim ou transplante renal)"
               value={data.rmCirurgiaRenal}
               onChange={(v) => updateData({ rmCirurgiaRenal: v })}
+              unknownLabel="Não lembro"
             />
             
             <YesNoQuestion
@@ -251,6 +274,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               value={data.rmAlergiaContraste}
               onChange={(v) => updateData({ rmAlergiaContraste: v })}
               showWarning
+              unknownLabel="Não lembro"
             />
           </>
         )}
@@ -297,6 +321,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               value={data.tcAlergiaContraste}
               onChange={(v) => updateData({ tcAlergiaContraste: v })}
               showWarning
+              unknownLabel="Não lembro"
             />
             
             <YesNoQuestion
@@ -304,6 +329,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               label="Já fez alguma cirurgia renal? (p. ex. retirada de rim ou transplante renal)"
               value={data.tcCirurgiaRenal}
               onChange={(v) => updateData({ tcCirurgiaRenal: v })}
+              unknownLabel="Não lembro"
             />
             
             <YesNoQuestion
@@ -351,8 +377,9 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               label="Fraturou algum osso nos últimos cinco anos? Se sim, qual osso e como ocorreu?"
               value={data.fraturouOsso}
               onChange={(v) => updateData({ fraturouOsso: v })}
+              unknownLabel="Não lembro"
             >
-              {data.fraturouOsso && (
+              {data.fraturouOsso === true && (
                 <Textarea
                   placeholder="Por favor, descreva qual osso e como ocorreu"
                   value={data.fraturouOssoDetalhes ?? ''}
@@ -396,7 +423,7 @@ export function SegurancaStep({ data, updateData, onNext, onBack }: SegurancaSte
               value={data.parenteOsteoporose}
               onChange={(v) => updateData({ parenteOsteoporose: v })}
             >
-              {data.parenteOsteoporose && (
+              {data.parenteOsteoporose === true && (
                 <Textarea
                   placeholder="Por favor, informe qual parente"
                   value={data.parenteOsteoporoseDetalhes ?? ''}

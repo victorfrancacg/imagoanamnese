@@ -5,20 +5,23 @@ type Questionario = Tables<'questionarios'>;
 
 interface QuestionItemProps {
   label: string;
-  value: boolean | null | undefined;
+  value: boolean | 'nao_sei' | null | undefined;
   warning?: boolean;
 }
 
 const QuestionItem = ({ label, value, warning = false }: QuestionItemProps) => {
   if (value === null || value === undefined) return null;
 
+  const isUnknown = value === 'nao_sei';
+  const displayText = isUnknown ? 'Não sei' : (value ? 'Sim' : 'Não');
+
   return (
     <div className="flex justify-between items-center py-2 border-b">
       <span className="text-sm text-muted-foreground">{label}</span>
       <Badge
-        variant={warning && value ? 'destructive' : value ? 'default' : 'secondary'}
+        variant={isUnknown ? 'outline' : (warning && value === true ? 'destructive' : value === true ? 'default' : 'secondary')}
       >
-        {value ? 'Sim' : 'Não'}
+        {displayText}
       </Badge>
     </div>
   );

@@ -1,6 +1,19 @@
-# ImagoAnamnese
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Sobre o Projeto
 
 Sistema de anamnese clínica para exames de imagem (Ressonância Magnética, Tomografia, Mamografia e Densitometria).
+
+## Comandos
+
+```bash
+npm run dev      # Servidor de desenvolvimento
+npm run build    # Build de produção
+npm run lint     # ESLint
+npm run preview  # Preview do build
+```
 
 ## Stack
 
@@ -11,62 +24,69 @@ Sistema de anamnese clínica para exames de imagem (Ressonância Magnética, Tom
 - **Roteamento**: React Router DOM
 - **PDF**: jsPDF
 
-## Estrutura de Pastas
+## Arquitetura
 
-```
-src/
-├── components/       # Componentes reutilizáveis
-│   ├── admin/        # Componentes do painel admin
-│   ├── tecnico/      # Componentes do painel técnico
-│   └── ui/           # Componentes shadcn/ui
-├── contexts/         # React Contexts (Auth)
-├── hooks/            # Custom hooks
-├── integrations/     # Configurações Supabase
-│   └── supabase/
-│       ├── adminClient.ts    # Cliente Supabase para admin
-│       └── tecnicoClient.ts  # Cliente Supabase para técnico
-├── lib/              # Utilitários e helpers
-├── pages/            # Páginas da aplicação
-│   ├── admin/        # Páginas do painel admin
-│   ├── tecnico/      # Páginas do painel técnico
-│   └── paciente/     # Páginas do questionário do paciente
-└── types/            # Definições TypeScript
-```
+### Três Módulos Independentes
 
-## Comandos
+O sistema possui três módulos com rotas separadas:
 
-```bash
-npm run dev      # Servidor de desenvolvimento
-npm run build    # Build de produção
-npm run preview  # Preview do build
-```
+1. **Paciente** (`/`) - Questionário público sem autenticação
+2. **Técnico** (`/tecnico/*`) - Painel para técnicos revisarem e finalizarem questionários
+3. **Admin** (`/admin/*`) - Painel para gerenciar técnicos
 
-## Fluxo de Status dos Questionários
+### Autenticação Dual
 
-### Mamografia / Densitometria
+O sistema usa **dois clientes Supabase separados** com sessões independentes para permitir login simultâneo de admin e técnico no mesmo navegador:
+
+- `supabaseAdmin` (sessionStorage: `admin-*`) → `AdminAuthContext`
+- `supabaseTecnico` (sessionStorage: `tecnico-*`) → `AuthContext`
+
+Arquivos relevantes:
+- `src/integrations/supabase/adminClient.ts`
+- `src/integrations/supabase/tecnicoClient.ts`
+- `src/contexts/AdminAuthContext.tsx`
+- `src/contexts/AuthContext.tsx`
+
+### Fluxo de Status dos Questionários
+
+**Mamografia / Densitometria:**
 ```
 paciente_preenchendo → aguardando_operador → finalizado
 ```
 
-### Ressonância Magnética / Tomografia
+**Ressonância Magnética / Tomografia:**
 ```
 paciente_preenchendo → aguardando_assistente → (telecomando?)
                                                  ├─ Sim → finalizado
                                                  └─ Não → aguardando_operador → finalizado
 ```
 
-## Autenticação
+### Geração de PDF
 
-O sistema usa **dois clientes Supabase separados** com sessões independentes:
+O sistema gera PDFs usando jsPDF com arquitetura modular:
 
-- `supabaseAdmin` (sessionStorage: `admin-*`) - Painel administrativo
-- `supabaseTecnico` (sessionStorage: `tecnico-*`) - Painel técnico
+```
+src/lib/pdf/
+├── index.ts                 # Re-exports de todas as funções
+├── core/                    # Utilitários compartilhados
+│   ├── types.ts
+│   ├── constants.ts
+│   ├── layout.ts
+│   ├── builder.ts
+│   └── formatters.ts
+└── exames/                  # Um diretório por tipo de exame
+    ├── mamografia/
+    ├── densitometria/
+    ├── ressonancia/
+    └── tomografia/
+```
 
-### Contexts
-- `AdminAuthContext` - Auth para `/admin/*`
-- `AuthContext` - Auth para `/tecnico/*`
+Cada exame tem:
+- `fields.ts` - Campos específicos do questionário
+- `termo.ts` - Termo de consentimento
+- `index.ts` - Funções `generate{Exame}PDF` e `generateFinal{Exame}PDF`
 
-## Tipos de Usuário
+### Tipos de Usuário
 
 | Tipo | Status | Acesso |
 |------|--------|--------|
@@ -75,6 +95,17 @@ O sistema usa **dois clientes Supabase separados** com sessões independentes:
 | `tecnico` | `ativo` | Painel técnico, revisão de questionários |
 | `tecnico` | `inativo` | Acesso bloqueado |
 
+### Banco de Dados (Supabase)
+
+**Tabelas principais:**
+- `profiles` - Perfis de usuários (admin/técnico)
+- `questionarios` - Questionários de anamnese
+
+**Storage:**
+- `questionarios-pdfs` - PDFs gerados dos questionários
+
+**Tipos:** `src/integrations/supabase/types.ts` contém os tipos gerados + interface manual `RespostasCompletas`
+
 ## Convenções
 
 - Código e comentários em **português**
@@ -82,15 +113,6 @@ O sistema usa **dois clientes Supabase separados** com sessões independentes:
 - Hooks começam com `use`
 - Arquivos de página em `PascalCase.tsx`
 - Utilitários em `camelCase.ts`
-
-## Banco de Dados (Supabase)
-
-### Tabelas principais
-- `profiles` - Perfis de usuários (admin/técnico)
-- `questionarios` - Questionários de anamnese
-
-### Storage
-- `questionarios-pdfs` - PDFs gerados dos questionários
 
 ## Pendências Técnicas
 

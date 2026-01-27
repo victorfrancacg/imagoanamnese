@@ -13,12 +13,17 @@ export interface RespostasCompletas {
     telefone: string;
     dataExame: string;
   };
-  seguranca: Record<string, boolean | string | null>;
-  clinicas: Record<string, any>;
+  seguranca: Record<string, boolean | 'nao_sei' | string | null>;
+  clinicas: Record<string, boolean | 'nao_sei' | string | any>;
   consentimento: {
     aceitaRiscos: boolean;
     aceitaCompartilhamento: boolean;
     assinaturaData?: string;
+    preenchidoPor?: 'paciente' | 'responsavel';
+    nomeResponsavel?: string;
+    assinaturaResponsavel?: string;
+    tcAceitaContraste?: boolean | null;  // TC: autorização contraste iodado
+    rmAceitaContraste?: boolean | null;  // RM: autorização contraste gadolínio
   };
   metadata?: {
     preenchidoEm: string;

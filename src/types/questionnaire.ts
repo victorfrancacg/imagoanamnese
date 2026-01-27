@@ -1,6 +1,9 @@
 export type Sex = 'masculino' | 'feminino';
 export type TipoExame = 'tomografia' | 'ressonancia' | 'densitometria' | 'mamografia';
 
+// Tipo para respostas ternárias (Sim/Não/Não sei)
+export type TernaryResponse = boolean | 'nao_sei' | null;
+
 export interface QuestionnaireData {
   // Dados Pessoais
   nome: string;
@@ -14,43 +17,43 @@ export interface QuestionnaireData {
   dataExame: string;
 
   // Questões de Segurança - Tomografia Computadorizada
-  tcGravida: boolean | null;
-  tcAmamentando: boolean | null;
-  tcUsaMetformina: boolean | null;
-  tcMarcapasso: boolean | null;
-  tcAlergiaContraste: boolean | null;
-  tcCirurgiaRenal: boolean | null;
-  tcDoencaRenal: boolean | null;
-  
+  tcGravida: TernaryResponse;
+  tcAmamentando: TernaryResponse;
+  tcUsaMetformina: TernaryResponse;
+  tcMarcapasso: TernaryResponse;
+  tcAlergiaContraste: TernaryResponse;
+  tcCirurgiaRenal: TernaryResponse;
+  tcDoencaRenal: TernaryResponse;
+
   // Campo genérico de gravidez (para mamografia e densitometria)
-  gravida: boolean | null;
-  
+  gravida: TernaryResponse;
+
   // Questões de Segurança - Ressonância Magnética
-  rmGravida: boolean | null;
-  rmAmamentando: boolean | null;
-  rmImplanteMedicamentoso: boolean | null;
-  rmMarcapasso: boolean | null;
-  rmFragmentoMetalico: boolean | null;
-  rmEletroestimulador: boolean | null;
-  rmClipeAneurisma: boolean | null;
-  rmExpansorTecidual: boolean | null;
-  rmClipeGastrico: boolean | null;
-  rmImplanteCoclear: boolean | null;
-  rmLesaoOlhoMetal: boolean | null;
-  rmTatuagemRecente: boolean | null;
-  rmCirurgiaRenal: boolean | null;
-  rmDoencaRenal: boolean | null;
-  rmAlergiaContraste: boolean | null;
-  
+  rmGravida: TernaryResponse;
+  rmAmamentando: TernaryResponse;
+  rmImplanteMedicamentoso: TernaryResponse;
+  rmMarcapasso: TernaryResponse;
+  rmFragmentoMetalico: TernaryResponse;
+  rmEletroestimulador: TernaryResponse;
+  rmClipeAneurisma: TernaryResponse;
+  rmExpansorTecidual: TernaryResponse;
+  rmClipeGastrico: TernaryResponse;
+  rmImplanteCoclear: TernaryResponse;
+  rmLesaoOlhoMetal: TernaryResponse;
+  rmTatuagemRecente: TernaryResponse;
+  rmCirurgiaRenal: TernaryResponse;
+  rmDoencaRenal: TernaryResponse;
+  rmAlergiaContraste: TernaryResponse;
+
   // Específicas Densitometria (Segurança)
-  exameContrasteRecente: boolean | null;
-  fraturouOsso: boolean | null;
+  exameContrasteRecente: TernaryResponse;
+  fraturouOsso: TernaryResponse;
   fraturouOssoDetalhes?: string;
-  perdeuAltura: boolean | null;
-  perdaOsseaRadiografia: boolean | null;
-  cifoseDorsal: boolean | null;
-  quedas12Meses: boolean | null;
-  parenteOsteoporose: boolean | null;
+  perdeuAltura: TernaryResponse;
+  perdaOsseaRadiografia: TernaryResponse;
+  cifoseDorsal: TernaryResponse;
+  quedas12Meses: TernaryResponse;
+  parenteOsteoporose: TernaryResponse;
   parenteOsteoporoseDetalhes?: string;
 
   // Regiões do exame (para Tomografia e Ressonância)
@@ -61,65 +64,65 @@ export interface QuestionnaireData {
   sintomas: string[];
   sintomasOutros?: string;
   // Específicas Tomografia e Ressonância
-  traumaRegiao: boolean | null;
-  cirurgiaCorpo: boolean | null;
+  traumaRegiao: TernaryResponse;
+  cirurgiaCorpo: TernaryResponse;
   cirurgiaCorpoDetalhes?: string;
-  historicoCancer: boolean | null;
+  historicoCancer: TernaryResponse;
   historicoCancerDetalhes?: string;
   // Específicas Ressonância
-  examesRelacionados: boolean | null;
+  examesRelacionados: TernaryResponse;
   examesRelacionadosDetalhes?: string;
   // Específicas Densitometria (Clínicas)
-  temOsteoporose: boolean | null;
-  doencaTireoide: boolean | null;
+  temOsteoporose: TernaryResponse;
+  doencaTireoide: TernaryResponse;
   doencaTireoideDetalhes?: string;
-  doencaIntestinal: boolean | null;
+  doencaIntestinal: TernaryResponse;
   doencaIntestinalDetalhes?: string;
-  temHiperparatiroidismo: boolean | null;
-  temDoencaPaget: boolean | null;
-  maAbsorcaoCalcio: boolean | null;
-  temOsteomalacia: boolean | null;
-  temSindromeCushing: boolean | null;
-  deficienciaVitaminaD: boolean | null;
-  disfuncaoRenalCronica: boolean | null;
-  usaMedicacaoRegular: boolean | null;
+  temHiperparatiroidismo: TernaryResponse;
+  temDoencaPaget: TernaryResponse;
+  maAbsorcaoCalcio: TernaryResponse;
+  temOsteomalacia: TernaryResponse;
+  temSindromeCushing: TernaryResponse;
+  deficienciaVitaminaD: TernaryResponse;
+  disfuncaoRenalCronica: TernaryResponse;
+  usaMedicacaoRegular: TernaryResponse;
   usaMedicacaoRegularDetalhes?: string;
   // Densitometria - Feminino
-  passouMenopausa: boolean | null;
+  passouMenopausa: TernaryResponse;
   passouMenopausaDetalhes?: string;
-  ciclosIrregulares: boolean | null;
-  teveCancerMamaDensi: boolean | null;
-  fezHisterectomia: boolean | null;
+  ciclosIrregulares: TernaryResponse;
+  teveCancerMamaDensi: TernaryResponse;
+  fezHisterectomia: TernaryResponse;
   fezHisterectomiaDetalhes?: string;
-  retirouOvarios: boolean | null;
+  retirouOvarios: TernaryResponse;
 
   // Perguntas Específicas - Feminino
-  cancerMama: boolean | null;
-  amamentando: boolean | null;
+  cancerMama: TernaryResponse;
+  amamentando: TernaryResponse;
 
   // Perguntas Específicas - Mamografia
-  mamoExameAnterior: boolean | null;
+  mamoExameAnterior: TernaryResponse;
   mamoExameAnteriorDetalhes?: string;
   mamoUltimaMenstruacao: string;
-  mamoMenopausa: boolean | null;
+  mamoMenopausa: TernaryResponse;
   mamoMenopausaDetalhes?: string;
-  mamoUsaHormonios: boolean | null;
-  mamoTemFilhos: boolean | null;
+  mamoUsaHormonios: TernaryResponse;
+  mamoTemFilhos: TernaryResponse;
   mamoTemFilhosDetalhes?: string;
-  mamoProblemaMamas: boolean | null;
+  mamoProblemaMamas: TernaryResponse;
   mamoProblemaMamasDetalhes?: string;
-  mamoCirurgiaMamas: boolean | null;
+  mamoCirurgiaMamas: TernaryResponse;
   mamoCirurgiaMamasDetalhes?: string;
-  mamoUltrassonografia: boolean | null;
+  mamoUltrassonografia: TernaryResponse;
   mamoUltrassonografiaDetalhes?: string;
-  mamoHistoricoFamiliar: boolean | null;
+  mamoHistoricoFamiliar: TernaryResponse;
   mamoHistoricoFamiliarDetalhes?: string;
-  mamoRadioterapia: boolean | null;
+  mamoRadioterapia: TernaryResponse;
   mamoRadioterapiaDetalhes?: string;
 
   // Perguntas Específicas - Masculino
-  problemaProstata: boolean | null;
-  dificuldadeUrinaria: boolean | null;
+  problemaProstata: TernaryResponse;
+  dificuldadeUrinaria: TernaryResponse;
 
   // Termo de Consentimento
   aceitaRiscos: boolean | null;

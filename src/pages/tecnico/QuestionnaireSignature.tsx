@@ -41,6 +41,8 @@ function convertToQuestionnaireData(questionario: Questionario): QuestionnaireDa
     preenchidoPor: respostas.consentimento.preenchidoPor || 'paciente',
     nomeResponsavel: respostas.consentimento.nomeResponsavel,
     assinaturaResponsavel: respostas.consentimento.assinaturaResponsavel,
+    tcAceitaContraste: respostas.consentimento.tcAceitaContraste ?? null,
+    rmAceitaContraste: respostas.consentimento.rmAceitaContraste ?? null,
 
     // Segurança
     ...respostas.seguranca,

@@ -20,8 +20,9 @@ const TIPO_EXAME_LABELS: Record<TipoExame, string> = {
   'mamografia': 'Mamografia',
 };
 
-function formatBoolean(value: boolean | null): string {
+function formatBoolean(value: boolean | 'nao_sei' | null): string {
   if (value === null) return '-';
+  if (value === 'nao_sei') return 'Não sei';
   return value ? 'Sim' : 'Não';
 }
 
