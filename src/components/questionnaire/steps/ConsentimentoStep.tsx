@@ -782,7 +782,7 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
               <div className="border-2 border-dashed border-border rounded-lg p-2 bg-background">
                 <canvas
                   ref={canvasResponsavelRef}
-                  className="w-full h-32 cursor-crosshair touch-none"
+                  className="w-full h-48 sm:h-32 cursor-crosshair touch-none"
                   onMouseDown={startDrawingResponsavel}
                   onMouseMove={drawResponsavel}
                   onMouseUp={stopDrawingResponsavel}
@@ -822,7 +822,7 @@ export function ConsentimentoStep({ data, updateData, onNext, onBack, isSaving =
           <div className="border-2 border-dashed border-border rounded-lg p-2 bg-background">
             <canvas
               ref={canvasRef}
-              className="w-full h-32 cursor-crosshair touch-none"
+              className="w-full h-48 sm:h-32 cursor-crosshair touch-none"
               onMouseDown={startDrawing}
               onMouseMove={draw}
               onMouseUp={stopDrawing}
