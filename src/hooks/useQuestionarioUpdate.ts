@@ -42,6 +42,11 @@ export function useQuestionarioUpdate() {
           aceitaRiscos: data.aceitaRiscos ?? false,
           aceitaCompartilhamento: data.aceitaCompartilhamento ?? false,
           assinaturaData: data.assinaturaData,
+          preenchidoPor: data.preenchidoPor || 'paciente',
+          nomeResponsavel: data.preenchidoPor === 'responsavel' ? data.nomeResponsavel : undefined,
+          assinaturaResponsavel: data.preenchidoPor === 'responsavel' ? data.assinaturaResponsavel : undefined,
+          tcAceitaContraste: data.tcAceitaContraste ?? null,
+          rmAceitaContraste: data.rmAceitaContraste ?? null,
         },
         metadata: {
           editadoEm: new Date().toISOString(),

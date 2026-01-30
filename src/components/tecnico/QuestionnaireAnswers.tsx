@@ -97,7 +97,7 @@ export function QuestionnaireAnswers({ questionario }: QuestionnaireAnswersProps
       {/* Consentimento */}
       <div>
         <h3 className="font-semibold mb-3 text-lg">Consentimento</h3>
-        <ConsentQuestions respostas={respostas.consentimento} />
+        <ConsentQuestions respostas={respostas.consentimento} tipoExame={tipoExame} />
       </div>
     </div>
   );
@@ -247,10 +247,17 @@ function ClinicalQuestions({ tipoExame, respostas, questionario }: any) {
   );
 }
 
-function ConsentQuestions({ respostas }: any) {
+function ConsentQuestions({ respostas, tipoExame }: any) {
+  console.log('[DEBUG ConsentQuestions]', { tipoExame, respostas });
   return (
     <>
       <QuestionItem label="Aceita os riscos do procedimento?" value={respostas.aceitaRiscos} />
+      {tipoExame === 'ressonancia' && (
+        <QuestionItem label="Autoriza uso de contraste (gadolínio)?" value={respostas.rmAceitaContraste} />
+      )}
+      {tipoExame === 'tomografia' && (
+        <QuestionItem label="Autoriza uso de contraste iodado?" value={respostas.tcAceitaContraste} />
+      )}
       <QuestionItem label="Aceita compartilhamento de dados?" value={respostas.aceitaCompartilhamento} />
       <QuestionItem label="Assinatura fornecida?" value={!!respostas.assinaturaData} />
     </>
