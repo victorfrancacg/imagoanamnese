@@ -9,22 +9,38 @@ interface SecurityFieldsProps {
   updateData: (updates: Partial<QuestionnaireData>) => void;
 }
 
-// Componente reutilizável para perguntas Sim/Não
+// Componente reutilizável para perguntas Sim/Não/Não sei
 function YesNoQuestion({
   id,
   label,
   value,
   onChange,
   showWarning = false,
+  showUnknownOption = true,
+  unknownLabel = "Não sei",
   children,
 }: {
   id: string;
   label: string;
-  value: boolean | null;
-  onChange: (value: boolean) => void;
+  value: boolean | 'nao_sei' | null;
+  onChange: (value: boolean | 'nao_sei') => void;
   showWarning?: boolean;
+  showUnknownOption?: boolean;
+  unknownLabel?: string;
   children?: React.ReactNode;
 }) {
+  const getRadioValue = () => {
+    if (value === null) return '';
+    if (value === 'nao_sei') return 'nao_sei';
+    return value ? 'sim' : 'nao';
+  };
+
+  const handleChange = (v: string) => {
+    if (v === 'sim') onChange(true);
+    else if (v === 'nao') onChange(false);
+    else if (v === 'nao_sei') onChange('nao_sei');
+  };
+
   return (
     <div className="space-y-2 animate-fade-in">
       <Label className="text-sm font-medium flex items-center gap-2">
@@ -32,8 +48,8 @@ function YesNoQuestion({
         <span>{label}</span>
       </Label>
       <RadioGroup
-        value={value === null ? '' : value ? 'sim' : 'nao'}
-        onValueChange={(v) => onChange(v === 'sim')}
+        value={getRadioValue()}
+        onValueChange={handleChange}
         className="flex gap-4"
       >
         <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
@@ -44,6 +60,12 @@ function YesNoQuestion({
           <RadioGroupItem value="nao" id={`${id}-nao`} />
           <Label htmlFor={`${id}-nao`} className="cursor-pointer">Não</Label>
         </div>
+        {showUnknownOption && (
+          <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+            <RadioGroupItem value="nao_sei" id={`${id}-nao_sei`} />
+            <Label htmlFor={`${id}-nao_sei`} className="cursor-pointer">{unknownLabel}</Label>
+          </div>
+        )}
       </RadioGroup>
       {children}
     </div>
@@ -169,6 +191,7 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             label="Já fez alguma cirurgia renal? (p. ex. retirada de rim ou transplante renal)"
             value={data.rmCirurgiaRenal}
             onChange={(v) => updateData({ rmCirurgiaRenal: v })}
+            unknownLabel="Não lembro"
           />
 
           <YesNoQuestion
@@ -184,6 +207,7 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             value={data.rmAlergiaContraste}
             onChange={(v) => updateData({ rmAlergiaContraste: v })}
             showWarning
+            unknownLabel="Não lembro"
           />
         </>
       )}
@@ -230,6 +254,7 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             value={data.tcAlergiaContraste}
             onChange={(v) => updateData({ tcAlergiaContraste: v })}
             showWarning
+            unknownLabel="Não lembro"
           />
 
           <YesNoQuestion
@@ -237,6 +262,7 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             label="Já fez alguma cirurgia renal? (p. ex. retirada de rim ou transplante renal)"
             value={data.tcCirurgiaRenal}
             onChange={(v) => updateData({ tcCirurgiaRenal: v })}
+            unknownLabel="Não lembro"
           />
 
           <YesNoQuestion
@@ -284,8 +310,9 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             label="Fraturou algum osso nos últimos cinco anos? Se sim, qual osso e como ocorreu?"
             value={data.fraturouOsso}
             onChange={(v) => updateData({ fraturouOsso: v })}
+            unknownLabel="Não lembro"
           >
-            {data.fraturouOsso && (
+            {data.fraturouOsso === true && (
               <Textarea
                 placeholder="Por favor, descreva qual osso e como ocorreu"
                 value={data.fraturouOssoDetalhes ?? ''}
@@ -329,7 +356,7 @@ export function SecurityFields({ data, updateData }: SecurityFieldsProps) {
             value={data.parenteOsteoporose}
             onChange={(v) => updateData({ parenteOsteoporose: v })}
           >
-            {data.parenteOsteoporose && (
+            {data.parenteOsteoporose === true && (
               <Textarea
                 placeholder="Por favor, informe qual parente"
                 value={data.parenteOsteoporoseDetalhes ?? ''}

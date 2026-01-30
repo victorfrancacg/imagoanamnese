@@ -10,26 +10,42 @@ interface ClinicalFieldsProps {
   updateData: (updates: Partial<QuestionnaireData>) => void;
 }
 
-// Componente reutilizável para perguntas Sim/Não
+// Componente reutilizável para perguntas Sim/Não/Não sei
 function YesNoQuestion({
   id,
   label,
   value,
   onChange,
+  showUnknownOption = true,
+  unknownLabel = "Não sei",
   children,
 }: {
   id: string;
   label: string;
-  value: boolean | null;
-  onChange: (value: boolean) => void;
+  value: boolean | 'nao_sei' | null;
+  onChange: (value: boolean | 'nao_sei') => void;
+  showUnknownOption?: boolean;
+  unknownLabel?: string;
   children?: React.ReactNode;
 }) {
+  const getRadioValue = () => {
+    if (value === null) return '';
+    if (value === 'nao_sei') return 'nao_sei';
+    return value ? 'sim' : 'nao';
+  };
+
+  const handleChange = (v: string) => {
+    if (v === 'sim') onChange(true);
+    else if (v === 'nao') onChange(false);
+    else if (v === 'nao_sei') onChange('nao_sei');
+  };
+
   return (
     <div className="space-y-3 animate-fade-in">
       <Label className="text-base font-medium">{label}</Label>
       <RadioGroup
-        value={value === null ? '' : value ? 'sim' : 'nao'}
-        onValueChange={(value) => onChange(value === 'sim')}
+        value={getRadioValue()}
+        onValueChange={handleChange}
         className="flex gap-4"
       >
         <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
@@ -40,6 +56,12 @@ function YesNoQuestion({
           <RadioGroupItem value="nao" id={`${id}-nao`} />
           <Label htmlFor={`${id}-nao`} className="cursor-pointer">Não</Label>
         </div>
+        {showUnknownOption && (
+          <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer flex-1">
+            <RadioGroupItem value="nao_sei" id={`${id}-nao_sei`} />
+            <Label htmlFor={`${id}-nao_sei`} className="cursor-pointer">{unknownLabel}</Label>
+          </div>
+        )}
       </RadioGroup>
       {children}
     </div>
@@ -135,6 +157,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Sofreu algum trauma na região a ser examinada?"
             value={data.traumaRegiao}
             onChange={(v) => updateData({ traumaRegiao: v })}
+            unknownLabel="Não lembro"
           />
 
           <YesNoQuestion
@@ -142,8 +165,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Já fez alguma cirurgia em qualquer lugar do corpo? Se sim, qual?"
             value={data.cirurgiaCorpo}
             onChange={(v) => updateData({ cirurgiaCorpo: v })}
+            unknownLabel="Não lembro"
           >
-            {data.cirurgiaCorpo && (
+            {data.cirurgiaCorpo === true && (
               <Textarea
                 placeholder="Descreva qual cirurgia"
                 value={data.cirurgiaCorpoDetalhes ?? ''}
@@ -159,7 +183,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.historicoCancer}
             onChange={(v) => updateData({ historicoCancer: v })}
           >
-            {data.historicoCancer && (
+            {data.historicoCancer === true && (
               <Textarea
                 placeholder="Descreva em qual local"
                 value={data.historicoCancerDetalhes ?? ''}
@@ -176,7 +200,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
               value={data.examesRelacionados}
               onChange={(v) => updateData({ examesRelacionados: v })}
             >
-              {data.examesRelacionados && (
+              {data.examesRelacionados === true && (
                 <Textarea
                   placeholder="Descreva quais exames"
                   value={data.examesRelacionadosDetalhes ?? ''}
@@ -224,8 +248,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Já realizou este exame anteriormente? Se sim, quando?"
             value={data.mamoExameAnterior}
             onChange={(v) => updateData({ mamoExameAnterior: v })}
+            unknownLabel="Não lembro"
           >
-            {data.mamoExameAnterior && (
+            {data.mamoExameAnterior === true && (
               <Input
                 type="text"
                 placeholder="Informe quando realizou"
@@ -253,7 +278,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.mamoMenopausa}
             onChange={(v) => updateData({ mamoMenopausa: v })}
           >
-            {data.mamoMenopausa && (
+            {data.mamoMenopausa === true && (
               <Input
                 type="text"
                 placeholder="Informe a idade"
@@ -277,7 +302,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.mamoTemFilhos}
             onChange={(v) => updateData({ mamoTemFilhos: v })}
           >
-            {data.mamoTemFilhos && (
+            {data.mamoTemFilhos === true && (
               <Input
                 type="text"
                 placeholder="Amamentou? Por quanto tempo?"
@@ -294,7 +319,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.mamoProblemaMamas}
             onChange={(v) => updateData({ mamoProblemaMamas: v })}
           >
-            {data.mamoProblemaMamas && (
+            {data.mamoProblemaMamas === true && (
               <Textarea
                 placeholder="Descreva o problema e em qual mama"
                 value={data.mamoProblemaMamasDetalhes ?? ''}
@@ -309,8 +334,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Já realizou alguma cirurgia nas mamas? Se sim, qual?"
             value={data.mamoCirurgiaMamas}
             onChange={(v) => updateData({ mamoCirurgiaMamas: v })}
+            unknownLabel="Não lembro"
           >
-            {data.mamoCirurgiaMamas && (
+            {data.mamoCirurgiaMamas === true && (
               <Textarea
                 placeholder="Descreva qual cirurgia"
                 value={data.mamoCirurgiaMamasDetalhes ?? ''}
@@ -325,8 +351,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Já realizou ultrassonografia de mama? Se sim, quando?"
             value={data.mamoUltrassonografia}
             onChange={(v) => updateData({ mamoUltrassonografia: v })}
+            unknownLabel="Não lembro"
           >
-            {data.mamoUltrassonografia && (
+            {data.mamoUltrassonografia === true && (
               <Input
                 type="text"
                 placeholder="Informe quando realizou"
@@ -343,7 +370,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.mamoHistoricoFamiliar}
             onChange={(v) => updateData({ mamoHistoricoFamiliar: v })}
           >
-            {data.mamoHistoricoFamiliar && (
+            {data.mamoHistoricoFamiliar === true && (
               <Textarea
                 placeholder="Informe quais parentes"
                 value={data.mamoHistoricoFamiliarDetalhes ?? ''}
@@ -358,8 +385,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             label="Já fez radioterapia na mama? Se sim, em que ano?"
             value={data.mamoRadioterapia}
             onChange={(v) => updateData({ mamoRadioterapia: v })}
+            unknownLabel="Não lembro"
           >
-            {data.mamoRadioterapia && (
+            {data.mamoRadioterapia === true && (
               <Input
                 type="text"
                 placeholder="Informe o ano"
@@ -388,7 +416,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.doencaTireoide}
             onChange={(v) => updateData({ doencaTireoide: v })}
           >
-            {data.doencaTireoide && (
+            {data.doencaTireoide === true && (
               <Textarea
                 placeholder="Descreva qual doença"
                 value={data.doencaTireoideDetalhes ?? ''}
@@ -404,7 +432,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.doencaIntestinal}
             onChange={(v) => updateData({ doencaIntestinal: v })}
           >
-            {data.doencaIntestinal && (
+            {data.doencaIntestinal === true && (
               <Textarea
                 placeholder="Descreva qual doença"
                 value={data.doencaIntestinalDetalhes ?? ''}
@@ -469,7 +497,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
             value={data.usaMedicacaoRegular}
             onChange={(v) => updateData({ usaMedicacaoRegular: v })}
           >
-            {data.usaMedicacaoRegular && (
+            {data.usaMedicacaoRegular === true && (
               <Textarea
                 placeholder="Descreva quais medicações"
                 value={data.usaMedicacaoRegularDetalhes ?? ''}
@@ -488,7 +516,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
                 value={data.passouMenopausa}
                 onChange={(v) => updateData({ passouMenopausa: v })}
               >
-                {data.passouMenopausa && (
+                {data.passouMenopausa === true && (
                   <Textarea
                     placeholder="Informe a idade e se os ciclos foram irregulares"
                     value={data.passouMenopausaDetalhes ?? ''}
@@ -517,8 +545,9 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
                 label="Já fez histerectomia (remoção do útero)? Se sim, com qual idade?"
                 value={data.fezHisterectomia}
                 onChange={(v) => updateData({ fezHisterectomia: v })}
+                unknownLabel="Não lembro"
               >
-                {data.fezHisterectomia && (
+                {data.fezHisterectomia === true && (
                   <Textarea
                     placeholder="Informe com qual idade"
                     value={data.fezHisterectomiaDetalhes ?? ''}
@@ -533,6 +562,7 @@ export function ClinicalFields({ data, updateData }: ClinicalFieldsProps) {
                 label="Retirou ovários?"
                 value={data.retirouOvarios}
                 onChange={(v) => updateData({ retirouOvarios: v })}
+                unknownLabel="Não lembro"
               />
             </div>
           )}
